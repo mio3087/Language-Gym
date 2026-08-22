@@ -609,6 +609,38 @@
             </div>
 
 
+            <!-- 学習終了 -->
+
+            <div
+                style="
+                    display:flex;
+                    justify-content:flex-start;
+                    margin:0 0 24px 0;
+                "
+            >
+
+                <button
+                    id="study-exit-button"
+                    type="button"
+                    style="
+                        display:inline-flex;
+                        align-items:center;
+                        gap:8px;
+                        padding:10px 18px;
+                        border:1px solid rgba(139,124,246,.35);
+                        border-radius:12px;
+                        background:rgba(139,124,246,.08);
+                        color:inherit;
+                        font-weight:600;
+                        cursor:pointer;
+                    "
+                >
+                    ← 勉強を終了して戻る
+                </button>
+
+            </div>
+
+
 
             <div id="study-content">
 
@@ -1776,6 +1808,51 @@ document.addEventListener(
                 attributeFilter: ["class", "style"]
             });
         });
+
+        /*
+         * 学習画面の「勉強を終了して戻る」
+         * 学習途中でも安全に学習画面を終了し、
+         * 学習を開始した直前のページへ戻ります。
+         *
+         * 学習中の回答記録や既存の保存処理は触りません。
+         */
+        const studyExitButton = document.getElementById("study-exit-button");
+
+        if (studyExitButton) {
+            studyExitButton.addEventListener("click", event => {
+                event.preventDefault();
+                event.stopPropagation();
+
+                const current = getCurrentPage();
+                if (current !== "study") return;
+
+                /* 学習画面は基本的にデッキから開始するため、
+                   履歴があればそれを優先し、なければデッキへ戻す。 */
+                let target = pageHistory.length
+                    ? pageHistory[pageHistory.length - 1]
+                    : "decks";
+
+                if (!target || target === "study") {
+                    target = "decks";
+                }
+
+                changingByBack = true;
+
+                if (!navigateTo(target)) {
+                    navigateTo("decks");
+                }
+
+                /* 学習ページ自身を履歴に残さない */
+                pageHistory = pageHistory.filter(page => page !== "study");
+
+                setTimeout(() => {
+                    currentPage = getCurrentPage();
+                    changingByBack = false;
+                    updateBackButton();
+                }, 200);
+            });
+        }
+
 
         /*
          * 戻るボタン
