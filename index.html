@@ -26,75 +26,26 @@
         href="style.css"
     >
 
-<style id="language-gym-menu-fix">
 
-#mobile-menu-overlay[hidden] {
-    display: none !important;
+
+<style id="language-gym-back-fix">
+#app-back-button {
+    display: none;
+    align-items: center;
+    gap: 6px;
+    margin: 0 0 18px 0;
+    padding: 10px 16px;
+    border: 1px solid rgba(139,124,246,.25);
+    border-radius: 10px;
+    background: #fff;
+    color: #5f55b5;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,.06);
 }
-
-@media (max-width: 900px) {
-
-    #mobile-menu-button {
-        position: relative;
-        z-index: 10001;
-        cursor: pointer;
-        touch-action: manipulation;
-    }
-
-    .mobile-header {
-        position: relative;
-        z-index: 10001;
-    }
-
-    .sidebar {
-        position: fixed !important;
-        top: 0 !important;
-        left: 0 !important;
-        bottom: 0 !important;
-
-        width: min(82vw, 320px) !important;
-
-        z-index: 10000 !important;
-
-        transform: translateX(-110%) !important;
-        transition: transform 0.25s ease !important;
-
-        visibility: hidden !important;
-        pointer-events: none !important;
-
-        overflow-y: auto !important;
-    }
-
-    .sidebar.mobile-open {
-        transform: translateX(0) !important;
-        visibility: visible !important;
-        pointer-events: auto !important;
-    }
-
-    #mobile-menu-overlay {
-        position: fixed !important;
-        inset: 0 !important;
-        z-index: 9999 !important;
-
-        background: rgba(0, 0, 0, 0.35) !important;
-    }
-
-    #mobile-menu-overlay:not([hidden]) {
-        display: block !important;
-    }
-
-}
-
-@media (min-width: 901px) {
-
-    #mobile-menu-overlay {
-        display: none !important;
-    }
-
-}
-
+#app-back-button:hover { transform: translateY(-1px); }
 </style>
-
 </head>
 
 
@@ -241,16 +192,6 @@
                 </span>
 
             </div>
-
-
-            <button
-                id="mobile-menu-button"
-                class="icon-button"
-                type="button"
-                aria-label="メニュー"
-            >
-                ☰
-            </button>
 
         </header>
 
@@ -1300,10 +1241,6 @@
      MOBILE MENU OVERLAY
 ========================================================== -->
 
-<div
-    id="mobile-menu-overlay"
-    hidden
-></div>
 
 
 
@@ -1754,593 +1691,200 @@ document.addEventListener(
 
 
         /* =================================================
-           MOBILE MENU
-        ================================================== */
-
-        const mobileButton =
-            document.getElementById("mobile-menu-button");
-
-        const sidebar =
-            document.querySelector(".sidebar");
-
-        const overlay =
-            document.getElementById("mobile-menu-overlay");
-
-
-        function openMobileMenu() {
-
-            if (sidebar) {
-                sidebar.classList.add("mobile-open");
-            }
-
-            if (overlay) {
-                overlay.hidden = false;
-            }
-
-            if (mobileButton) {
-                mobileButton.setAttribute(
-                    "aria-expanded",
-                    "true"
-                );
-            }
-
-        }
-
-
-        function closeMobileMenu() {
-
-            if (sidebar) {
-                sidebar.classList.remove("mobile-open");
-            }
-
-            if (overlay) {
-                overlay.hidden = true;
-            }
-
-            if (mobileButton) {
-                mobileButton.setAttribute(
-                    "aria-expanded",
-                    "false"
-                );
-            }
-
-        }
-
-
-        if (mobileButton) {
-
-            mobileButton.setAttribute(
-                "aria-expanded",
-                "false"
-            );
-
-            mobileButton.addEventListener(
-                "click",
-                function (event) {
-
-                    event.preventDefault();
-                    event.stopPropagation();
-
-                    if (
-                        sidebar &&
-                        sidebar.classList.contains("mobile-open")
-                    ) {
-
-                        closeMobileMenu();
-
-                    } else {
-
-                        openMobileMenu();
-
-                    }
-
-                }
-            );
-
-        }
-
-
-        if (overlay) {
-
-            overlay.addEventListener(
-                "click",
-                function () {
-
-                    closeMobileMenu();
-
-                }
-            );
-
-        }
-
-
-        if (sidebar) {
-
-            sidebar.addEventListener(
-                "click",
-                function (event) {
-
-                    const navItem =
-                        event.target.closest(".nav-item");
-
-                    if (navItem) {
-                        closeMobileMenu();
-                    }
-
-                }
-            );
-
-        }
-
-
-        /* =================================================
-           BACK BUTTON
+           PAGE HISTORY / BACK BUTTON
         ================================================== */
 
         const backButton =
-            document.getElementById(
-                "app-back-button"
-            );
+            document.getElementById("app-back-button");
 
+        let pageHistory = [];
+        let lastPage = null;
+        let restoringHistory = false;
 
-        let currentPage =
-            "home";
-
-
-        let previousPage =
-            "home";
-
-
-        let isGoingBack =
-            false;
-
-
-        /*
-         * 現在のページを取得
-         */
 
         function getCurrentPage() {
 
-            const activePage =
-                document.querySelector(
-                    ".page.active-page"
-                );
+            const active = document.querySelector(".page.active-page");
 
-
-            if (
-                activePage &&
-                activePage.id
-            ) {
-
-                return activePage.id.replace(
-                    "page-",
-                    ""
-                );
-
+            if (active && active.id) {
+                return active.id.replace("page-", "");
             }
 
+            const pages = document.querySelectorAll(".page");
 
-            /*
-             * active-pageを使わない
-             * app.jsの状態にも対応
-             */
-
-            const visiblePage =
-                Array.from(
-                    document.querySelectorAll(
-                        ".page"
-                    )
-                ).find(
-                    page => {
-
-                        const style =
-                            window.getComputedStyle(
-                                page
-                            );
-
-                        return (
-                            style.display !==
-                            "none"
-                        );
-
-                    }
-                );
-
-
-            if (
-                visiblePage &&
-                visiblePage.id
-            ) {
-
-                return visiblePage.id.replace(
-                    "page-",
-                    ""
-                );
-
+            for (const page of pages) {
+                if (window.getComputedStyle(page).display !== "none") {
+                    return page.id.replace("page-", "");
+                }
             }
-
 
             return "home";
-
         }
 
-
-
-        /*
-         * 戻るボタンの表示
-         */
 
         function updateBackButton() {
 
-            if (
-                !backButton
-            ) {
+            if (!backButton) return;
 
+            const page = getCurrentPage();
+
+            /* ホームでは戻るボタンを隠す */
+            if (page === "home") {
+                backButton.style.display = "none";
                 return;
-
             }
 
-
-            const page =
-                getCurrentPage();
-
-
-            if (
-                page === "home"
-            ) {
-
-                backButton.style.display =
-                    "none";
-
-            } else {
-
-                backButton.style.display =
-                    "inline-flex";
-
-            }
-
+            backButton.style.display = "inline-flex";
         }
 
 
+        function goToPage(pageName) {
 
-        /*
-         * ページが変更されたか確認
-         */
+            const button = document.querySelector(
+                `[data-page="${pageName}"]`
+            );
 
-        function checkPageChange() {
-
-            const newPage =
-                getCurrentPage();
-
-
-            if (
-                newPage !== currentPage
-            ) {
-
-                if (
-                    !isGoingBack
-                ) {
-
-                    previousPage =
-                        currentPage;
-
-                }
-
-
-                currentPage =
-                    newPage;
-
-                isGoingBack =
-                    false;
-
+            if (button) {
+                button.click();
+                return true;
             }
 
+            return false;
+        }
 
+
+        /*
+         * 画面遷移を記録。
+         * app.jsが実際にページを切り替えた後に取得するため、
+         * app.jsの既存ナビゲーションを壊しません。
+         */
+        function rememberPageChange() {
+
+            const page = getCurrentPage();
+
+            if (!lastPage) {
+                lastPage = page;
+                updateBackButton();
+                return;
+            }
+
+            if (page === lastPage) {
+                updateBackButton();
+                return;
+            }
+
+            if (!restoringHistory) {
+                pageHistory.push(lastPage);
+            }
+
+            lastPage = page;
             updateBackButton();
-
         }
 
 
-
         /*
-         * app.jsによるページ変更を監視
+         * data-pageボタンが押されたら、app.jsの処理後に履歴を確認。
          */
-
-        const pageObserver =
-            new MutationObserver(
-                () => {
-
-                    checkPageChange();
-
-                }
-            );
-
-
-        document
-            .querySelectorAll(".page")
-            .forEach(
-                page => {
-
-                    pageObserver.observe(
-                        page,
-                        {
-                            attributes: true,
-                            attributeFilter: [
-                                "class",
-                                "style"
-                            ]
-                        }
-                    );
-
-                }
-            );
-
-
-
-        /*
-         * data-pageを持つボタンを
-         * 押した時にも履歴を確認
-         */
-
         document.addEventListener(
             "click",
             event => {
 
-                const target =
-                    event.target.closest(
-                        "[data-page]"
-                    );
+                const target = event.target.closest("[data-page]");
 
+                if (!target) return;
 
-                if (
-                    !target
-                ) {
-
-                    return;
-
-                }
-
-
-                /*
-                 * 戻るボタン自身は除外
-                 */
-
-                if (
-                    target === backButton
-                ) {
-
-                    return;
-
-                }
-
-
-                const targetPage =
-                    target.dataset.page;
-
-
-                if (
-                    !targetPage
-                ) {
-
-                    return;
-
-                }
-
-
-                const beforePage =
-                    getCurrentPage();
-
-
-                /*
-                 * app.jsのページ切り替えが
-                 * 完了してから履歴を更新
-                 */
+                if (target === backButton) return;
 
                 setTimeout(
-                    () => {
-
-                        const afterPage =
-                            getCurrentPage();
-
-
-                        if (
-                            afterPage !==
-                            beforePage
-                        ) {
-
-                            previousPage =
-                                beforePage;
-
-                            currentPage =
-                                afterPage;
-
-                        }
-
-
-                        updateBackButton();
-
-                    },
-                    50
+                    rememberPageChange,
+                    80
                 );
-
             },
             true
         );
 
 
+        /*
+         * app.jsが直接ページを切り替えた場合にも対応。
+         */
+        const historyObserver = new MutationObserver(
+            () => {
+                rememberPageChange();
+            }
+        );
+
+        document.querySelectorAll(".page").forEach(page => {
+            historyObserver.observe(
+                page,
+                {
+                    attributes: true,
+                    attributeFilter: ["class", "style"]
+                }
+            );
+        });
+
 
         /*
-         * 戻るボタンを押した時
+         * 戻るボタン
+         *
+         * ★ 学習画面では必ず「デッキ」に戻る
+         * ★ その他の画面では直前のページへ戻る
          */
-
-        if (
-            backButton
-        ) {
+        if (backButton) {
 
             backButton.addEventListener(
                 "click",
-                () => {
+                event => {
 
-                    const targetPage =
-                        previousPage ||
-                        "home";
+                    event.preventDefault();
+                    event.stopPropagation();
 
+                    const current = getCurrentPage();
 
-                    /*
-                     * 同じページならホーム
-                     */
+                    /* 学習中の「戻る」はデッキへ */
+                    if (current === "study") {
 
-                    if (
-                        targetPage ===
-                        currentPage
-                    ) {
+                        restoringHistory = true;
 
-                        isGoingBack =
-                            true;
+                        pageHistory = pageHistory.filter(
+                            page => page !== "study"
+                        );
 
-                        const homeButton =
-                            document.querySelector(
-                                '[data-page="home"]'
-                            );
+                        goToPage("decks");
 
-
-                        if (
-                            homeButton
-                        ) {
-
-                            homeButton.click();
-
-                        }
-
-                        previousPage =
-                            "home";
-
-                        currentPage =
-                            "home";
-
-                        updateBackButton();
+                        setTimeout(() => {
+                            lastPage = getCurrentPage();
+                            restoringHistory = false;
+                            updateBackButton();
+                        }, 120);
 
                         return;
-
                     }
 
+                    let target = pageHistory.pop();
 
-                    /*
-                     * 戻り先を探す
-                     */
+                    /* 履歴がなければホームへ */
+                    if (!target || target === current) {
+                        target = "home";
+                    }
 
-                    const targetButton =
-                        document.querySelector(
-                            `[data-page="${targetPage}"]`
-                        );
+                    restoringHistory = true;
 
+                    goToPage(target);
 
-                    if (
-                        targetButton
-                    ) {
-
-                        isGoingBack =
-                            true;
-
-                        /*
-                         * 今いるページを
-                         * 次の「戻る先」にする
-                         */
-
-                        const pageBeforeBack =
-                            currentPage;
-
-
-                        targetButton.click();
-
-
-                        setTimeout(
-                            () => {
-
-                                currentPage =
-                                    getCurrentPage();
-
-                                previousPage =
-                                    "home";
-
-                                /*
-                                 * さらに戻る場合に
-                                 * できるだけ自然にする
-                                 */
-
-                                if (
-                                    currentPage ===
-                                    "home"
-                                ) {
-
-                                    previousPage =
-                                        "home";
-
-                                } else {
-
-                                    previousPage =
-                                        "home";
-
-                                }
-
-                                updateBackButton();
-
-                            },
-                            100
-                        );
-
-
-                    } else {
-
-                        /*
-                         * 戻り先が見つからない場合
-                         * ホームへ戻る
-                         */
-
-                        isGoingBack =
-                            true;
-
-                        const homeButton =
-                            document.querySelector(
-                                '[data-page="home"]'
-                            );
-
-
-                        if (
-                            homeButton
-                        ) {
-
-                            homeButton.click();
-
-                        }
-
-                        currentPage =
-                            "home";
-
-                        previousPage =
-                            "home";
-
+                    setTimeout(() => {
+                        lastPage = getCurrentPage();
+                        restoringHistory = false;
                         updateBackButton();
-
-                    }
-
+                    }, 120);
                 }
             );
-
         }
 
 
-
-        /*
-         * 初期化
-         */
-
-        currentPage =
-            getCurrentPage();
-
-        previousPage =
-            "home";
-
+        /* 初期化 */
+        lastPage = getCurrentPage();
+        pageHistory = [];
         updateBackButton();
 
 
