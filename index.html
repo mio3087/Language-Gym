@@ -1,0 +1,1836 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="theme-color"
+        content="#8B7CF6"
+    >
+
+    <meta
+        name="description"
+        content="Language Gym - 多言語学習トレーニングアプリ"
+    >
+
+    <title>Language Gym</title>
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+</head>
+
+
+<body>
+
+<div id="app">
+
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
+    <aside class="sidebar">
+
+        <div class="logo">
+
+            <span class="logo-icon">
+                L
+            </span>
+
+            <span>
+                Language Gym
+            </span>
+
+        </div>
+
+
+        <nav class="navigation">
+
+
+            <!-- HOME -->
+
+            <button
+                class="nav-item active"
+                data-page="home"
+                type="button"
+            >
+                <span>ホーム</span>
+            </button>
+
+
+            <!-- DECKS -->
+
+            <button
+                class="nav-item"
+                data-page="decks"
+                type="button"
+            >
+                <span>デッキ</span>
+            </button>
+
+
+            <!-- STUDY -->
+
+            <button
+                class="nav-item"
+                data-page="study"
+                type="button"
+            >
+                <span>学習</span>
+            </button>
+
+
+            <!-- PROGRESS -->
+
+            <button
+                class="nav-item"
+                data-page="progress"
+                type="button"
+            >
+                <span>学習記録</span>
+            </button>
+
+
+            <!-- IMPORT -->
+
+            <button
+                class="nav-item"
+                data-page="import"
+                type="button"
+            >
+                <span>教材を追加</span>
+            </button>
+
+
+            <!-- DATA SHARE -->
+
+            <button
+                class="nav-item"
+                data-page="data-share"
+                type="button"
+            >
+                <span>データ共有</span>
+            </button>
+
+        </nav>
+
+
+        <!-- SIDEBAR BOTTOM -->
+
+        <div class="sidebar-bottom">
+
+            <button
+                class="nav-item"
+                data-page="settings"
+                type="button"
+            >
+                <span>設定</span>
+            </button>
+
+        </div>
+
+    </aside>
+
+
+
+    <!-- =====================================================
+         MAIN CONTENT
+    ====================================================== -->
+
+    <main class="main-content">
+
+
+        <!-- =================================================
+             MOBILE HEADER
+        ================================================== -->
+
+        <header class="mobile-header">
+
+            <div class="logo">
+
+                <span class="logo-icon">
+                    L
+                </span>
+
+                <span>
+                    Language Gym
+                </span>
+
+            </div>
+
+
+            <button
+                id="mobile-menu-button"
+                class="icon-button"
+                type="button"
+                aria-label="メニュー"
+            >
+                ☰
+            </button>
+
+        </header>
+
+
+
+        <!-- =================================================
+             HOME
+        ================================================== -->
+
+        <section
+            id="page-home"
+            class="page active-page"
+        >
+
+
+            <div class="page-header">
+
+                <div>
+
+                    <p class="eyebrow">
+                        LANGUAGE TRAINING
+                    </p>
+
+                    <h1>
+                        今日もトレーニングしよう
+                    </h1>
+
+                    <p class="page-description">
+                        少しずつ、確実に言語能力を鍛えていきましょう。
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- DAILY MESSAGE -->
+
+            <div
+                id="daily-message"
+                class="daily-message"
+            ></div>
+
+
+            <!-- TODAY STATS -->
+
+            <div class="stats-grid">
+
+
+                <div class="stat-card">
+
+                    <div class="stat-icon">
+                        Time
+                    </div>
+
+                    <div>
+
+                        <span class="stat-label">
+                            今日の学習時間
+                        </span>
+
+                        <strong id="today-time">
+                            0分
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+
+                <div class="stat-card">
+
+                    <div class="stat-icon">
+                        Answers
+                    </div>
+
+                    <div>
+
+                        <span class="stat-label">
+                            今日の回答数
+                        </span>
+
+                        <strong id="today-answers">
+                            0
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+
+                <div class="stat-card">
+
+                    <div class="stat-icon">
+                        Accuracy
+                    </div>
+
+                    <div>
+
+                        <span class="stat-label">
+                            今日の正答率
+                        </span>
+
+                        <strong id="today-accuracy">
+                            0%
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+
+                <div class="stat-card">
+
+                    <div class="stat-icon">
+                        Decks
+                    </div>
+
+                    <div>
+
+                        <span class="stat-label">
+                            デッキ数
+                        </span>
+
+                        <strong id="deck-count">
+                            0
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- TRAINING -->
+
+            <div class="section-header">
+
+                <div>
+
+                    <h2>
+                        トレーニング
+                    </h2>
+
+                    <p>
+                        鍛えたい技能を選択してください。
+                    </p>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="training-grid">
+
+
+                <button
+                    class="training-card"
+                    data-training="vocabulary"
+                    data-page="decks"
+                    type="button"
+                >
+
+                    <span class="training-title">
+                        Vocabulary
+                    </span>
+
+                    <span class="training-description">
+                        単語・表現
+                    </span>
+
+                </button>
+
+
+
+                <button
+                    class="training-card"
+                    data-training="reading"
+                    data-page="decks"
+                    type="button"
+                >
+
+                    <span class="training-title">
+                        Reading
+                    </span>
+
+                    <span class="training-description">
+                        読解
+                    </span>
+
+                </button>
+
+
+
+                <button
+                    class="training-card"
+                    data-training="listening"
+                    data-page="decks"
+                    type="button"
+                >
+
+                    <span class="training-title">
+                        Listening
+                    </span>
+
+                    <span class="training-description">
+                        聴解
+                    </span>
+
+                </button>
+
+
+
+                <button
+                    class="training-card"
+                    data-training="writing"
+                    data-page="decks"
+                    type="button"
+                >
+
+                    <span class="training-title">
+                        Writing
+                    </span>
+
+                    <span class="training-description">
+                        作文
+                    </span>
+
+                </button>
+
+
+
+                <button
+                    class="training-card"
+                    data-training="speaking"
+                    data-page="decks"
+                    type="button"
+                >
+
+                    <span class="training-title">
+                        Speaking
+                    </span>
+
+                    <span class="training-description">
+                        会話
+                    </span>
+
+                </button>
+
+
+            </div>
+
+
+
+            <!-- RECENT LEARNING -->
+
+            <div class="section-header">
+
+                <div>
+
+                    <h2>
+                        最近の学習
+                    </h2>
+
+                </div>
+
+            </div>
+
+
+            <div
+                id="recent-learning"
+                class="empty-state"
+            >
+
+                <div class="empty-icon">
+                    —
+                </div>
+
+                <h3>
+                    まだ学習記録がありません
+                </h3>
+
+                <p>
+                    最初のトレーニングを始めてみましょう。
+                </p>
+
+                <button
+                    class="primary-button"
+                    data-page="decks"
+                    type="button"
+                >
+                    デッキを見る
+                </button>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             DECKS
+        ================================================== -->
+
+        <section
+            id="page-decks"
+            class="page"
+        >
+
+
+            <div class="page-header">
+
+                <div>
+
+                    <p class="eyebrow">
+                        YOUR MATERIALS
+                    </p>
+
+                    <h1>
+                        デッキ
+                    </h1>
+
+                    <p class="page-description">
+                        学習する教材を管理します。
+                    </p>
+
+                </div>
+
+
+                <button
+                    class="primary-button"
+                    data-page="import"
+                    type="button"
+                >
+                    ＋ 教材を追加
+                </button>
+
+            </div>
+
+
+
+            <div
+                id="deck-list"
+                class="deck-list"
+            >
+
+                <div class="empty-state">
+
+                    <div class="empty-icon">
+                        📚
+                    </div>
+
+                    <h3>
+                        デッキがありません
+                    </h3>
+
+                    <p>
+                        TXT・CSV・PDFなどの教材を追加して、
+                        最初のデッキを作りましょう。
+                    </p>
+
+                    <button
+                        class="primary-button"
+                        data-page="import"
+                        type="button"
+                    >
+                        教材を追加する
+                    </button>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             STUDY
+        ================================================== -->
+
+        <section
+            id="page-study"
+            class="page"
+        >
+
+
+            <div class="page-header">
+
+                <div>
+
+                    <p class="eyebrow">
+                        TRAINING MODE
+                    </p>
+
+                    <h1>
+                        学習
+                    </h1>
+
+                    <p
+                        id="study-description"
+                        class="page-description"
+                    >
+                        デッキを選択して学習を開始してください。
+                    </p>
+
+                </div>
+
+            </div>
+
+
+
+            <div id="study-content">
+
+                <div class="empty-state">
+
+                    <div class="empty-icon">
+                        📖
+                    </div>
+
+                    <h3>
+                        トレーニングを開始しましょう
+                    </h3>
+
+                    <p>
+                        デッキから学習する教材を選択してください。
+                    </p>
+
+                    <button
+                        class="primary-button"
+                        data-page="decks"
+                        type="button"
+                    >
+                        デッキを選択
+                    </button>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             PROGRESS
+        ================================================== -->
+
+        <section
+            id="page-progress"
+            class="page"
+        >
+
+
+            <div class="page-header">
+
+                <div>
+
+                    <p class="eyebrow">
+                        YOUR PROGRESS
+                    </p>
+
+                    <h1>
+                        学習記録
+                    </h1>
+
+                    <p class="page-description">
+                        トレーニングの成果を確認できます。
+                    </p>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- PROGRESS OVERVIEW -->
+
+            <div class="progress-overview">
+
+
+                <div class="progress-card">
+
+                    <span>
+                        累計学習時間
+                    </span>
+
+                    <strong id="total-time">
+                        0時間
+                    </strong>
+
+                </div>
+
+
+
+                <div class="progress-card">
+
+                    <span>
+                        累計回答数
+                    </span>
+
+                    <strong id="total-answers">
+                        0
+                    </strong>
+
+                </div>
+
+
+
+                <div class="progress-card">
+
+                    <span>
+                        累計正答率
+                    </span>
+
+                    <strong id="total-accuracy">
+                        0%
+                    </strong>
+
+                </div>
+
+
+
+                <div class="progress-card">
+
+                    <span>
+                        不正解数
+                    </span>
+
+                    <strong id="total-wrong">
+                        0
+                    </strong>
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- DYNAMIC PROGRESS -->
+
+            <div class="section-header">
+
+                <h2>
+                    学習記録
+                </h2>
+
+            </div>
+
+
+            <div id="progress-content"></div>
+
+
+
+            <!-- DECK PROGRESS -->
+
+            <div
+                id="deck-progress"
+                style="display:none;"
+            ></div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             IMPORT
+        ================================================== -->
+
+        <section
+            id="page-import"
+            class="page"
+        >
+
+
+            <div class="page-header">
+
+                <div>
+
+                    <p class="eyebrow">
+                        IMPORT MATERIAL
+                    </p>
+
+                    <h1>
+                        教材を追加
+                    </h1>
+
+                    <p class="page-description">
+                        教材をLanguage Gymに取り込みます。
+                    </p>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="import-card">
+
+
+                <div class="import-icon">
+                    +
+                </div>
+
+
+                <h2>
+                    教材をインポート
+                </h2>
+
+
+                <p>
+                    TXT・CSV・PDFなどの教材を
+                    デッキとして利用できます。
+                </p>
+
+
+
+                <!-- FILE -->
+
+                <label
+                    for="file-input"
+                    class="file-button"
+                >
+                    📂 ファイルを選択
+                </label>
+
+
+                <input
+                    id="file-input"
+                    type="file"
+                    accept=".txt,.csv,.pdf,text/plain,text/csv,application/pdf"
+                    multiple
+                    hidden
+                >
+
+
+                <p id="selected-file">
+                    ファイルが選択されていません
+                </p>
+
+
+
+                <!-- LANGUAGE -->
+
+                <div class="import-language">
+
+
+                    <label
+                        for="import-language-select"
+                    >
+                        この教材の言語
+                    </label>
+
+
+                    <select
+                        id="import-language-select"
+                    >
+
+                        <option value="zh">
+                            🇨🇳 中文
+                        </option>
+
+                        <option value="en">
+                            🇬🇧 English
+                        </option>
+
+                        <option value="de">
+                            🇩🇪 Deutsch
+                        </option>
+
+                        <option value="es">
+                            🇪🇸 Español
+                        </option>
+
+                        <option value="ja">
+                            🇯🇵 日本語
+                        </option>
+
+                        <option value="fr">
+                            🇫🇷 Français
+                        </option>
+
+                        <option value="it">
+                            🇮🇹 Italiano
+                        </option>
+
+                        <option value="ko">
+                            🇰🇷 한국어
+                        </option>
+
+                        <option value="other">
+                            🌏 Other
+                        </option>
+
+                    </select>
+
+
+                    <p class="setting-hint">
+                        この言語設定はデッキごとに保存されます。
+                    </p>
+
+                </div>
+
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             DATA SHARE
+        ================================================== -->
+
+        <section
+            id="page-data-share"
+            class="page"
+        >
+
+
+            <div class="page-header">
+
+                <div>
+
+                    <p class="eyebrow">
+                        DATA MANAGEMENT
+                    </p>
+
+                    <h1>
+                        データ共有
+                    </h1>
+
+                    <p class="page-description">
+                        Language Gymの学習データを
+                        別の端末へ移動・共有できます。
+                    </p>
+
+                </div>
+
+            </div>
+
+
+
+            <div
+                id="data-share-content"
+            >
+
+                <!-- app.jsで生成 -->
+
+            </div>
+
+
+        </section>
+
+
+
+        <!-- =================================================
+             SETTINGS
+        ================================================== -->
+
+        <section
+            id="page-settings"
+            class="page"
+        >
+
+
+            <div class="page-header">
+
+                <div>
+
+                    <p class="eyebrow">
+                        SETTINGS
+                    </p>
+
+                    <h1>
+                        設定
+                    </h1>
+
+                    <p class="page-description">
+                        Language Gymをカスタマイズします。
+                    </p>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- =================================================
+                 THEME COLOR
+            ================================================== -->
+
+            <div class="settings-card">
+
+
+                <h2>
+                    🎨 テーマカラー
+                </h2>
+
+
+                <p>
+                    好きなカラーを選択してください。
+                </p>
+
+
+                <div
+                    id="theme-colors"
+                    class="theme-colors"
+                ></div>
+
+
+            </div>
+
+
+
+            <!-- =================================================
+                 DEFAULT LANGUAGE
+            ================================================== -->
+
+            <div class="settings-card">
+
+
+                <h2>
+                    🌏 アプリのデフォルト言語
+                </h2>
+
+
+                <p>
+                    新しい教材を追加するときの
+                    初期設定として使用します。
+                </p>
+
+
+
+                <div class="language-selector">
+
+
+                    <label
+                        for="language-select"
+                    >
+                        デフォルト言語
+                    </label>
+
+
+                    <select
+                        id="language-select"
+                    >
+
+                        <option value="zh">
+                            🇨🇳 中文
+                        </option>
+
+                        <option value="en">
+                            🇬🇧 English
+                        </option>
+
+                        <option value="de">
+                            🇩🇪 Deutsch
+                        </option>
+
+                        <option value="es">
+                            🇪🇸 Español
+                        </option>
+
+                        <option value="ja">
+                            🇯🇵 日本語
+                        </option>
+
+                        <option value="fr">
+                            🇫🇷 Français
+                        </option>
+
+                        <option value="it">
+                            🇮🇹 Italiano
+                        </option>
+
+                        <option value="ko">
+                            🇰🇷 한국어
+                        </option>
+
+                        <option value="other">
+                            🌏 Other
+                        </option>
+
+                    </select>
+
+
+                    <p class="setting-hint">
+                        教材ごとの言語設定とは別に保存されます。
+                    </p>
+
+
+                </div>
+
+            </div>
+
+
+
+            <!-- =================================================
+                 AUTO VOICE
+            ================================================== -->
+
+            <div class="settings-card">
+
+
+                <h2>
+                    🔊 自動音声
+                </h2>
+
+
+                <p>
+                    学習中に教材を自動で読み上げます。
+                </p>
+
+
+
+                <label
+                    class="setting-toggle"
+                >
+
+                    <input
+                        id="auto-voice"
+                        type="checkbox"
+                    >
+
+
+                    <span>
+                        学習開始時に自動読み上げ
+                    </span>
+
+                </label>
+
+
+                <p class="setting-hint">
+                    ブラウザの音声合成機能を使用します。
+                </p>
+
+
+            </div>
+
+
+
+            <!-- =================================================
+                 VOICE RATE
+            ================================================== -->
+
+            <div class="settings-card">
+
+
+                <h2>
+                    🎙 音声速度
+                </h2>
+
+
+                <p>
+                    自動読み上げの速度を設定します。
+                </p>
+
+
+                <div
+                    style="
+                        display:flex;
+                        align-items:center;
+                        gap:16px;
+                        flex-wrap:wrap;
+                    "
+                >
+
+                    <input
+                        id="voice-rate"
+                        type="range"
+                        min="0.5"
+                        max="2"
+                        step="0.1"
+                        value="1"
+                    >
+
+
+                    <span
+                        id="voice-rate-value"
+                    >
+                        1.0
+                    </span>
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- =================================================
+                 VOICE PITCH
+            ================================================== -->
+
+            <div class="settings-card">
+
+
+                <h2>
+                    🎵 音声の高さ
+                </h2>
+
+
+                <p>
+                    自動読み上げの声の高さを設定します。
+                </p>
+
+
+                <div
+                    style="
+                        display:flex;
+                        align-items:center;
+                        gap:16px;
+                        flex-wrap:wrap;
+                    "
+                >
+
+                    <input
+                        id="voice-pitch"
+                        type="range"
+                        min="0.5"
+                        max="2"
+                        step="0.1"
+                        value="1"
+                    >
+
+
+                    <span
+                        id="voice-pitch-value"
+                    >
+                        1.0
+                    </span>
+
+                </div>
+
+
+            </div>
+
+
+        </section>
+
+
+    </main>
+
+</div>
+
+
+
+<!-- =========================================================
+     MOBILE MENU OVERLAY
+========================================================== -->
+
+<div
+    id="mobile-menu-overlay"
+    hidden
+></div>
+
+
+
+<!-- =========================================================
+     PDF.JS
+========================================================== -->
+
+<script
+    src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"
+></script>
+
+
+<script>
+
+    /*
+     * PDF.js worker
+     */
+
+    if (
+        typeof pdfjsLib !== "undefined"
+    ) {
+
+        pdfjsLib.GlobalWorkerOptions.workerSrc =
+            "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+
+    }
+
+</script>
+
+
+
+<!-- =========================================================
+     APPLICATION
+========================================================== -->
+
+<script src="app.js"></script>
+
+
+
+<!-- =========================================================
+     SMALL UI ENHANCEMENTS
+========================================================== -->
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    () => {
+
+
+        /* =================================================
+           DEFAULT LANGUAGE
+        ================================================== */
+
+        const languageSelect =
+            document.getElementById(
+                "language-select"
+            );
+
+        const importLanguageSelect =
+            document.getElementById(
+                "import-language-select"
+            );
+
+
+        /*
+         * app.js側のデータが存在する場合、
+         * デフォルト言語を反映
+         */
+
+        try {
+
+            if (
+                typeof appData !== "undefined" &&
+                appData.settings
+            ) {
+
+                const language =
+                    appData.settings.learningLanguage ||
+                    "zh";
+
+                if (
+                    languageSelect
+                ) {
+
+                    languageSelect.value =
+                        language;
+
+                }
+
+                if (
+                    importLanguageSelect
+                ) {
+
+                    importLanguageSelect.value =
+                        language;
+
+                }
+
+            }
+
+        } catch (error) {
+
+            console.warn(
+                "言語設定の読み込みに失敗しました。",
+                error
+            );
+
+        }
+
+
+
+        /* =================================================
+           DEFAULT LANGUAGE CHANGE
+        ================================================== */
+
+        if (
+            languageSelect
+        ) {
+
+            languageSelect.addEventListener(
+                "change",
+                () => {
+
+                    try {
+
+                        if (
+                            typeof appData !==
+                            "undefined"
+                        ) {
+
+                            appData.settings =
+                                appData.settings ||
+                                {};
+
+                            appData.settings
+                                .learningLanguage =
+                                languageSelect.value;
+
+                            if (
+                                importLanguageSelect
+                            ) {
+
+                                importLanguageSelect.value =
+                                    languageSelect.value;
+
+                            }
+
+                            if (
+                                typeof saveData ===
+                                "function"
+                            ) {
+
+                                saveData();
+
+                            }
+
+                        }
+
+                    } catch (error) {
+
+                        console.error(
+                            "言語設定保存エラー:",
+                            error
+                        );
+
+                    }
+
+                }
+            );
+
+        }
+
+
+
+        /* =================================================
+           AUTO VOICE
+        ================================================== */
+
+        const autoVoice =
+            document.getElementById(
+                "auto-voice"
+            );
+
+
+        if (
+            autoVoice
+        ) {
+
+            try {
+
+                if (
+                    typeof appData !==
+                    "undefined"
+                ) {
+
+                    autoVoice.checked =
+                        Boolean(
+                            appData.settings
+                                ?.autoVoice
+                        );
+
+                }
+
+            } catch (error) {
+
+                console.warn(
+                    "音声設定読み込みエラー:",
+                    error
+                );
+
+            }
+
+
+            autoVoice.addEventListener(
+                "change",
+                () => {
+
+                    try {
+
+                        if (
+                            typeof appData !==
+                            "undefined"
+                        ) {
+
+                            appData.settings =
+                                appData.settings ||
+                                {};
+
+                            appData.settings
+                                .autoVoice =
+                                autoVoice.checked;
+
+                            if (
+                                typeof saveData ===
+                                "function"
+                            ) {
+
+                                saveData();
+
+                            }
+
+                        }
+
+                    } catch (error) {
+
+                        console.error(
+                            "自動音声設定保存エラー:",
+                            error
+                        );
+
+                    }
+
+                }
+            );
+
+        }
+
+
+
+        /* =================================================
+           VOICE RATE
+        ================================================== */
+
+        const voiceRate =
+            document.getElementById(
+                "voice-rate"
+            );
+
+        const voiceRateValue =
+            document.getElementById(
+                "voice-rate-value"
+            );
+
+
+        if (
+            voiceRate
+        ) {
+
+            try {
+
+                const savedRate =
+                    Number(
+                        appData
+                            ?.settings
+                            ?.voiceRate
+                    ) || 1;
+
+                voiceRate.value =
+                    savedRate;
+
+                if (
+                    voiceRateValue
+                ) {
+
+                    voiceRateValue.textContent =
+                        Number(
+                            savedRate
+                        ).toFixed(1);
+
+                }
+
+            } catch (error) {}
+
+
+
+            voiceRate.addEventListener(
+                "input",
+                () => {
+
+                    const value =
+                        Number(
+                            voiceRate.value
+                        );
+
+
+                    if (
+                        voiceRateValue
+                    ) {
+
+                        voiceRateValue.textContent =
+                            value.toFixed(1);
+
+                    }
+
+
+                    try {
+
+                        appData.settings =
+                            appData.settings ||
+                            {};
+
+                        appData.settings.voiceRate =
+                            value;
+
+                        if (
+                            typeof saveData ===
+                            "function"
+                        ) {
+
+                            saveData();
+
+                        }
+
+                    } catch (error) {
+
+                        console.error(
+                            "音声速度保存エラー:",
+                            error
+                        );
+
+                    }
+
+                }
+            );
+
+        }
+
+
+
+        /* =================================================
+           VOICE PITCH
+        ================================================== */
+
+        const voicePitch =
+            document.getElementById(
+                "voice-pitch"
+            );
+
+        const voicePitchValue =
+            document.getElementById(
+                "voice-pitch-value"
+            );
+
+
+        if (
+            voicePitch
+        ) {
+
+            try {
+
+                const savedPitch =
+                    Number(
+                        appData
+                            ?.settings
+                            ?.voicePitch
+                    ) || 1;
+
+                voicePitch.value =
+                    savedPitch;
+
+                if (
+                    voicePitchValue
+                ) {
+
+                    voicePitchValue.textContent =
+                        Number(
+                            savedPitch
+                        ).toFixed(1);
+
+                }
+
+            } catch (error) {}
+
+
+
+            voicePitch.addEventListener(
+                "input",
+                () => {
+
+                    const value =
+                        Number(
+                            voicePitch.value
+                        );
+
+
+                    if (
+                        voicePitchValue
+                    ) {
+
+                        voicePitchValue.textContent =
+                            value.toFixed(1);
+
+                    }
+
+
+                    try {
+
+                        appData.settings =
+                            appData.settings ||
+                            {};
+
+                        appData.settings.voicePitch =
+                            value;
+
+                        if (
+                            typeof saveData ===
+                            "function"
+                        ) {
+
+                            saveData();
+
+                        }
+
+                    } catch (error) {
+
+                        console.error(
+                            "音声高さ保存エラー:",
+                            error
+                        );
+
+                    }
+
+                }
+            );
+
+        }
+
+
+
+        /* =================================================
+           MOBILE MENU
+        ================================================== */
+
+        const mobileButton =
+            document.getElementById(
+                "mobile-menu-button"
+            );
+
+        const sidebar =
+            document.querySelector(
+                ".sidebar"
+            );
+
+        const overlay =
+            document.getElementById(
+                "mobile-menu-overlay"
+            );
+
+
+        function closeMobileMenu() {
+
+            if (
+                sidebar
+            ) {
+
+                sidebar.classList.remove(
+                    "mobile-open"
+                );
+
+            }
+
+            if (
+                overlay
+            ) {
+
+                overlay.hidden =
+                    true;
+
+            }
+
+        }
+
+
+        function openMobileMenu() {
+
+            if (
+                sidebar
+            ) {
+
+                sidebar.classList.add(
+                    "mobile-open"
+                );
+
+            }
+
+            if (
+                overlay
+            ) {
+
+                overlay.hidden =
+                    false;
+
+            }
+
+        }
+
+
+        if (
+            mobileButton
+        ) {
+
+            mobileButton.addEventListener(
+                "click",
+                () => {
+
+                    if (
+                        sidebar?.classList.contains(
+                            "mobile-open"
+                        )
+                    ) {
+
+                        closeMobileMenu();
+
+                    } else {
+
+                        openMobileMenu();
+
+                    }
+
+                }
+            );
+
+        }
+
+
+        if (
+            overlay
+        ) {
+
+            overlay.addEventListener(
+                "click",
+                closeMobileMenu
+            );
+
+        }
+
+
+        document.addEventListener(
+            "click",
+            event => {
+
+                if (
+                    event.target.closest(
+                        ".nav-item"
+                    )
+                ) {
+
+                    closeMobileMenu();
+
+                }
+
+            }
+        );
+
+
+    }
+
+);
+
+</script>
+
+
+</body>
+
+</html>
