@@ -30,7 +30,7 @@
 
 <style id="language-gym-back-fix">
 #app-back-button {
-    display: none;
+    display: none !important;
     align-items: center;
     gap: 6px;
     margin: 0 0 18px 0;
@@ -1691,202 +1691,133 @@ document.addEventListener(
 
 
         /* =================================================
-           PAGE HISTORY / BACK BUTTON
+           PAGE HISTORY / BACK BUTTON - FINAL
         ================================================== */
 
-        const backButton =
-            document.getElementById("app-back-button");
-
+        const backButton = document.getElementById("app-back-button");
         let pageHistory = [];
-        let lastPage = null;
-        let restoringHistory = false;
-
+        let currentPage = getCurrentPage();
+        let changingByBack = false;
 
         function getCurrentPage() {
-
             const active = document.querySelector(".page.active-page");
-
-            if (active && active.id) {
-                return active.id.replace("page-", "");
-            }
+            if (active && active.id) return active.id.replace("page-", "");
 
             const pages = document.querySelectorAll(".page");
-
             for (const page of pages) {
-                if (window.getComputedStyle(page).display !== "none") {
+                if (getComputedStyle(page).display !== "none") {
                     return page.id.replace("page-", "");
                 }
             }
-
             return "home";
         }
 
-
         function updateBackButton() {
-
             if (!backButton) return;
-
             const page = getCurrentPage();
-
-            /* ホームでは戻るボタンを隠す */
-            if (page === "home") {
-                backButton.style.display = "none";
-                return;
-            }
-
-            backButton.style.display = "inline-flex";
-        }
-
-
-        function goToPage(pageName) {
-
-            const button = document.querySelector(
-                `[data-page="${pageName}"]`
+            backButton.style.setProperty(
+                "display",
+                page === "home" ? "none" : "inline-flex",
+                "important"
             );
-
-            if (button) {
-                button.click();
-                return true;
-            }
-
-            return false;
         }
 
+        function findPageButton(pageName) {
+            return document.querySelector(
+                `[data-page="${CSS.escape(pageName)}"]`
+            );
+        }
 
-        /*
-         * 画面遷移を記録。
-         * app.jsが実際にページを切り替えた後に取得するため、
-         * app.jsの既存ナビゲーションを壊しません。
-         */
-        function rememberPageChange() {
+        function navigateTo(pageName) {
+            const button = findPageButton(pageName);
+            if (!button) return false;
+            button.click();
+            return true;
+        }
 
-            const page = getCurrentPage();
-
-            if (!lastPage) {
-                lastPage = page;
+        function recordNavigation() {
+            const next = getCurrentPage();
+            if (!next || next === currentPage) {
                 updateBackButton();
                 return;
             }
 
-            if (page === lastPage) {
-                updateBackButton();
-                return;
+            if (!changingByBack) {
+                /* 同じページが連続するのを防止 */
+                if (pageHistory[pageHistory.length - 1] !== currentPage) {
+                    pageHistory.push(currentPage);
+                }
             }
 
-            if (!restoringHistory) {
-                pageHistory.push(lastPage);
-            }
-
-            lastPage = page;
+            currentPage = next;
             updateBackButton();
         }
 
-
         /*
-         * data-pageボタンが押されたら、app.jsの処理後に履歴を確認。
+         * すべての data-page 遷移を監視。
+         * app.jsの既存処理を先に動かし、その後で履歴を記録します。
          */
-        document.addEventListener(
-            "click",
-            event => {
+        document.addEventListener("click", event => {
+            const target = event.target.closest("[data-page]");
+            if (!target || target === backButton) return;
 
-                const target = event.target.closest("[data-page]");
+            setTimeout(recordNavigation, 30);
+            setTimeout(recordNavigation, 150);
+        }, true);
 
-                if (!target) return;
-
-                if (target === backButton) return;
-
-                setTimeout(
-                    rememberPageChange,
-                    80
-                );
-            },
-            true
-        );
-
-
-        /*
-         * app.jsが直接ページを切り替えた場合にも対応。
-         */
-        const historyObserver = new MutationObserver(
-            () => {
-                rememberPageChange();
-            }
-        );
-
-        document.querySelectorAll(".page").forEach(page => {
-            historyObserver.observe(
-                page,
-                {
-                    attributes: true,
-                    attributeFilter: ["class", "style"]
-                }
-            );
+        /* app.jsが直接ページを切り替える場合にも対応 */
+        const pageObserver = new MutationObserver(() => {
+            setTimeout(recordNavigation, 0);
         });
 
+        document.querySelectorAll(".page").forEach(page => {
+            pageObserver.observe(page, {
+                attributes: true,
+                attributeFilter: ["class", "style"]
+            });
+        });
 
         /*
          * 戻るボタン
-         *
-         * ★ 学習画面では必ず「デッキ」に戻る
-         * ★ その他の画面では直前のページへ戻る
+         * ・学習画面 → 必ずデッキへ
+         * ・その他 → 直前のページへ
+         * ・履歴がなければホームへ
          */
         if (backButton) {
+            backButton.addEventListener("click", event => {
+                event.preventDefault();
+                event.stopImmediatePropagation();
 
-            backButton.addEventListener(
-                "click",
-                event => {
+                const current = getCurrentPage();
+                let target;
 
-                    event.preventDefault();
-                    event.stopPropagation();
-
-                    const current = getCurrentPage();
-
-                    /* 学習中の「戻る」はデッキへ */
-                    if (current === "study") {
-
-                        restoringHistory = true;
-
-                        pageHistory = pageHistory.filter(
-                            page => page !== "study"
-                        );
-
-                        goToPage("decks");
-
-                        setTimeout(() => {
-                            lastPage = getCurrentPage();
-                            restoringHistory = false;
-                            updateBackButton();
-                        }, 120);
-
-                        return;
-                    }
-
-                    let target = pageHistory.pop();
-
-                    /* 履歴がなければホームへ */
-                    if (!target || target === current) {
-                        target = "home";
-                    }
-
-                    restoringHistory = true;
-
-                    goToPage(target);
-
-                    setTimeout(() => {
-                        lastPage = getCurrentPage();
-                        restoringHistory = false;
-                        updateBackButton();
-                    }, 120);
+                if (current === "study") {
+                    target = "decks";
+                    /* 学習画面から戻った後にさらに戻れるようにする */
+                    pageHistory = pageHistory.filter(page => page !== "study");
+                } else {
+                    target = pageHistory.pop();
+                    if (!target || target === current) target = "home";
                 }
-            );
+
+                changingByBack = true;
+
+                if (!navigateTo(target)) {
+                    target = "home";
+                    navigateTo("home");
+                }
+
+                setTimeout(() => {
+                    currentPage = getCurrentPage();
+                    changingByBack = false;
+                    updateBackButton();
+                }, 200);
+            });
         }
 
-
-        /* 初期化 */
-        lastPage = getCurrentPage();
+        currentPage = getCurrentPage();
         pageHistory = [];
         updateBackButton();
-
 
     }
 
