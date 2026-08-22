@@ -41,10 +41,6 @@
 
         <div class="logo">
 
-            <span class="logo-icon">
-                L
-            </span>
-
             <span>
                 Language Gym
             </span>
@@ -149,16 +145,26 @@
 
 
         <!-- =================================================
+             BACK BUTTON
+        ================================================== -->
+
+        <button
+            id="app-back-button"
+            type="button"
+            aria-label="前のページに戻る"
+        >
+            ← 戻る
+        </button>
+
+
+
+        <!-- =================================================
              MOBILE HEADER
         ================================================== -->
 
         <header class="mobile-header">
 
             <div class="logo">
-
-                <span class="logo-icon">
-                    L
-                </span>
 
                 <span>
                     Language Gym
@@ -970,9 +976,7 @@
 
 
 
-            <!-- =================================================
-                 THEME COLOR
-            ================================================== -->
+            <!-- THEME COLOR -->
 
             <div class="settings-card">
 
@@ -997,9 +1001,7 @@
 
 
 
-            <!-- =================================================
-                 DEFAULT LANGUAGE
-            ================================================== -->
+            <!-- DEFAULT LANGUAGE -->
 
             <div class="settings-card">
 
@@ -1080,9 +1082,7 @@
 
 
 
-            <!-- =================================================
-                 AUTO VOICE
-            ================================================== -->
+            <!-- AUTO VOICE -->
 
             <div class="settings-card">
 
@@ -1124,9 +1124,7 @@
 
 
 
-            <!-- =================================================
-                 VOICE RATE
-            ================================================== -->
+            <!-- VOICE RATE -->
 
             <div class="settings-card">
 
@@ -1173,9 +1171,7 @@
 
 
 
-            <!-- =================================================
-                 VOICE PITCH
-            ================================================== -->
+            <!-- VOICE PITCH -->
 
             <div class="settings-card">
 
@@ -1252,18 +1248,14 @@
 
 <script>
 
-    /*
-     * PDF.js worker
-     */
+if (
+    typeof pdfjsLib !== "undefined"
+) {
 
-    if (
-        typeof pdfjsLib !== "undefined"
-    ) {
+    pdfjsLib.GlobalWorkerOptions.workerSrc =
+        "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
 
-        pdfjsLib.GlobalWorkerOptions.workerSrc =
-            "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
-
-    }
+}
 
 </script>
 
@@ -1278,7 +1270,7 @@
 
 
 <!-- =========================================================
-     SMALL UI ENHANCEMENTS
+     UI / SETTINGS / BACK BUTTON
 ========================================================== -->
 
 <script>
@@ -1302,11 +1294,6 @@ document.addEventListener(
                 "import-language-select"
             );
 
-
-        /*
-         * app.js側のデータが存在する場合、
-         * デフォルト言語を反映
-         */
 
         try {
 
@@ -1543,7 +1530,6 @@ document.addEventListener(
             } catch (error) {}
 
 
-
             voiceRate.addEventListener(
                 "input",
                 () => {
@@ -1641,7 +1627,6 @@ document.addEventListener(
                 }
 
             } catch (error) {}
-
 
 
             voicePitch.addEventListener(
@@ -1824,8 +1809,479 @@ document.addEventListener(
         );
 
 
-    }
 
+        /* =================================================
+           BACK BUTTON
+        ================================================== */
+
+        const backButton =
+            document.getElementById(
+                "app-back-button"
+            );
+
+
+        let currentPage =
+            "home";
+
+
+        let previousPage =
+            "home";
+
+
+        let isGoingBack =
+            false;
+
+
+        /*
+         * 現在のページを取得
+         */
+
+        function getCurrentPage() {
+
+            const activePage =
+                document.querySelector(
+                    ".page.active-page"
+                );
+
+
+            if (
+                activePage &&
+                activePage.id
+            ) {
+
+                return activePage.id.replace(
+                    "page-",
+                    ""
+                );
+
+            }
+
+
+            /*
+             * active-pageを使わない
+             * app.jsの状態にも対応
+             */
+
+            const visiblePage =
+                Array.from(
+                    document.querySelectorAll(
+                        ".page"
+                    )
+                ).find(
+                    page => {
+
+                        const style =
+                            window.getComputedStyle(
+                                page
+                            );
+
+                        return (
+                            style.display !==
+                            "none"
+                        );
+
+                    }
+                );
+
+
+            if (
+                visiblePage &&
+                visiblePage.id
+            ) {
+
+                return visiblePage.id.replace(
+                    "page-",
+                    ""
+                );
+
+            }
+
+
+            return "home";
+
+        }
+
+
+
+        /*
+         * 戻るボタンの表示
+         */
+
+        function updateBackButton() {
+
+            if (
+                !backButton
+            ) {
+
+                return;
+
+            }
+
+
+            const page =
+                getCurrentPage();
+
+
+            if (
+                page === "home"
+            ) {
+
+                backButton.style.display =
+                    "none";
+
+            } else {
+
+                backButton.style.display =
+                    "inline-flex";
+
+            }
+
+        }
+
+
+
+        /*
+         * ページが変更されたか確認
+         */
+
+        function checkPageChange() {
+
+            const newPage =
+                getCurrentPage();
+
+
+            if (
+                newPage !== currentPage
+            ) {
+
+                if (
+                    !isGoingBack
+                ) {
+
+                    previousPage =
+                        currentPage;
+
+                }
+
+
+                currentPage =
+                    newPage;
+
+                isGoingBack =
+                    false;
+
+            }
+
+
+            updateBackButton();
+
+        }
+
+
+
+        /*
+         * app.jsによるページ変更を監視
+         */
+
+        const pageObserver =
+            new MutationObserver(
+                () => {
+
+                    checkPageChange();
+
+                }
+            );
+
+
+        document
+            .querySelectorAll(".page")
+            .forEach(
+                page => {
+
+                    pageObserver.observe(
+                        page,
+                        {
+                            attributes: true,
+                            attributeFilter: [
+                                "class",
+                                "style"
+                            ]
+                        }
+                    );
+
+                }
+            );
+
+
+
+        /*
+         * data-pageを持つボタンを
+         * 押した時にも履歴を確認
+         */
+
+        document.addEventListener(
+            "click",
+            event => {
+
+                const target =
+                    event.target.closest(
+                        "[data-page]"
+                    );
+
+
+                if (
+                    !target
+                ) {
+
+                    return;
+
+                }
+
+
+                /*
+                 * 戻るボタン自身は除外
+                 */
+
+                if (
+                    target === backButton
+                ) {
+
+                    return;
+
+                }
+
+
+                const targetPage =
+                    target.dataset.page;
+
+
+                if (
+                    !targetPage
+                ) {
+
+                    return;
+
+                }
+
+
+                const beforePage =
+                    getCurrentPage();
+
+
+                /*
+                 * app.jsのページ切り替えが
+                 * 完了してから履歴を更新
+                 */
+
+                setTimeout(
+                    () => {
+
+                        const afterPage =
+                            getCurrentPage();
+
+
+                        if (
+                            afterPage !==
+                            beforePage
+                        ) {
+
+                            previousPage =
+                                beforePage;
+
+                            currentPage =
+                                afterPage;
+
+                        }
+
+
+                        updateBackButton();
+
+                    },
+                    50
+                );
+
+            },
+            true
+        );
+
+
+
+        /*
+         * 戻るボタンを押した時
+         */
+
+        if (
+            backButton
+        ) {
+
+            backButton.addEventListener(
+                "click",
+                () => {
+
+                    const targetPage =
+                        previousPage ||
+                        "home";
+
+
+                    /*
+                     * 同じページならホーム
+                     */
+
+                    if (
+                        targetPage ===
+                        currentPage
+                    ) {
+
+                        isGoingBack =
+                            true;
+
+                        const homeButton =
+                            document.querySelector(
+                                '[data-page="home"]'
+                            );
+
+
+                        if (
+                            homeButton
+                        ) {
+
+                            homeButton.click();
+
+                        }
+
+                        previousPage =
+                            "home";
+
+                        currentPage =
+                            "home";
+
+                        updateBackButton();
+
+                        return;
+
+                    }
+
+
+                    /*
+                     * 戻り先を探す
+                     */
+
+                    const targetButton =
+                        document.querySelector(
+                            `[data-page="${targetPage}"]`
+                        );
+
+
+                    if (
+                        targetButton
+                    ) {
+
+                        isGoingBack =
+                            true;
+
+                        /*
+                         * 今いるページを
+                         * 次の「戻る先」にする
+                         */
+
+                        const pageBeforeBack =
+                            currentPage;
+
+
+                        targetButton.click();
+
+
+                        setTimeout(
+                            () => {
+
+                                currentPage =
+                                    getCurrentPage();
+
+                                previousPage =
+                                    "home";
+
+                                /*
+                                 * さらに戻る場合に
+                                 * できるだけ自然にする
+                                 */
+
+                                if (
+                                    currentPage ===
+                                    "home"
+                                ) {
+
+                                    previousPage =
+                                        "home";
+
+                                } else {
+
+                                    previousPage =
+                                        "home";
+
+                                }
+
+                                updateBackButton();
+
+                            },
+                            100
+                        );
+
+
+                    } else {
+
+                        /*
+                         * 戻り先が見つからない場合
+                         * ホームへ戻る
+                         */
+
+                        isGoingBack =
+                            true;
+
+                        const homeButton =
+                            document.querySelector(
+                                '[data-page="home"]'
+                            );
+
+
+                        if (
+                            homeButton
+                        ) {
+
+                            homeButton.click();
+
+                        }
+
+                        currentPage =
+                            "home";
+
+                        previousPage =
+                            "home";
+
+                        updateBackButton();
+
+                    }
+
+                }
+            );
+
+        }
+
+
+
+        /*
+         * 初期化
+         */
+
+        currentPage =
+            getCurrentPage();
+
+        previousPage =
+            "home";
+
+        updateBackButton();
+
+
+    }
 );
 
 </script>

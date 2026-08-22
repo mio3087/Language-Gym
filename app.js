@@ -1,7 +1,9 @@
 /* =========================================================
    LANGUAGE GYM
    Core Application
+   Navigation Enhanced Edition
    ========================================================= */
+
 
 /* =========================================================
    STORAGE & CONSTANTS
@@ -11,7 +13,7 @@ const STORAGE_KEY = "languageGymData";
 const THEME_KEY = "languageGymTheme";
 const BACKUP_KEY = "languageGymBackup";
 
-const APP_VERSION = 4;
+const APP_VERSION = 5;
 
 
 /* =========================================================
@@ -43,6 +45,7 @@ const DEFAULT_THEME_COLOR = "#8B7CF6";
    ========================================================= */
 
 const defaultData = {
+
     version: APP_VERSION,
 
     decks: [],
@@ -56,11 +59,17 @@ const defaultData = {
     messages: {},
 
     settings: {
+
         autoVoice: false,
+
         voiceRate: 1,
+
         voicePitch: 1,
+
         uiLanguage: "ja",
+
         learningLanguage: "zh",
+
         customColor: DEFAULT_THEME_COLOR
     }
 };
@@ -78,6 +87,7 @@ let appData = loadData();
    ========================================================= */
 
 let studyState = {
+
     active: false,
 
     deckId: null,
@@ -101,14 +111,53 @@ let studyState = {
 
 
 /* =========================================================
+   NAVIGATION STATE
+   ========================================================= */
+
+/*
+ * Language Gym独自のページ履歴。
+ *
+ * ブラウザの履歴とは別に管理します。
+ *
+ * 例：
+ *
+ * home
+ *   ↓
+ * decks
+ *   ↓
+ * study
+ *
+ * 「戻る」
+ *   → decks
+ *
+ * 「進む」
+ *   → study
+ */
+
+const navigationState = {
+
+    currentPage: "home",
+
+    history: [],
+
+    historyIndex: -1,
+
+    ignoreBrowserPopState: false
+};
+
+
+/* =========================================================
    UTILITY FUNCTIONS
    ========================================================= */
 
 function generateId() {
 
     return (
+
         Date.now().toString(36) +
+
         "-" +
+
         Math.random()
             .toString(36)
             .substring(2, 11)
@@ -129,14 +178,20 @@ function escapeHTML(value) {
         value === null ||
         value === undefined
     ) {
+
         return "";
     }
 
     return String(value)
+
         .replace(/&/g, "&amp;")
+
         .replace(/</g, "&lt;")
+
         .replace(/>/g, "&gt;")
+
         .replace(/"/g, "&quot;")
+
         .replace(/'/g, "&#039;");
 }
 
@@ -144,6 +199,7 @@ function escapeHTML(value) {
 function formatDate(dateString) {
 
     if (!dateString) {
+
         return "";
     }
 
@@ -155,6 +211,7 @@ function formatDate(dateString) {
             date.getTime()
         )
     ) {
+
         return "";
     }
 
@@ -188,8 +245,11 @@ function formatSeconds(seconds) {
     if (hours > 0) {
 
         return (
+
             `${hours}時間` +
+
             `${minutes}分` +
+
             `${secs}秒`
         );
     }
@@ -197,7 +257,9 @@ function formatSeconds(seconds) {
     if (minutes > 0) {
 
         return (
+
             `${minutes}分` +
+
             `${secs}秒`
         );
     }
@@ -214,18 +276,11 @@ function loadData() {
 
     try {
 
-        /*
-         * 新しいキー
-         */
         let saved =
             localStorage.getItem(
                 STORAGE_KEY
             );
 
-        /*
-         * 旧バージョンの
-         * typoキーにも対応
-         */
         if (!saved) {
 
             saved =
@@ -270,8 +325,12 @@ function saveData() {
             APP_VERSION;
 
         localStorage.setItem(
+
             STORAGE_KEY,
-            JSON.stringify(appData)
+
+            JSON.stringify(
+                appData
+            )
         );
 
         createAutomaticBackup();
@@ -313,7 +372,9 @@ function createAutomaticBackup() {
         };
 
         localStorage.setItem(
+
             BACKUP_KEY,
+
             JSON.stringify(
                 backup
             )
@@ -421,35 +482,45 @@ function normalizeImportedData(data) {
 
         decks:
             Array.isArray(data.decks)
+
                 ? data.decks.map(
                     normalizeDeck
                 )
+
                 : [],
 
         records:
             Array.isArray(data.records)
+
                 ? data.records.map(
                     normalizeRecord
                 )
+
                 : [],
 
         deletedItems:
             Array.isArray(
                 data.deletedItems
             )
+
                 ? data.deletedItems
+
                 : [],
 
         plans:
             Array.isArray(data.plans)
+
                 ? data.plans
+
                 : [],
 
         messages:
             data.messages &&
             typeof data.messages ===
                 "object"
+
                 ? data.messages
+
                 : {},
 
         settings: {
@@ -460,9 +531,6 @@ function normalizeImportedData(data) {
         }
     };
 
-    /*
-     * 色データを安全化
-     */
 
     if (
         !isValidHexColor(
@@ -473,6 +541,7 @@ function normalizeImportedData(data) {
         normalized.settings.customColor =
             DEFAULT_THEME_COLOR;
     }
+
 
     return normalized;
 }
@@ -539,17 +608,23 @@ function normalizeRecord(record) {
 function normalizeDeck(deck) {
 
     const normalizedItems =
+
         Array.isArray(
             deck?.items
         )
+
             ? deck.items.map(
+
                 (item, index) =>
+
                     normalizeItem(
                         item,
                         index
                     )
             )
+
             : [];
+
 
     return {
 
@@ -624,7 +699,9 @@ function normalizeItem(
             Number.isInteger(
                 item?.index
             )
+
                 ? item.index
+
                 : index,
 
         createdAt:
@@ -655,10 +732,12 @@ function reindexDeckItems(deck) {
             deck.items
         )
     ) {
+
         return;
     }
 
     deck.items.forEach(
+
         (item, index) => {
 
             item.index =
@@ -675,7 +754,9 @@ function reindexDeckItems(deck) {
 function isValidHexColor(color) {
 
     return (
+
         typeof color === "string" &&
+
         /^#[0-9A-Fa-f]{6}$/.test(
             color
         )
@@ -714,25 +795,30 @@ function createLightColor(hex) {
         );
 
     const mix = channel =>
+
         Math.round(
+
             channel +
+
             (255 - channel) *
+
             0.88
         );
 
     return (
+
         `rgb(` +
+
         `${mix(r)}, ` +
+
         `${mix(g)}, ` +
+
         `${mix(b)}` +
+
         `)`
     );
 }
 
-
-/* =========================================================
-   APPLY THEME
-   ========================================================= */
 
 function applyTheme(color) {
 
@@ -758,6 +844,7 @@ function applyTheme(color) {
             createLightColor(color)
         );
 
+
     const metaTheme =
         document.querySelector(
             'meta[name="theme-color"]'
@@ -771,6 +858,7 @@ function applyTheme(color) {
         );
     }
 
+
     document
         .querySelectorAll(
             ".theme-color, [data-theme]"
@@ -783,25 +871,27 @@ function applyTheme(color) {
                 );
 
             if (!theme) {
+
                 return;
             }
 
+            const selected =
+                theme.toLowerCase() ===
+                color.toLowerCase();
+
             button.classList.toggle(
                 "selected",
-                theme.toLowerCase() ===
-                    color.toLowerCase()
+                selected
             );
 
-            if (
-                theme.toLowerCase() ===
-                color.toLowerCase()
-            ) {
+            if (selected) {
 
                 button.style.borderColor =
                     "#333";
 
                 button.style.boxShadow =
                     "0 0 0 2px #fff, 0 0 0 4px var(--primary)";
+
             } else {
 
                 button.style.borderColor =
@@ -811,6 +901,7 @@ function applyTheme(color) {
                     "none";
             }
         });
+
 
     document
         .querySelectorAll(
@@ -831,11 +922,13 @@ function applyTheme(color) {
             }
         );
 
+
     if (appData?.settings) {
 
         appData.settings.customColor =
             color;
     }
+
 
     localStorage.setItem(
         THEME_KEY,
@@ -843,10 +936,6 @@ function applyTheme(color) {
     );
 }
 
-
-/* =========================================================
-   LOAD THEME
-   ========================================================= */
 
 function loadTheme() {
 
@@ -860,15 +949,21 @@ function loadTheme() {
             ?.customColor;
 
     const colorToApply =
+
         isValidHexColor(
             savedTheme
         )
+
             ? savedTheme
+
             : (
+
                 isValidHexColor(
                     storedColor
                 )
+
                     ? storedColor
+
                     : DEFAULT_THEME_COLOR
             );
 
@@ -879,7 +974,7 @@ function loadTheme() {
 
 
 /* =========================================================
-   RENDER THEME COLORS
+   THEME COLORS
    ========================================================= */
 
 function renderThemeColors() {
@@ -903,17 +998,22 @@ function renderThemeColors() {
         containers.find(Boolean);
 
     if (!container) {
+
         return;
     }
 
     const currentColor =
+
         isValidHexColor(
             appData.settings
                 ?.customColor
         )
+
             ? appData.settings
                 .customColor
+
             : DEFAULT_THEME_COLOR;
+
 
     container.innerHTML = `
 
@@ -931,6 +1031,7 @@ function renderThemeColors() {
         >
 
             ${PRESET_COLORS.map(
+
                 (color, index) => `
 
                     <button
@@ -957,6 +1058,7 @@ function renderThemeColors() {
 
                 `
             ).join("")}
+
 
             <label
                 class="custom-color-button"
@@ -1014,6 +1116,7 @@ function renderThemeColors() {
 
         </div>
 
+
         <div
             id="custom-color-value"
             style="
@@ -1037,15 +1140,12 @@ function renderThemeColors() {
         </div>
     `;
 
+
     applyTheme(
         currentColor
     );
 }
 
-
-/* =========================================================
-   CUSTOM COLOR LABEL
-   ========================================================= */
 
 function updateCustomColorLabel(
     color
@@ -1057,6 +1157,7 @@ function updateCustomColorLabel(
         );
 
     if (!label) {
+
         return;
     }
 
@@ -1094,6 +1195,7 @@ function setupThemeEvents() {
                 );
 
             if (!button) {
+
                 return;
             }
 
@@ -1107,6 +1209,7 @@ function setupThemeEvents() {
                     color
                 )
             ) {
+
                 return;
             }
 
@@ -1122,6 +1225,7 @@ function setupThemeEvents() {
         }
     );
 
+
     document.addEventListener(
         "input",
         event => {
@@ -1133,6 +1237,7 @@ function setupThemeEvents() {
                 !target ||
                 target.type !== "color"
             ) {
+
                 return;
             }
 
@@ -1144,6 +1249,7 @@ function setupThemeEvents() {
                     color
                 )
             ) {
+
                 return;
             }
 
@@ -1162,6 +1268,833 @@ function setupThemeEvents() {
 
 
 /* =========================================================
+   PAGE NAVIGATION
+   ========================================================= */
+
+/*
+ * ページ移動の中心関数。
+ *
+ * pushHistory = true
+ * → 新しい履歴を作る
+ *
+ * pushHistory = false
+ * → 履歴を戻す/進むだけ
+ */
+
+function showPage(
+    pageName,
+    options = {}
+) {
+
+    const {
+
+        pushHistory = true,
+
+        browserHistory = true,
+
+        scroll = true
+
+    } = options;
+
+
+    if (!pageName) {
+
+        return;
+    }
+
+
+    const targetPage =
+        document.getElementById(
+            `page-${pageName}`
+        );
+
+    if (!targetPage) {
+
+        console.warn(
+            `ページが見つかりません: ${pageName}`
+        );
+
+        return;
+    }
+
+
+    const previousPage =
+        navigationState.currentPage;
+
+
+    /* =====================================================
+       学習中のページ離脱確認
+       ===================================================== */
+
+    if (
+
+        previousPage === "study" &&
+
+        pageName !== "study" &&
+
+        studyState.active
+
+    ) {
+
+        const confirmed =
+            confirm(
+
+                "現在、学習中です。\n\n" +
+
+                "このページを離れると、" +
+
+                "今回の学習セッションを終了します。\n\n" +
+
+                "ページを移動しますか？"
+            );
+
+        if (!confirmed) {
+
+            return;
+        }
+
+        finishStudy(
+            {
+                silent: true,
+                redirect: false
+            }
+        );
+    }
+
+
+    /* =====================================================
+       ページ表示
+       ===================================================== */
+
+    document
+        .querySelectorAll(
+            ".page"
+        )
+        .forEach(page => {
+
+            page.classList.remove(
+                "active-page"
+            );
+        });
+
+
+    targetPage.classList.add(
+        "active-page"
+    );
+
+
+    /* =====================================================
+       ナビゲーションのactive
+       ===================================================== */
+
+    document
+        .querySelectorAll(
+            ".nav-item"
+        )
+        .forEach(item => {
+
+            item.classList.remove(
+                "active"
+            );
+
+            if (
+                item.dataset.page ===
+                pageName
+            ) {
+
+                item.classList.add(
+                    "active"
+                );
+            }
+        });
+
+
+    navigationState.currentPage =
+        pageName;
+
+
+    /* =====================================================
+       アプリ内履歴
+       ===================================================== */
+
+    if (pushHistory) {
+
+        addNavigationHistory(
+            pageName
+        );
+    }
+
+
+    /* =====================================================
+       ブラウザ履歴
+       ===================================================== */
+
+    if (browserHistory) {
+
+        syncBrowserHistory(
+            pageName
+        );
+    }
+
+
+    /* =====================================================
+       スクロール
+       ===================================================== */
+
+    if (scroll) {
+
+        window.scrollTo({
+
+            top: 0,
+
+            behavior: "smooth"
+        });
+    }
+
+
+    /* =====================================================
+       ページ別レンダリング
+       ===================================================== */
+
+    renderPageContent(
+        pageName
+    );
+
+
+    updateNavigationButtons();
+}
+
+
+/* =========================================================
+   NAVIGATION HISTORY
+   ========================================================= */
+
+function addNavigationHistory(
+    pageName
+) {
+
+    if (
+        navigationState.historyIndex >= 0 &&
+        navigationState.history[
+            navigationState.historyIndex
+        ] === pageName
+    ) {
+
+        return;
+    }
+
+
+    /*
+     * 戻ったあとに新しいページへ進んだ場合、
+     * その先の履歴を削除します。
+     */
+
+    if (
+        navigationState.historyIndex <
+        navigationState.history.length - 1
+    ) {
+
+        navigationState.history =
+            navigationState.history.slice(
+                0,
+                navigationState.historyIndex + 1
+            );
+    }
+
+
+    navigationState.history.push(
+        pageName
+    );
+
+
+    navigationState.historyIndex =
+        navigationState.history.length - 1;
+}
+
+
+/* =========================================================
+   BROWSER HISTORY
+   ========================================================= */
+
+function syncBrowserHistory(
+    pageName
+) {
+
+    try {
+
+        history.pushState(
+            {
+                languageGym: true,
+                page: pageName
+            },
+            "",
+            `#${encodeURIComponent(
+                pageName
+            )}`
+        );
+
+    } catch (error) {
+
+        console.warn(
+            "ブラウザ履歴の更新に失敗:",
+            error
+        );
+    }
+}
+
+
+/* =========================================================
+   BROWSER BACK / FORWARD
+   ========================================================= */
+
+function setupBrowserNavigation() {
+
+    window.addEventListener(
+        "popstate",
+        event => {
+
+            const state =
+                event.state;
+
+
+            if (
+                state &&
+                state.languageGym &&
+                state.page
+            ) {
+
+                navigateFromBrowser(
+                    state.page
+                );
+
+                return;
+            }
+
+
+            /*
+             * 外部の履歴に戻った場合。
+             *
+             * アプリとしてはhomeへ戻します。
+             */
+
+            const hash =
+                location.hash
+                    .replace(/^#/, "");
+
+
+            if (hash) {
+
+                navigateFromBrowser(
+                    decodeURIComponent(
+                        hash
+                    )
+                );
+
+            } else {
+
+                navigateFromBrowser(
+                    "home"
+                );
+            }
+        }
+    );
+}
+
+
+function navigateFromBrowser(
+    pageName
+) {
+
+    const target =
+        document.getElementById(
+            `page-${pageName}`
+        );
+
+    if (!target) {
+
+        pageName = "home";
+    }
+
+
+    navigationState.ignoreBrowserPopState =
+        true;
+
+
+    const index =
+        navigationState.history.lastIndexOf(
+            pageName
+        );
+
+
+    if (index >= 0) {
+
+        navigationState.historyIndex =
+            index;
+    }
+
+
+    showPage(
+        pageName,
+        {
+            pushHistory: false,
+            browserHistory: false
+        }
+    );
+
+
+    navigationState.ignoreBrowserPopState =
+        false;
+}
+
+
+/* =========================================================
+   APP BACK
+   ========================================================= */
+
+function goBack() {
+
+    /*
+     * 学習中は専用確認を出す。
+     */
+
+    if (
+        studyState.active &&
+        navigationState.currentPage ===
+            "study"
+    ) {
+
+        const confirmed =
+            confirm(
+
+                "学習を中断しますか？\n\n" +
+
+                "今回の学習結果は途中までの記録としては保存されません。"
+            );
+
+        if (!confirmed) {
+
+            return;
+        }
+
+        stopStudyTimer();
+
+        studyState = createEmptyStudyState();
+    }
+
+
+    if (
+        navigationState.historyIndex > 0
+    ) {
+
+        navigationState.historyIndex--;
+
+        const previousPage =
+            navigationState.history[
+                navigationState.historyIndex
+            ];
+
+
+        showPage(
+            previousPage,
+            {
+                pushHistory: false,
+                browserHistory: true
+            }
+        );
+
+        return;
+    }
+
+
+    /*
+     * 履歴がない場合はhomeへ。
+     */
+
+    if (
+        navigationState.currentPage !==
+        "home"
+    ) {
+
+        showPage(
+            "home",
+            {
+                pushHistory: false,
+                browserHistory: true
+            }
+        );
+
+        return;
+    }
+
+
+    /*
+     * homeではブラウザの戻る操作を尊重。
+     */
+
+    try {
+
+        window.history.back();
+
+    } catch (error) {
+
+        console.warn(
+            "ブラウザ履歴を戻せません:",
+            error
+        );
+    }
+}
+
+
+/* =========================================================
+   APP FORWARD
+   ========================================================= */
+
+function goForward() {
+
+    if (
+        navigationState.historyIndex <
+        navigationState.history.length - 1
+    ) {
+
+        navigationState.historyIndex++;
+
+        const nextPage =
+            navigationState.history[
+                navigationState.historyIndex
+            ];
+
+
+        showPage(
+            nextPage,
+            {
+                pushHistory: false,
+                browserHistory: true
+            }
+        );
+    }
+}
+
+
+/* =========================================================
+   CREATE EMPTY STUDY STATE
+   ========================================================= */
+
+function createEmptyStudyState() {
+
+    return {
+
+        active: false,
+
+        deckId: null,
+
+        currentIndex: 0,
+
+        sessionAnswers: 0,
+
+        sessionCorrect: 0,
+
+        sessionWrong: 0,
+
+        startedAt: null,
+
+        timerInterval: null,
+
+        elapsedSeconds: 0,
+
+        answerShown: false
+    };
+}
+
+
+/* =========================================================
+   NAVIGATION BUTTONS
+   ========================================================= */
+
+function updateNavigationButtons() {
+
+    const backButtons =
+        document.querySelectorAll(
+            "[data-action='back'], .app-back-button"
+        );
+
+
+    const forwardButtons =
+        document.querySelectorAll(
+            "[data-action='forward'], .app-forward-button"
+        );
+
+
+    const canGoBack =
+        navigationState.historyIndex > 0 ||
+        navigationState.currentPage !== "home";
+
+
+    const canGoForward =
+        navigationState.historyIndex <
+        navigationState.history.length - 1;
+
+
+    backButtons.forEach(
+        button => {
+
+            button.disabled =
+                !canGoBack;
+
+            button.setAttribute(
+                "aria-disabled",
+                String(!canGoBack)
+            );
+
+            button.style.opacity =
+                canGoBack
+                    ? "1"
+                    : "0.45";
+
+            button.style.cursor =
+                canGoBack
+                    ? "pointer"
+                    : "default";
+        }
+    );
+
+
+    forwardButtons.forEach(
+        button => {
+
+            button.disabled =
+                !canGoForward;
+
+            button.setAttribute(
+                "aria-disabled",
+                String(!canGoForward)
+            );
+
+            button.style.opacity =
+                canGoForward
+                    ? "1"
+                    : "0.45";
+
+            button.style.cursor =
+                canGoForward
+                    ? "pointer"
+                    : "default";
+        }
+    );
+}
+
+
+/* =========================================================
+   NAVIGATION BUTTON EVENTS
+   ========================================================= */
+
+function setupNavigationEvents() {
+
+    document.addEventListener(
+        "click",
+        event => {
+
+            const back =
+                event.target.closest(
+                    "[data-action='back'], .app-back-button"
+                );
+
+            if (back) {
+
+                event.preventDefault();
+
+                goBack();
+
+                return;
+            }
+
+
+            const forward =
+                event.target.closest(
+                    "[data-action='forward'], .app-forward-button"
+                );
+
+            if (forward) {
+
+                event.preventDefault();
+
+                goForward();
+
+                return;
+            }
+        }
+    );
+
+
+    /*
+     * Android / キーボードのAlt+← / Alt+→
+     */
+
+    document.addEventListener(
+        "keydown",
+        event => {
+
+            if (
+                event.altKey &&
+                event.key === "ArrowLeft"
+            ) {
+
+                event.preventDefault();
+
+                goBack();
+
+                return;
+            }
+
+
+            if (
+                event.altKey &&
+                event.key === "ArrowRight"
+            ) {
+
+                event.preventDefault();
+
+                goForward();
+            }
+        }
+    );
+}
+
+
+/* =========================================================
+   PAGE BUTTON EVENTS
+   ========================================================= */
+
+function setupPageNavigationEvents() {
+
+    document.addEventListener(
+        "click",
+        event => {
+
+            const button =
+                event.target.closest(
+                    "[data-page]"
+                );
+
+            if (!button) {
+
+                return;
+            }
+
+
+            /*
+             * ボタン内部にdata-pageがある場合でも
+             * 正しく拾います。
+             */
+
+            const pageName =
+                button.dataset.page;
+
+
+            if (!pageName) {
+
+                return;
+            }
+
+
+            event.preventDefault();
+
+
+            showPage(
+                pageName
+            );
+        }
+    );
+}
+
+
+/* =========================================================
+   PAGE CONTENT RENDERER
+   ========================================================= */
+
+function renderPageContent(
+    pageName
+) {
+
+    if (
+        pageName === "study"
+    ) {
+
+        renderStudyPage();
+
+        return;
+    }
+
+
+    if (
+        pageName === "decks"
+    ) {
+
+        renderDecks();
+
+        return;
+    }
+
+
+    if (
+        pageName === "progress"
+    ) {
+
+        renderProgress();
+
+        return;
+    }
+
+
+    if (
+        pageName === "home"
+    ) {
+
+        renderHomeStats();
+
+        renderDailyMessage();
+
+        return;
+    }
+
+
+    if (
+        pageName === "share" ||
+        pageName === "data-share"
+    ) {
+
+        renderDataSharePage();
+
+        return;
+    }
+}
+
+
+/* =========================================================
+   TRAINING CARDS
+   ========================================================= */
+
+function setupTrainingCards() {
+
+    document
+        .querySelectorAll(
+            ".training-card"
+        )
+        .forEach(card => {
+
+            card.addEventListener(
+                "click",
+                () => {
+
+                    showPage(
+                        "decks"
+                    );
+                }
+            );
+        });
+}
+
+
+/* =========================================================
    IMPORT LANGUAGE
    ========================================================= */
 
@@ -1175,16 +2108,21 @@ function getImportLanguage() {
     if (!select) {
 
         return (
+
             appData.settings
                 ?.learningLanguage ||
+
             "unknown"
         );
     }
 
     return (
+
         select.value ||
+
         appData.settings
             ?.learningLanguage ||
+
         "unknown"
     );
 }
@@ -1228,8 +2166,11 @@ function createTextDeck(
             now,
 
         items:
+
             lines.map(
+
                 (line, index) =>
+
                     normalizeItem(
                         {
                             text:
@@ -1269,8 +2210,10 @@ function setupFileImport() {
         );
 
     if (!fileInput) {
+
         return;
     }
+
 
     fileInput.addEventListener(
         "change",
@@ -1281,24 +2224,33 @@ function setupFileImport() {
                     event.target.files || []
                 );
 
+
             if (!files.length) {
+
                 return;
             }
+
 
             const selectedFile =
                 document.getElementById(
                     "selected-file"
                 );
 
+
             if (selectedFile) {
 
                 selectedFile.textContent =
+
                     files.length === 1
+
                         ? `選択中: ${files[0].name}`
+
                         : `${files.length}個のファイルを選択中`;
             }
 
+
             let successCount = 0;
+
 
             try {
 
@@ -1313,6 +2265,7 @@ function setupFileImport() {
                         );
 
                     if (result) {
+
                         successCount++;
                     }
                 }
@@ -1329,7 +2282,9 @@ function setupFileImport() {
                 );
             }
 
+
             fileInput.value = "";
+
 
             if (
                 successCount > 0
@@ -1353,14 +2308,17 @@ function setupFileImport() {
 async function importFile(file) {
 
     if (!file) {
+
         return false;
     }
+
 
     const extension =
         file.name
             .split(".")
             .pop()
             .toLowerCase();
+
 
     try {
 
@@ -1373,6 +2331,7 @@ async function importFile(file) {
             );
         }
 
+
         if (
             extension === "csv"
         ) {
@@ -1381,6 +2340,7 @@ async function importFile(file) {
                 file
             );
         }
+
 
         if (
             extension === "pdf"
@@ -1391,9 +2351,14 @@ async function importFile(file) {
             );
         }
 
+
         alert(
-            `「${file.name}」は非対応形式です。\n\n対応形式：TXT / CSV / PDF`
+
+            `「${file.name}」は非対応形式です。\n\n` +
+
+            `対応形式：TXT / CSV / PDF`
         );
+
 
         return false;
 
@@ -1424,12 +2389,16 @@ async function importTXT(file) {
 
     const lines =
         text
+
             .split(/\r?\n/)
+
             .map(
                 line =>
                     line.trim()
             )
+
             .filter(Boolean);
+
 
     if (!lines.length) {
 
@@ -1440,28 +2409,41 @@ async function importTXT(file) {
         return false;
     }
 
+
     const language =
         getImportLanguage();
 
+
     const deck =
         createTextDeck(
+
             removeExtension(
                 file.name
             ),
+
             language,
+
             lines,
+
             "text"
         );
+
 
     appData.decks.push(
         deck
     );
 
+
     saveData();
 
+
     alert(
-        `デッキ「${deck.name}」を作成しました。\n\n${deck.items.length}件のカードを登録しました。`
+
+        `デッキ「${deck.name}」を作成しました。\n\n` +
+
+        `${deck.items.length}件のカードを登録しました。`
     );
+
 
     return true;
 }
@@ -1483,25 +2465,33 @@ async function importPDF(file) {
         return false;
     }
 
+
     try {
 
         const buffer =
             await file.arrayBuffer();
 
+
         const pdf =
             await pdfjsLib
+
                 .getDocument({
                     data:
                         buffer
                 })
+
                 .promise;
+
 
         const lines = [];
 
+
         for (
             let pageNumber = 1;
+
             pageNumber <=
-                pdf.numPages;
+            pdf.numPages;
+
             pageNumber++
         ) {
 
@@ -1510,17 +2500,23 @@ async function importPDF(file) {
                     pageNumber
                 );
 
+
             const content =
                 await page.getTextContent();
 
+
             const pageText =
                 content.items
+
                     .map(
                         item =>
                             item.str
                     )
+
                     .join(" ")
+
                     .trim();
+
 
             if (pageText) {
 
@@ -1530,37 +2526,54 @@ async function importPDF(file) {
             }
         }
 
+
         if (!lines.length) {
 
             alert(
-                "PDFからテキストを抽出できませんでした。\n\n画像PDFの場合はOCRが必要です。"
+
+                "PDFからテキストを抽出できませんでした。\n\n" +
+
+                "画像PDFの場合はOCRが必要です。"
             );
 
             return false;
         }
 
+
         const language =
             getImportLanguage();
 
+
         const deck =
             createTextDeck(
+
                 removeExtension(
                     file.name
                 ),
+
                 language,
+
                 lines,
+
                 "pdf"
             );
+
 
         appData.decks.push(
             deck
         );
 
+
         saveData();
 
+
         alert(
-            `デッキ「${deck.name}」を作成しました。\n\n${deck.items.length}ページ分のデータを登録しました。`
+
+            `デッキ「${deck.name}」を作成しました。\n\n` +
+
+            `${deck.items.length}ページ分のデータを登録しました。`
         );
+
 
         return true;
 
@@ -1591,19 +2604,25 @@ function showPDFSetupPopup() {
             "pdf-setup-popup"
         );
 
+
     if (existing) {
+
         existing.remove();
     }
+
 
     const popup =
         document.createElement(
             "div"
         );
 
+
     popup.id =
         "pdf-setup-popup";
 
+
     popup.style.cssText = `
+
         position:fixed;
         inset:0;
         background:rgba(0,0,0,.5);
@@ -1613,7 +2632,9 @@ function showPDFSetupPopup() {
         z-index:9999;
         padding:20px;
         box-sizing:border-box;
+
     `;
+
 
     popup.innerHTML = `
 
@@ -1638,9 +2659,11 @@ function showPDFSetupPopup() {
                 📄
             </div>
 
+
             <h3>
                 PDFライブラリ未検出
             </h3>
+
 
             <p
                 style="
@@ -1652,6 +2675,7 @@ function showPDFSetupPopup() {
                 PDFを読み込むには
                 PDF.jsライブラリが必要です。
             </p>
+
 
             <button
                 type="button"
@@ -1671,9 +2695,11 @@ function showPDFSetupPopup() {
         </div>
     `;
 
+
     document.body.appendChild(
         popup
     );
+
 
     document
         .getElementById(
@@ -1695,8 +2721,10 @@ async function importCSV(file) {
     const text =
         await file.text();
 
+
     const rows =
         parseCSV(text);
+
 
     if (!rows.length) {
 
@@ -1707,11 +2735,14 @@ async function importCSV(file) {
         return false;
     }
 
+
     const language =
         getImportLanguage();
 
+
     const now =
         new Date().toISOString();
+
 
     const deck = {
 
@@ -1735,13 +2766,18 @@ async function importCSV(file) {
             now,
 
         items:
+
             rows.map(
+
                 (row, index) =>
+
                     normalizeItem(
+
                         {
                             data:
                                 row
                         },
+
                         index
                     )
             ),
@@ -1760,15 +2796,22 @@ async function importCSV(file) {
         plan: null
     };
 
+
     appData.decks.push(
         deck
     );
 
+
     saveData();
 
+
     alert(
-        `デッキ「${deck.name}」を作成しました。\n\n${deck.items.length}行を登録しました。`
+
+        `デッキ「${deck.name}」を作成しました。\n\n` +
+
+        `${deck.items.length}行を登録しました。`
     );
+
 
     return true;
 }
@@ -1786,12 +2829,14 @@ function parseCSV(text) {
 
     let cell = "";
 
-    let insideQuotes =
-        false;
+    let insideQuotes = false;
+
 
     for (
         let i = 0;
+
         i < text.length;
+
         i++
     ) {
 
@@ -1800,6 +2845,7 @@ function parseCSV(text) {
 
         const next =
             text[i + 1];
+
 
         if (
             char === '"' &&
@@ -1814,6 +2860,7 @@ function parseCSV(text) {
             continue;
         }
 
+
         if (
             char === '"'
         ) {
@@ -1823,6 +2870,7 @@ function parseCSV(text) {
 
             continue;
         }
+
 
         if (
             char === "," &&
@@ -1837,6 +2885,7 @@ function parseCSV(text) {
 
             continue;
         }
+
 
         if (
             (
@@ -1854,9 +2903,11 @@ function parseCSV(text) {
                 i++;
             }
 
+
             row.push(
                 cell
             );
+
 
             if (
                 row.some(
@@ -1871,6 +2922,7 @@ function parseCSV(text) {
                 );
             }
 
+
             row = [];
 
             cell = "";
@@ -1878,12 +2930,15 @@ function parseCSV(text) {
             continue;
         }
 
+
         cell += char;
     }
+
 
     row.push(
         cell
     );
+
 
     if (
         row.some(
@@ -1897,6 +2952,7 @@ function parseCSV(text) {
             row
         );
     }
+
 
     return rows;
 }
@@ -1918,6 +2974,7 @@ async function addFileToDeck(
                 deckId
         );
 
+
     if (!deck) {
 
         alert(
@@ -1927,19 +2984,18 @@ async function addFileToDeck(
         return false;
     }
 
+
     const extension =
         file.name
             .split(".")
             .pop()
             .toLowerCase();
 
+
     let newItems = [];
 
-    try {
 
-        /* =================================================
-           TXT
-           ================================================= */
+    try {
 
         if (
             extension === "txt"
@@ -1948,18 +3004,25 @@ async function addFileToDeck(
             const text =
                 await file.text();
 
+
             const lines =
                 text
+
                     .split(/\r?\n/)
+
                     .map(
                         line =>
                             line.trim()
                     )
+
                     .filter(Boolean);
+
 
             newItems =
                 lines.map(
+
                     line =>
+
                         normalizeItem(
                             {
                                 text:
@@ -1967,13 +3030,9 @@ async function addFileToDeck(
                             }
                         )
                 );
-        }
 
-        /* =================================================
-           PDF
-           ================================================= */
 
-        else if (
+        } else if (
             extension === "pdf"
         ) {
 
@@ -1987,23 +3046,31 @@ async function addFileToDeck(
                 return false;
             }
 
+
             const buffer =
                 await file.arrayBuffer();
 
+
             const pdf =
                 await pdfjsLib
+
                     .getDocument({
                         data:
                             buffer
                     })
+
                     .promise;
+
 
             const lines = [];
 
+
             for (
                 let pageNumber = 1;
+
                 pageNumber <=
-                    pdf.numPages;
+                pdf.numPages;
+
                 pageNumber++
             ) {
 
@@ -2012,17 +3079,23 @@ async function addFileToDeck(
                         pageNumber
                     );
 
+
                 const content =
                     await page.getTextContent();
 
+
                 const text =
                     content.items
+
                         .map(
                             item =>
                                 item.str
                         )
+
                         .join(" ")
+
                         .trim();
+
 
                 if (text) {
 
@@ -2032,9 +3105,12 @@ async function addFileToDeck(
                 }
             }
 
+
             newItems =
                 lines.map(
+
                     line =>
+
                         normalizeItem(
                             {
                                 text:
@@ -2042,25 +3118,25 @@ async function addFileToDeck(
                             }
                         )
                 );
-        }
 
-        /* =================================================
-           CSV
-           ================================================= */
 
-        else if (
+        } else if (
             extension === "csv"
         ) {
 
             const text =
                 await file.text();
 
+
             const rows =
                 parseCSV(text);
 
+
             newItems =
                 rows.map(
+
                     row =>
+
                         normalizeItem(
                             {
                                 data:
@@ -2068,9 +3144,9 @@ async function addFileToDeck(
                             }
                         )
                 );
-        }
 
-        else {
+
+        } else {
 
             alert(
                 "TXT / CSV / PDFファイルのみ追加できます。"
@@ -2078,6 +3154,7 @@ async function addFileToDeck(
 
             return false;
         }
+
 
         if (!newItems.length) {
 
@@ -2088,24 +3165,32 @@ async function addFileToDeck(
             return false;
         }
 
+
         deck.items.push(
             ...newItems
         );
+
 
         reindexDeckItems(
             deck
         );
 
+
         deck.updatedAt =
             new Date().toISOString();
 
+
         saveData();
+
 
         renderAll();
 
+
         alert(
+
             `${newItems.length}件を「${deck.name}」に追加しました。`
         );
+
 
         return true;
 
@@ -2126,158 +3211,6 @@ async function addFileToDeck(
 
 
 /* =========================================================
-   PAGE NAVIGATION
-   ========================================================= */
-
-function showPage(
-    pageName
-) {
-
-    document
-        .querySelectorAll(
-            ".page"
-        )
-        .forEach(page => {
-
-            page.classList.remove(
-                "active-page"
-            );
-        });
-
-    const targetPage =
-        document.getElementById(
-            `page-${pageName}`
-        );
-
-    if (targetPage) {
-
-        targetPage.classList.add(
-            "active-page"
-        );
-    }
-
-    document
-        .querySelectorAll(
-            ".nav-item"
-        )
-        .forEach(item => {
-
-            item.classList.remove(
-                "active"
-            );
-
-            if (
-                item.dataset.page ===
-                pageName
-            ) {
-
-                item.classList.add(
-                    "active"
-                );
-            }
-        });
-
-    window.scrollTo({
-        top: 0,
-        behavior: "smooth"
-    });
-
-    if (
-        pageName === "study"
-    ) {
-
-        renderStudyPage();
-    }
-
-    if (
-        pageName === "decks"
-    ) {
-
-        renderDecks();
-    }
-
-    if (
-        pageName === "progress"
-    ) {
-
-        renderProgress();
-    }
-
-    if (
-        pageName === "home"
-    ) {
-
-        renderHomeStats();
-
-        renderDailyMessage();
-    }
-
-    if (
-        pageName === "share" ||
-        pageName === "data-share"
-    ) {
-
-        renderDataSharePage();
-    }
-}
-
-
-/* =========================================================
-   PAGE BUTTON EVENTS
-   ========================================================= */
-
-document.addEventListener(
-    "click",
-    event => {
-
-        const button =
-            event.target.closest(
-                "[data-page]"
-            );
-
-        if (!button) {
-            return;
-        }
-
-        const pageName =
-            button.dataset.page;
-
-        if (pageName) {
-
-            showPage(
-                pageName
-            );
-        }
-    }
-);
-
-
-/* =========================================================
-   TRAINING CARDS
-   ========================================================= */
-
-function setupTrainingCards() {
-
-    document
-        .querySelectorAll(
-            ".training-card"
-        )
-        .forEach(card => {
-
-            card.addEventListener(
-                "click",
-                () => {
-
-                    showPage(
-                        "decks"
-                    );
-                }
-            );
-        });
-}
-
-
-/* =========================================================
    DECK RENDERING
    ========================================================= */
 
@@ -2288,9 +3221,12 @@ function renderDecks() {
             "deck-list"
         );
 
+
     if (!container) {
+
         return;
     }
+
 
     if (
         !appData.decks.length
@@ -2304,15 +3240,18 @@ function renderDecks() {
                     📚
                 </div>
 
+
                 <h3>
                     デッキがありません
                 </h3>
+
 
                 <p>
                     教材ファイル
                     （PDF / TXT / CSV）
                     を読み込んで作成しましょう。
                 </p>
+
 
                 <button
                     class="primary-button"
@@ -2328,39 +3267,52 @@ function renderDecks() {
         return;
     }
 
+
     container.innerHTML =
+
         appData.decks
+
             .map(
                 deck => {
 
                     const total =
+
                         Array.isArray(
                             deck.items
                         )
+
                             ? deck.items.filter(
                                 item =>
                                     !item.deleted
                             ).length
+
                             : 0;
+
 
                     const answers =
                         Number(
                             deck.stats?.answers
                         ) || 0;
 
+
                     const correct =
                         Number(
                             deck.stats?.correct
                         ) || 0;
 
+
                     const accuracy =
+
                         answers > 0
+
                             ? Math.round(
                                 correct /
                                 answers *
                                 100
                             )
+
                             : 0;
+
 
                     return `
 
@@ -2400,6 +3352,7 @@ function renderDecks() {
                                     )}
                                 </span>
 
+
                                 <h3
                                     class="deck-title"
                                     style="
@@ -2413,6 +3366,7 @@ function renderDecks() {
                                 </h3>
 
                             </div>
+
 
                             <div
                                 class="deck-meta"
@@ -2430,10 +3384,12 @@ function renderDecks() {
                                     ${total} 項目
                                 </span>
 
+
                                 <span>
                                     正答率:
                                     ${accuracy}%
                                 </span>
+
 
                                 <span>
                                     学習時間:
@@ -2444,6 +3400,7 @@ function renderDecks() {
                                 </span>
 
                             </div>
+
 
                             <div
                                 class="deck-actions"
@@ -2487,27 +3444,34 @@ function renderDecks() {
    DECK BUTTON EVENTS
    ========================================================= */
 
-document.addEventListener(
-    "click",
-    event => {
+function setupDeckEvents() {
 
-        const button =
-            event.target.closest(
-                ".start-study-btn"
+    document.addEventListener(
+        "click",
+        event => {
+
+            const button =
+                event.target.closest(
+                    ".start-study-btn"
+                );
+
+
+            if (!button) {
+
+                return;
+            }
+
+
+            const deckId =
+                button.dataset.id;
+
+
+            startStudy(
+                deckId
             );
-
-        if (!button) {
-            return;
         }
-
-        const deckId =
-            button.dataset.id;
-
-        startStudy(
-            deckId
-        );
-    }
-);
+    );
+}
 
 
 /* =========================================================
@@ -2525,6 +3489,7 @@ function startStudy(
                 deckId
         );
 
+
     if (!deck) {
 
         alert(
@@ -2534,15 +3499,20 @@ function startStudy(
         return;
     }
 
+
     const activeItems =
+
         Array.isArray(
             deck.items
         )
+
             ? deck.items.filter(
                 item =>
                     !item.deleted
             )
+
             : [];
+
 
     if (
         !activeItems.length
@@ -2554,6 +3524,7 @@ function startStudy(
 
         return;
     }
+
 
     studyState = {
 
@@ -2580,7 +3551,9 @@ function startStudy(
         answerShown: false
     };
 
+
     startStudyTimer();
+
 
     showPage(
         "study"
@@ -2596,6 +3569,7 @@ function startStudyTimer() {
 
     stopStudyTimer();
 
+
     studyState.timerInterval =
         setInterval(
             () => {
@@ -2603,16 +3577,21 @@ function startStudyTimer() {
                 if (
                     !studyState.active
                 ) {
+
                     return;
                 }
 
+
                 studyState.elapsedSeconds =
+
                     Math.floor(
+
                         (
                             Date.now() -
                             studyState.startedAt
                         ) / 1000
                     );
+
 
                 updateStudyTimer();
 
@@ -2645,20 +3624,27 @@ function updateStudyTimer() {
             "[data-study-timer]"
         );
 
+
     const seconds =
         studyState.elapsedSeconds;
+
 
     const minutes =
         Math.floor(
             seconds / 60
         );
 
+
     const remaining =
         seconds % 60;
 
+
     const formatted =
+
         `${String(minutes).padStart(2, "0")}:` +
+
         `${String(remaining).padStart(2, "0")}`;
+
 
     elements.forEach(
         element => {
@@ -2681,9 +3667,12 @@ function renderStudyPage() {
             "study-content"
         );
 
+
     if (!container) {
+
         return;
     }
+
 
     if (
         !studyState.active ||
@@ -2708,9 +3697,11 @@ function renderStudyPage() {
                     📖
                 </div>
 
+
                 <h2>
                     学習するデッキを選んでください
                 </h2>
+
 
                 <button
                     type="button"
@@ -2726,6 +3717,7 @@ function renderStudyPage() {
         return;
     }
 
+
     const deck =
         appData.decks.find(
             d =>
@@ -2733,23 +3725,33 @@ function renderStudyPage() {
                 studyState.deckId
         );
 
+
     if (!deck) {
 
-        studyState.active =
-            false;
+        studyState =
+            createEmptyStudyState();
+
+        showPage(
+            "decks"
+        );
 
         return;
     }
 
+
     const items =
+
         Array.isArray(
             deck.items
         )
+
             ? deck.items.filter(
                 item =>
                     !item.deleted
             )
+
             : [];
+
 
     if (
         studyState.currentIndex >=
@@ -2761,12 +3763,15 @@ function renderStudyPage() {
         return;
     }
 
+
     const item =
         items[
             studyState.currentIndex
         ];
 
+
     let content = "";
+
 
     if (
         item.text !== undefined &&
@@ -2785,11 +3790,14 @@ function renderStudyPage() {
     ) {
 
         content =
+
             item.data
+
                 .map(
                     value =>
                         String(value)
                 )
+
                 .join(" / ");
 
     } else if (
@@ -2801,6 +3809,7 @@ function renderStudyPage() {
                 item.data
             );
     }
+
 
     container.innerHTML = `
 
@@ -2828,6 +3837,7 @@ function renderStudyPage() {
                     )}
                 </strong>
 
+
                 <span
                     data-study-timer
                     style="
@@ -2840,16 +3850,22 @@ function renderStudyPage() {
 
             </div>
 
+
             <div
                 style="
                     margin-bottom:16px;
                     color:#666;
                 "
             >
+
                 ${studyState.currentIndex + 1}
+
                 /
+
                 ${items.length}
+
             </div>
+
 
             <div
                 style="
@@ -2869,10 +3885,13 @@ function renderStudyPage() {
                     word-break:break-word;
                 "
             >
+
                 ${escapeHTML(
                     content
                 )}
+
             </div>
+
 
             <div
                 style="
@@ -2900,6 +3919,7 @@ function renderStudyPage() {
                     ✓ 正解
                 </button>
 
+
                 <button
                     type="button"
                     data-study-answer="wrong"
@@ -2920,6 +3940,7 @@ function renderStudyPage() {
         </div>
     `;
 
+
     updateStudyTimer();
 }
 
@@ -2928,27 +3949,35 @@ function renderStudyPage() {
    STUDY ANSWER EVENT
    ========================================================= */
 
-document.addEventListener(
-    "click",
-    event => {
+function setupStudyEvents() {
 
-        const button =
-            event.target.closest(
-                "[data-study-answer]"
+    document.addEventListener(
+        "click",
+        event => {
+
+            const button =
+                event.target.closest(
+                    "[data-study-answer]"
+                );
+
+
+            if (!button) {
+
+                return;
+            }
+
+
+            const result =
+                button.dataset
+                    .studyAnswer;
+
+
+            answerStudy(
+                result === "correct"
             );
-
-        if (!button) {
-            return;
         }
-
-        const result =
-            button.dataset.studyAnswer;
-
-        answerStudy(
-            result === "correct"
-        );
-    }
-);
+    );
+}
 
 
 /* =========================================================
@@ -2962,8 +3991,10 @@ function answerStudy(
     if (
         !studyState.active
     ) {
+
         return;
     }
+
 
     const deck =
         appData.decks.find(
@@ -2972,11 +4003,15 @@ function answerStudy(
                 studyState.deckId
         );
 
+
     if (!deck) {
+
         return;
     }
 
+
     studyState.sessionAnswers++;
+
 
     if (isCorrect) {
 
@@ -2986,6 +4021,7 @@ function answerStudy(
 
         studyState.sessionWrong++;
     }
+
 
     if (!deck.stats) {
 
@@ -3001,7 +4037,9 @@ function answerStudy(
         };
     }
 
+
     deck.stats.answers++;
+
 
     if (isCorrect) {
 
@@ -3012,12 +4050,16 @@ function answerStudy(
         deck.stats.wrong++;
     }
 
+
     deck.updatedAt =
         new Date().toISOString();
 
+
     studyState.currentIndex++;
 
+
     saveData();
+
 
     renderStudyPage();
 }
@@ -3027,13 +4069,26 @@ function answerStudy(
    FINISH STUDY
    ========================================================= */
 
-function finishStudy() {
+function finishStudy(
+    options = {}
+) {
+
+    const {
+
+        silent = false,
+
+        redirect = true
+
+    } = options;
+
 
     if (
         !studyState.active
     ) {
+
         return;
     }
+
 
     const deck =
         appData.decks.find(
@@ -3042,8 +4097,10 @@ function finishStudy() {
                 studyState.deckId
         );
 
+
     const elapsed =
         studyState.elapsedSeconds;
+
 
     if (deck) {
 
@@ -3061,17 +4118,27 @@ function finishStudy() {
             };
         }
 
+
         deck.stats.studyTime =
+
             (
                 Number(
                     deck.stats.studyTime
                 ) || 0
             ) +
+
             elapsed;
+
 
         deck.updatedAt =
             new Date().toISOString();
     }
+
+
+    const result = {
+        ...studyState
+    };
+
 
     const record = {
 
@@ -3099,16 +4166,23 @@ function finishStudy() {
 
         accuracy:
             studyState.sessionAnswers
+
                 ? Math.round(
+
                     studyState.sessionCorrect /
+
                     studyState.sessionAnswers *
+
                     100
+
                 )
+
                 : 0,
 
         studyTime:
             elapsed
     };
+
 
     if (
         !Array.isArray(
@@ -3119,56 +4193,50 @@ function finishStudy() {
         appData.records = [];
     }
 
+
     appData.records.push(
         record
     );
 
+
     saveData();
+
 
     stopStudyTimer();
 
-    const result = {
-        ...studyState
-    };
 
-    studyState = {
+    studyState =
+        createEmptyStudyState();
 
-        active: false,
-
-        deckId: null,
-
-        currentIndex: 0,
-
-        sessionAnswers: 0,
-
-        sessionCorrect: 0,
-
-        sessionWrong: 0,
-
-        startedAt: null,
-
-        timerInterval: null,
-
-        elapsedSeconds: 0,
-
-        answerShown: false
-    };
 
     renderProgress();
 
-    alert(
-        `学習終了！\n\n` +
-        `回答数：${result.sessionAnswers}\n` +
-        `正解：${result.sessionCorrect}\n` +
-        `不正解：${result.sessionWrong}\n` +
-        `学習時間：${formatSeconds(
-            elapsed
-        )}`
-    );
 
-    showPage(
-        "progress"
-    );
+    if (!silent) {
+
+        alert(
+
+            `学習終了！\n\n` +
+
+            `回答数：${result.sessionAnswers}\n` +
+
+            `正解：${result.sessionCorrect}\n` +
+
+            `不正解：${result.sessionWrong}\n` +
+
+            `学習時間：${formatSeconds(
+                elapsed
+            )}`
+        );
+    }
+
+
+    if (redirect) {
+
+        showPage(
+            "progress"
+        );
+    }
 }
 
 
@@ -3183,71 +4251,103 @@ function renderProgress() {
             "progress-content"
         );
 
+
     if (!container) {
+
         return;
     }
 
+
     const records =
+
         Array.isArray(
             appData.records
         )
+
             ? appData.records
+
             : [];
 
+
     const totalAnswers =
+
         records.reduce(
+
             (
                 sum,
                 record
             ) =>
+
                 sum +
+
                 (
                     Number(
                         record.answers
                     ) || 0
                 ),
+
             0
         );
 
+
     const totalCorrect =
+
         records.reduce(
+
             (
                 sum,
                 record
             ) =>
+
                 sum +
+
                 (
                     Number(
                         record.correct
                     ) || 0
                 ),
+
             0
         );
 
+
     const totalTime =
+
         appData.decks.reduce(
+
             (
                 sum,
                 deck
             ) =>
+
                 sum +
+
                 (
                     Number(
                         deck.stats
                             ?.studyTime
                     ) || 0
                 ),
+
             0
         );
 
+
     const accuracy =
+
         totalAnswers > 0
+
             ? Math.round(
+
                 totalCorrect /
+
                 totalAnswers *
+
                 100
             )
+
             : 0;
+
 
     container.innerHTML = `
 
@@ -3290,6 +4390,7 @@ function renderProgress() {
 
             </div>
 
+
             <div
                 style="
                     padding:20px;
@@ -3315,6 +4416,7 @@ function renderProgress() {
                 </div>
 
             </div>
+
 
             <div
                 style="
@@ -3349,12 +4451,15 @@ function renderProgress() {
 
         </div>
 
+
         <h3>
             学習履歴
         </h3>
 
+
         ${
             records.length
+
                 ? `
 
                     <div
@@ -3366,9 +4471,13 @@ function renderProgress() {
                     >
 
                         ${records
+
                             .slice()
+
                             .reverse()
+
                             .map(
+
                                 record => `
 
                                     <div
@@ -3387,6 +4496,7 @@ function renderProgress() {
                                             )}
                                         </strong>
 
+
                                         <div
                                             style="
                                                 font-size:
@@ -3401,6 +4511,7 @@ function renderProgress() {
                                             )}
                                         </div>
 
+
                                         <div
                                             style="
                                                 margin-top:
@@ -3409,28 +4520,40 @@ function renderProgress() {
                                                     1.7;
                                             "
                                         >
+
                                             ${record.answers}問
+
                                             /
+
                                             正解 ${record.correct}
+
                                             /
+
                                             不正解 ${record.wrong}
+
                                             /
+
                                             ${record.accuracy}%
+
                                             /
+
                                             ${formatSeconds(
                                                 record.studyTime
                                             )}
+
                                         </div>
 
                                     </div>
 
                                 `
                             )
+
                             .join("")}
 
                     </div>
 
                 `
+
                 : `
 
                     <div
@@ -3470,33 +4593,45 @@ function renderHomeStats() {
         )
     ];
 
+
     const container =
         containers.find(Boolean);
 
+
     if (!container) {
+
         return;
     }
+
 
     const decks =
         appData.decks.length;
 
+
     const records =
         appData.records.length;
 
+
     const answers =
+
         appData.records.reduce(
+
             (
                 sum,
                 record
             ) =>
+
                 sum +
+
                 (
                     Number(
                         record.answers
                     ) || 0
                 ),
+
             0
         );
+
 
     container.innerHTML = `
 
@@ -3535,6 +4670,7 @@ function renderHomeStats() {
 
             </div>
 
+
             <div
                 style="
                     padding:16px;
@@ -3560,6 +4696,7 @@ function renderHomeStats() {
                 </div>
 
             </div>
+
 
             <div
                 style="
@@ -3613,17 +4750,23 @@ function renderDailyMessage() {
         )
     ];
 
+
     const container =
         containers.find(Boolean);
 
+
     if (!container) {
+
         return;
     }
+
 
     const hour =
         new Date().getHours();
 
+
     let greeting;
+
 
     if (hour < 5) {
 
@@ -3645,6 +4788,7 @@ function renderDailyMessage() {
         greeting =
             "こんばんは";
     }
+
 
     container.innerHTML = `
 
@@ -3676,26 +4820,38 @@ function renderDataSharePage() {
         )
     ];
 
+
     const container =
         containers.find(Boolean);
 
+
     if (!container) {
+
         return;
     }
 
+
     const deckCount =
+
         Array.isArray(
             appData.decks
         )
+
             ? appData.decks.length
+
             : 0;
 
+
     const recordCount =
+
         Array.isArray(
             appData.records
         )
+
             ? appData.records.length
+
             : 0;
+
 
     container.innerHTML = `
 
@@ -3722,6 +4878,7 @@ function renderDataSharePage() {
                     📦
                 </div>
 
+
                 <h2
                     style="
                         margin:
@@ -3730,6 +4887,7 @@ function renderDataSharePage() {
                 >
                     データ共有
                 </h2>
+
 
                 <p
                     style="
@@ -3744,6 +4902,7 @@ function renderDataSharePage() {
                 </p>
 
             </div>
+
 
             <div
                 style="
@@ -3779,6 +4938,7 @@ function renderDataSharePage() {
                         ${deckCount}
                     </div>
 
+
                     <div
                         style="
                             font-size:13px;
@@ -3789,6 +4949,7 @@ function renderDataSharePage() {
                     </div>
 
                 </div>
+
 
                 <div
                     style="
@@ -3811,6 +4972,7 @@ function renderDataSharePage() {
                         ${recordCount}
                     </div>
 
+
                     <div
                         style="
                             font-size:13px;
@@ -3823,6 +4985,7 @@ function renderDataSharePage() {
                 </div>
 
             </div>
+
 
             <div
                 style="
@@ -3851,6 +5014,7 @@ function renderDataSharePage() {
                     📤 データを共有する
                 </button>
 
+
                 <button
                     type="button"
                     data-action="export-data"
@@ -3869,6 +5033,7 @@ function renderDataSharePage() {
                     💾 JSONファイルとして保存
                 </button>
 
+
                 <button
                     type="button"
                     data-action="import-data"
@@ -3886,6 +5051,7 @@ function renderDataSharePage() {
                 >
                     📥 データを読み込む
                 </button>
+
 
                 <button
                     type="button"
@@ -3906,6 +5072,7 @@ function renderDataSharePage() {
                 </button>
 
             </div>
+
 
             <div
                 style="
@@ -3987,12 +5154,14 @@ function exportDataAsJSON() {
         const exportData =
             createExportData();
 
+
         const json =
             JSON.stringify(
                 exportData,
                 null,
                 2
             );
+
 
         const blob =
             new Blob(
@@ -4003,38 +5172,48 @@ function exportDataAsJSON() {
                 }
             );
 
+
         const url =
             URL.createObjectURL(
                 blob
             );
+
 
         const link =
             document.createElement(
                 "a"
             );
 
+
         const date =
             new Date()
                 .toISOString()
                 .slice(0, 10);
 
+
         link.href =
             url;
 
+
         link.download =
             `Language-Gym-backup-${date}.json`;
+
 
         document.body.appendChild(
             link
         );
 
+
         link.click();
 
+
         link.remove();
+
 
         URL.revokeObjectURL(
             url
         );
+
 
         alert(
             "JSONファイルを保存しました。"
@@ -4065,12 +5244,14 @@ async function shareData() {
         const exportData =
             createExportData();
 
+
         const json =
             JSON.stringify(
                 exportData,
                 null,
                 2
             );
+
 
         const blob =
             new Blob(
@@ -4081,13 +5262,16 @@ async function shareData() {
                 }
             );
 
+
         const date =
             new Date()
                 .toISOString()
                 .slice(0, 10);
 
+
         const filename =
             `Language-Gym-backup-${date}.json`;
+
 
         if (
             navigator.share &&
@@ -4104,6 +5288,7 @@ async function shareData() {
                             "application/json"
                     }
                 );
+
 
             if (
                 !navigator.canShare ||
@@ -4128,6 +5313,7 @@ async function shareData() {
             }
         }
 
+
         exportDataAsJSON();
 
     } catch (error) {
@@ -4136,17 +5322,21 @@ async function shareData() {
             error?.name ===
             "AbortError"
         ) {
+
             return;
         }
+
 
         console.error(
             "データ共有エラー:",
             error
         );
 
+
         alert(
             "共有に失敗したため、JSONファイルとして保存します。"
         );
+
 
         exportDataAsJSON();
     }
@@ -4164,11 +5354,14 @@ function importDataFromJSON() {
             "input"
         );
 
+
     input.type =
         "file";
 
+
     input.accept =
         ".json,application/json";
+
 
     input.addEventListener(
         "change",
@@ -4178,21 +5371,27 @@ function importDataFromJSON() {
                 event.target
                     .files?.[0];
 
+
             if (!file) {
+
                 return;
             }
+
 
             try {
 
                 const text =
                     await file.text();
 
+
                 const parsed =
                     JSON.parse(
                         text
                     );
 
+
                 let importedData;
+
 
                 if (
                     parsed &&
@@ -4210,10 +5409,12 @@ function importDataFromJSON() {
                         parsed;
                 }
 
+
                 const normalized =
                     normalizeImportedData(
                         importedData
                     );
+
 
                 showImportModeDialog(
                     normalized
@@ -4226,12 +5427,17 @@ function importDataFromJSON() {
                     error
                 );
 
+
                 alert(
-                    "JSONファイルを読み込めませんでした。\n\n正しいLanguage Gymデータか確認してください。"
+
+                    "JSONファイルを読み込めませんでした。\n\n" +
+
+                    "正しいLanguage Gymデータか確認してください。"
                 );
             }
         }
     );
+
 
     input.click();
 }
@@ -4250,19 +5456,25 @@ function showImportModeDialog(
             "language-gym-import-dialog"
         );
 
+
     if (existing) {
+
         existing.remove();
     }
+
 
     const overlay =
         document.createElement(
             "div"
         );
 
+
     overlay.id =
         "language-gym-import-dialog";
 
+
     overlay.style.cssText = `
+
         position:fixed;
         inset:0;
         background:rgba(0,0,0,.45);
@@ -4272,13 +5484,17 @@ function showImportModeDialog(
         z-index:10000;
         padding:20px;
         box-sizing:border-box;
+
     `;
+
 
     const deckCount =
         importedData.decks.length;
 
+
     const recordCount =
         importedData.records.length;
+
 
     overlay.innerHTML = `
 
@@ -4305,6 +5521,7 @@ function showImportModeDialog(
                 📥
             </div>
 
+
             <h3
                 style="
                     text-align:center;
@@ -4315,6 +5532,7 @@ function showImportModeDialog(
                 データを読み込みます
             </h3>
 
+
             <p
                 style="
                     text-align:center;
@@ -4322,10 +5540,15 @@ function showImportModeDialog(
                     line-height:1.7;
                 "
             >
+
                 デッキ ${deckCount}個
+
                 ／
+
                 学習記録 ${recordCount}件
+
             </p>
+
 
             <div
                 style="
@@ -4353,6 +5576,7 @@ function showImportModeDialog(
                     🔄 現在のデータを置き換える
                 </button>
 
+
                 <button
                     type="button"
                     data-import-mode="merge"
@@ -4367,6 +5591,7 @@ function showImportModeDialog(
                 >
                     ➕ 現在のデータに追加する
                 </button>
+
 
                 <button
                     type="button"
@@ -4387,9 +5612,11 @@ function showImportModeDialog(
         </div>
     `;
 
+
     document.body.appendChild(
         overlay
     );
+
 
     overlay.addEventListener(
         "click",
@@ -4400,15 +5627,20 @@ function showImportModeDialog(
                     "[data-import-mode]"
                 );
 
+
             if (!button) {
+
                 return;
             }
+
 
             const mode =
                 button.dataset
                     .importMode;
 
+
             overlay.remove();
+
 
             if (
                 mode === "replace"
@@ -4420,6 +5652,7 @@ function showImportModeDialog(
 
                 return;
             }
+
 
             if (
                 mode === "merge"
@@ -4446,23 +5679,33 @@ function replaceData(
 
     const confirmed =
         confirm(
-            "現在のLanguage Gymデータをすべて置き換えます。\n\n本当によろしいですか？"
+
+            "現在のLanguage Gymデータをすべて置き換えます。\n\n" +
+
+            "本当によろしいですか？"
         );
 
+
     if (!confirmed) {
+
         return;
     }
+
 
     appData =
         normalizeImportedData(
             importedData
         );
 
+
     saveData();
+
 
     loadTheme();
 
+
     renderAll();
+
 
     alert(
         "データを置き換えました。"
@@ -4480,28 +5723,28 @@ function mergeData(
 
     const currentDeckIds =
         new Set(
+
             appData.decks.map(
                 deck =>
                     deck.id
             )
         );
 
+
     const currentRecordIds =
         new Set(
+
             appData.records.map(
                 record =>
                     record.id
             )
         );
 
+
     let addedDecks = 0;
 
     let addedRecords = 0;
 
-
-    /* =====================================================
-       DECKS
-       ===================================================== */
 
     for (
         const importedDeck
@@ -4513,6 +5756,7 @@ function mergeData(
                 importedDeck
             );
 
+
         if (
             currentDeckIds.has(
                 deck.id
@@ -4523,37 +5767,41 @@ function mergeData(
                 generateId();
         }
 
+
         deck.items =
+
             Array.isArray(
                 deck.items
             )
+
                 ? deck.items.map(
                     item =>
                         normalizeItem(
                             item
                         )
                 )
+
                 : [];
+
 
         reindexDeckItems(
             deck
         );
 
+
         appData.decks.push(
             deck
         );
+
 
         currentDeckIds.add(
             deck.id
         );
 
+
         addedDecks++;
     }
 
-
-    /* =====================================================
-       RECORDS
-       ===================================================== */
 
     for (
         const importedRecord
@@ -4567,6 +5815,7 @@ function mergeData(
                 )
             );
 
+
         if (
             currentRecordIds.has(
                 record.id
@@ -4577,21 +5826,20 @@ function mergeData(
                 generateId();
         }
 
+
         appData.records.push(
             record
         );
+
 
         currentRecordIds.add(
             record.id
         );
 
+
         addedRecords++;
     }
 
-
-    /* =====================================================
-       OTHER DATA
-       ===================================================== */
 
     if (
         Array.isArray(
@@ -4600,11 +5848,13 @@ function mergeData(
     ) {
 
         appData.deletedItems.push(
+
             ...structuredClone(
                 importedData.deletedItems
             )
         );
     }
+
 
     if (
         Array.isArray(
@@ -4613,11 +5863,13 @@ function mergeData(
     ) {
 
         appData.plans.push(
+
             ...structuredClone(
                 importedData.plans
             )
         );
     }
+
 
     if (
         importedData.messages &&
@@ -4635,15 +5887,22 @@ function mergeData(
         };
     }
 
+
     saveData();
+
 
     loadTheme();
 
+
     renderAll();
 
+
     alert(
+
         `データを追加しました！\n\n` +
+
         `追加デッキ：${addedDecks}個\n\n` +
+
         `追加学習記録：${addedRecords}件`
     );
 }
@@ -4664,12 +5923,16 @@ function setupDataShareEvents() {
                     "[data-action]"
                 );
 
+
             if (!button) {
+
                 return;
             }
 
+
             const action =
                 button.dataset.action;
+
 
             if (
                 action ===
@@ -4681,6 +5944,7 @@ function setupDataShareEvents() {
                 return;
             }
 
+
             if (
                 action ===
                 "export-data"
@@ -4691,6 +5955,7 @@ function setupDataShareEvents() {
                 return;
             }
 
+
             if (
                 action ===
                 "import-data"
@@ -4700,6 +5965,7 @@ function setupDataShareEvents() {
 
                 return;
             }
+
 
             if (
                 action ===
@@ -4733,12 +5999,101 @@ function renderAll() {
 
     renderDataSharePage();
 
+
     if (
         studyState.active
     ) {
 
         renderStudyPage();
     }
+
+
+    updateNavigationButtons();
+}
+
+
+/* =========================================================
+   INITIAL BROWSER HISTORY
+   ========================================================= */
+
+function initializeBrowserHistory() {
+
+    let initialPage =
+        "home";
+
+
+    const hash =
+        location.hash
+            .replace(/^#/, "");
+
+
+    if (hash) {
+
+        const decoded =
+            decodeURIComponent(
+                hash
+            );
+
+
+        if (
+            document.getElementById(
+                `page-${decoded}`
+            )
+        ) {
+
+            initialPage =
+                decoded;
+        }
+    }
+
+
+    navigationState.currentPage =
+        initialPage;
+
+
+    navigationState.history = [
+        initialPage
+    ];
+
+
+    navigationState.historyIndex =
+        0;
+
+
+    try {
+
+        history.replaceState(
+
+            {
+                languageGym: true,
+
+                page: initialPage
+            },
+
+            "",
+
+            `#${encodeURIComponent(
+                initialPage
+            )}`
+        );
+
+    } catch (error) {
+
+        console.warn(
+            "初期履歴の設定に失敗:",
+            error
+        );
+    }
+
+
+    showPage(
+        initialPage,
+        {
+            pushHistory: false,
+            browserHistory: false,
+            scroll: false
+        }
+    );
 }
 
 
@@ -4770,40 +6125,83 @@ function initApp() {
 
 
     /*
-     * ④ 教材インポート
+     * ④ ページ移動
+     */
+
+    setupPageNavigationEvents();
+
+
+    /*
+     * ⑤ 戻る・進む
+     */
+
+    setupNavigationEvents();
+
+
+    /*
+     * ⑥ ブラウザ戻る・進む
+     */
+
+    setupBrowserNavigation();
+
+
+    /*
+     * ⑦ 教材インポート
      */
 
     setupFileImport();
 
 
     /*
-     * ⑤ データ共有
+     * ⑧ データ共有
      */
 
     setupDataShareEvents();
 
 
     /*
-     * ⑥ トレーニングカード
+     * ⑨ トレーニングカード
      */
 
     setupTrainingCards();
 
 
     /*
-     * ⑦ 全画面描画
+     * ⑩ デッキ
+     */
+
+    setupDeckEvents();
+
+
+    /*
+     * ⑪ 学習
+     */
+
+    setupStudyEvents();
+
+
+    /*
+     * ⑫ 全画面描画
      */
 
     renderAll();
 
 
     /*
-     * ⑧ 現在時刻に合わせて
-     *    挨拶を更新
+     * ⑬ ブラウザ履歴初期化
+     */
+
+    initializeBrowserHistory();
+
+
+    /*
+     * ⑭ 時刻による挨拶更新
      */
 
     setInterval(
+
         renderDailyMessage,
+
         60 * 1000
     );
 
