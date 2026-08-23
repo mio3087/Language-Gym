@@ -21,503 +21,894 @@
 
     <title>Language Gym</title>
 
-    <link
-        rel="stylesheet"
-        href="style.css"
-    >
+    <style>
+        :root {
+            --primary: #8B7CF6;
+            --primary-light: #EEEAFE;
+            --bg: #f7f7fb;
+            --card: #ffffff;
+            --text: #222222;
+            --muted: #777777;
+            --border: #e7e7ee;
+            --danger: #e85d75;
+            --radius: 18px;
+            --shadow: 0 8px 30px rgba(0,0,0,0.06);
+        }
 
+        * {
+            box-sizing: border-box;
+        }
 
+        html {
+            scroll-behavior: smooth;
+        }
 
-<style id="language-gym-back-fix">
-#app-back-button {
-    display: none !important;
-    align-items: center;
-    gap: 6px;
-    margin: 0 0 18px 0;
-    padding: 10px 16px;
-    border: 1px solid rgba(139,124,246,.25);
-    border-radius: 10px;
-    background: #fff;
-    color: #5f55b5;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    box-shadow: 0 2px 8px rgba(0,0,0,.06);
-}
-#app-back-button:hover { transform: translateY(-1px); }
-</style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: var(--bg);
+            color: var(--text);
+            font-family:
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                "Noto Sans JP",
+                sans-serif;
+        }
+
+        button,
+        input,
+        select,
+        textarea {
+            font: inherit;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        button:disabled {
+            cursor: not-allowed;
+            opacity: 0.45;
+        }
+
+        .app {
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* =========================
+           SIDEBAR
+           ========================= */
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 250px;
+            background: var(--card);
+            border-right: 1px solid var(--border);
+            padding: 24px 16px;
+            z-index: 100;
+            overflow-y: auto;
+        }
+
+        .logo {
+            padding: 8px 12px 24px;
+        }
+
+        .logo-title {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .logo-subtitle {
+            margin-top: 4px;
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .nav {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .nav-item {
+            width: 100%;
+            border: 0;
+            background: transparent;
+            color: var(--text);
+            padding: 13px 14px;
+            border-radius: 13px;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: 0.2s;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: var(--primary-light);
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .nav-icon {
+            width: 24px;
+            text-align: center;
+        }
+
+        /* =========================
+           MAIN
+           ========================= */
+
+        .main {
+            margin-left: 250px;
+            width: calc(100% - 250px);
+            min-height: 100vh;
+        }
+
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            height: 70px;
+            background: rgba(255,255,255,0.94);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 28px;
+        }
+
+        .topbar-left,
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .icon-button {
+            width: 40px;
+            height: 40px;
+            border: 1px solid var(--border);
+            background: white;
+            border-radius: 12px;
+            color: var(--text);
+        }
+
+        .icon-button:hover:not(:disabled) {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 32px;
+        }
+
+        /* =========================
+           PAGE
+           ========================= */
+
+        .page {
+            display: none;
+        }
+
+        .page.active-page {
+            display: block;
+        }
+
+        .page-header {
+            margin-bottom: 28px;
+        }
+
+        .page-title {
+            margin: 0;
+            font-size: 30px;
+            font-weight: 800;
+        }
+
+        .page-description {
+            margin: 8px 0 0;
+            color: var(--muted);
+        }
+
+        /* =========================
+           CARDS
+           ========================= */
+
+        .grid {
+            display: grid;
+            grid-template-columns:
+                repeat(auto-fit, minmax(220px, 1fr));
+            gap: 18px;
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 22px;
+            box-shadow: var(--shadow);
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .stat-label {
+            color: var(--muted);
+            margin-top: 5px;
+        }
+
+        /* =========================
+           BUTTONS
+           ========================= */
+
+        .btn {
+            border: 0;
+            border-radius: 12px;
+            padding: 11px 17px;
+            transition: 0.2s;
+        }
+
+        .btn:hover:not(:disabled) {
+            transform: translateY(-1px);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .btn-outline {
+            background: white;
+            border: 1px solid var(--border);
+            color: var(--text);
+        }
+
+        .btn-danger {
+            background: #fff0f2;
+            color: var(--danger);
+        }
+
+        .button-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        /* =========================
+           FORM
+           ========================= */
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 700;
+            margin-bottom: 7px;
+        }
+
+        .input,
+        .select,
+        .textarea {
+            width: 100%;
+            border: 1px solid var(--border);
+            background: white;
+            border-radius: 12px;
+            padding: 12px 14px;
+            outline: none;
+        }
+
+        .input:focus,
+        .select:focus,
+        .textarea:focus {
+            border-color: var(--primary);
+            box-shadow:
+                0 0 0 3px var(--primary-light);
+        }
+
+        .textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        /* =========================
+           DECK
+           ========================= */
+
+        .deck-list {
+            display: grid;
+            grid-template-columns:
+                repeat(auto-fill, minmax(260px, 1fr));
+            gap: 18px;
+        }
+
+        .deck-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .deck-name {
+            font-size: 20px;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .deck-meta {
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        /* =========================
+           STUDY
+           ========================= */
+
+        .study-container {
+            max-width: 760px;
+            margin: 0 auto;
+        }
+
+        .study-card {
+            min-height: 360px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .study-front {
+            font-size: 34px;
+            font-weight: 800;
+            margin-bottom: 30px;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .study-back {
+            font-size: 24px;
+            color: var(--primary);
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .study-timer {
+            color: var(--muted);
+            margin-bottom: 12px;
+        }
+
+        /* =========================
+           SEARCH
+           ========================= */
+
+        .card-search-item {
+            padding: 16px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .card-search-item:last-child {
+            border-bottom: 0;
+        }
+
+        .search-card-front {
+            font-weight: 800;
+            font-size: 17px;
+        }
+
+        .search-card-back {
+            color: var(--muted);
+            margin-top: 5px;
+            white-space: pre-wrap;
+        }
+
+        .search-card-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        /* =========================
+           TABLE
+           ========================= */
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        th,
+        td {
+            padding: 13px;
+            border-bottom: 1px solid var(--border);
+            text-align: left;
+        }
+
+        th {
+            background: var(--primary-light);
+        }
+
+        /* =========================
+           COLOR
+           ========================= */
+
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 10px;
+            max-width: 500px;
+        }
+
+        .color-option {
+            width: 100%;
+            aspect-ratio: 1;
+            border-radius: 14px;
+            border: 3px solid white;
+            box-shadow:
+                0 0 0 1px var(--border);
+        }
+
+        .color-option.selected {
+            box-shadow:
+                0 0 0 3px var(--primary),
+                0 5px 12px rgba(0,0,0,0.12);
+        }
+
+        .color-picker-row {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-top: 18px;
+            flex-wrap: wrap;
+        }
+
+        #custom-color {
+            width: 60px;
+            height: 42px;
+            border: 0;
+            padding: 0;
+            background: transparent;
+        }
+
+        /* =========================
+           IMPORT
+           ========================= */
+
+        .drop-zone {
+            border: 2px dashed var(--border);
+            border-radius: 18px;
+            padding: 50px 25px;
+            text-align: center;
+            background: white;
+            transition: 0.2s;
+        }
+
+        .drop-zone:hover {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .drop-zone.dragover {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .selected-files {
+            margin-top: 15px;
+        }
+
+        .selected-file {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            margin-top: 8px;
+            background: white;
+        }
+
+        /* =========================
+           EMPTY
+           ========================= */
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--muted);
+        }
+
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        /* =========================
+           MOBILE
+           ========================= */
+
+        .mobile-menu-button {
+            display: none;
+        }
+
+        @media (max-width: 800px) {
+
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.25s;
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main {
+                margin-left: 0;
+                width: 100%;
+            }
+
+            .mobile-menu-button {
+                display: block;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .topbar {
+                padding: 0 16px;
+            }
+
+            .color-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+
+            .study-front {
+                font-size: 27px;
+            }
+
+            .study-back {
+                font-size: 21px;
+            }
+        }
+    </style>
 </head>
 
 
 <body>
 
-<div id="app">
+<div class="app">
 
-
-    <!-- =====================================================
+    <!-- =========================
          SIDEBAR
-    ====================================================== -->
+         ========================= -->
 
-    <aside class="sidebar">
+    <aside
+        class="sidebar"
+        id="sidebar"
+    >
 
         <div class="logo">
-
-            <span>
+            <div class="logo-title">
                 Language Gym
-            </span>
+            </div>
 
+            <div class="logo-subtitle">
+                多言語学習トレーニング
+            </div>
         </div>
 
-
-        <nav class="navigation">
-
-
-            <!-- HOME -->
+        <nav class="nav">
 
             <button
+                type="button"
                 class="nav-item active"
                 data-page="home"
-                type="button"
             >
-                <span>ホーム</span>
+                <span class="nav-icon">🏠</span>
+                ホーム
             </button>
 
-
-            <!-- DECKS -->
-
             <button
+                type="button"
                 class="nav-item"
                 data-page="decks"
-                type="button"
             >
-                <span>デッキ</span>
+                <span class="nav-icon">📚</span>
+                デッキ
             </button>
 
-
-            <!-- STUDY -->
-
             <button
+                type="button"
                 class="nav-item"
                 data-page="study"
-                type="button"
             >
-                <span>学習</span>
+                <span class="nav-icon">🏋️</span>
+                学習
             </button>
 
-
-            <!-- PROGRESS -->
-
             <button
+                type="button"
                 class="nav-item"
                 data-page="progress"
-                type="button"
             >
-                <span>学習記録</span>
+                <span class="nav-icon">📊</span>
+                学習記録
             </button>
 
-
-            <!-- IMPORT -->
-
             <button
+                type="button"
                 class="nav-item"
                 data-page="import"
-                type="button"
             >
-                <span>教材を追加</span>
+                <span class="nav-icon">📥</span>
+                インポート
             </button>
 
-
-            <!-- DATA SHARE -->
-
             <button
+                type="button"
                 class="nav-item"
                 data-page="data-share"
-                type="button"
             >
-                <span>データ共有</span>
+                <span class="nav-icon">🔄</span>
+                データ共有
+            </button>
+
+            <button
+                type="button"
+                class="nav-item"
+                data-page="settings"
+            >
+                <span class="nav-icon">⚙️</span>
+                設定
             </button>
 
         </nav>
 
-
-        <!-- SIDEBAR BOTTOM -->
-
-        <div class="sidebar-bottom">
-
-            <button
-                class="nav-item"
-                data-page="settings"
-                type="button"
-            >
-                <span>設定</span>
-            </button>
-
-        </div>
-
     </aside>
 
 
+    <!-- =========================
+         MAIN
+         ========================= -->
 
-    <!-- =====================================================
-         MAIN CONTENT
-    ====================================================== -->
+    <main class="main">
 
-    <main class="main-content">
+        <header class="topbar">
 
+            <div class="topbar-left">
 
-        <!-- =================================================
-             BACK BUTTON
-        ================================================== -->
+                <button
+                    type="button"
+                    class="icon-button mobile-menu-button"
+                    id="mobile-menu-button"
+                    aria-label="メニュー"
+                >
+                    ☰
+                </button>
 
-        <button
-            id="app-back-button"
-            type="button"
-            aria-label="前のページに戻る"
-        >
-            ← 戻る
-        </button>
+                <button
+                    type="button"
+                    class="icon-button btn-back"
+                    data-action="back"
+                    title="戻る"
+                    aria-label="戻る"
+                >
+                    ←
+                </button>
 
+                <button
+                    type="button"
+                    class="icon-button btn-forward"
+                    data-action="forward"
+                    title="進む"
+                    aria-label="進む"
+                >
+                    →
+                </button>
 
+            </div>
 
-        <!-- =================================================
-             MOBILE HEADER
-        ================================================== -->
-
-        <header class="mobile-header">
-
-            <div class="logo">
-
-                <span>
+            <div class="topbar-right">
+                <span id="header-language">
                     Language Gym
                 </span>
-
             </div>
 
         </header>
 
 
-
-        <!-- =================================================
-             HOME
-        ================================================== -->
-
-        <section
-            id="page-home"
-            class="page active-page"
-        >
+        <div class="content">
 
 
-            <div class="page-header">
+            <!-- =========================
+                 HOME
+                 ========================= -->
 
-                <div>
+            <section
+                id="page-home"
+                class="page active-page"
+            >
 
-                    <p class="eyebrow">
-                        LANGUAGE TRAINING
-                    </p>
+                <div class="page-header">
 
-                    <h1>
-                        今日もトレーニングしよう
+                    <h1 class="page-title">
+                        Language Gym
                     </h1>
 
                     <p class="page-description">
-                        少しずつ、確実に言語能力を鍛えていきましょう。
+                        今日も少しずつ、外国語を鍛えよう。
                     </p>
 
                 </div>
 
-            </div>
 
+                <div class="grid">
 
-            <!-- DAILY MESSAGE -->
+                    <div class="card">
 
-            <div
-                id="daily-message"
-                class="daily-message"
-            ></div>
-
-
-            <!-- TODAY STATS -->
-
-            <div class="stats-grid">
-
-
-                <div class="stat-card">
-
-                    <div class="stat-icon">
-                        Time
-                    </div>
-
-                    <div>
-
-                        <span class="stat-label">
-                            今日の学習時間
-                        </span>
-
-                        <strong id="today-time">
-                            0分
-                        </strong>
-
-                    </div>
-
-                </div>
-
-
-
-                <div class="stat-card">
-
-                    <div class="stat-icon">
-                        Answers
-                    </div>
-
-                    <div>
-
-                        <span class="stat-label">
-                            今日の回答数
-                        </span>
-
-                        <strong id="today-answers">
+                        <div
+                            class="stat-value"
+                            id="home-deck-count"
+                        >
                             0
-                        </strong>
+                        </div>
+
+                        <div class="stat-label">
+                            デッキ
+                        </div>
 
                     </div>
 
-                </div>
 
+                    <div class="card">
 
+                        <div
+                            class="stat-value"
+                            id="home-card-count"
+                        >
+                            0
+                        </div>
 
-                <div class="stat-card">
+                        <div class="stat-label">
+                            カード
+                        </div>
 
-                    <div class="stat-icon">
-                        Accuracy
                     </div>
 
-                    <div>
 
-                        <span class="stat-label">
-                            今日の正答率
-                        </span>
+                    <div class="card">
 
-                        <strong id="today-accuracy">
+                        <div
+                            class="stat-value"
+                            id="home-study-time"
+                        >
+                            0秒
+                        </div>
+
+                        <div class="stat-label">
+                            累計学習時間
+                        </div>
+
+                    </div>
+
+
+                    <div class="card">
+
+                        <div
+                            class="stat-value"
+                            id="home-accuracy"
+                        >
                             0%
-                        </strong>
+                        </div>
+
+                        <div class="stat-label">
+                            正答率
+                        </div>
 
                     </div>
 
                 </div>
 
 
-
-                <div class="stat-card">
-
-                    <div class="stat-icon">
-                        Decks
-                    </div>
-
-                    <div>
-
-                        <span class="stat-label">
-                            デッキ数
-                        </span>
-
-                        <strong id="deck-count">
-                            0
-                        </strong>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-
-            <!-- TRAINING -->
-
-            <div class="section-header">
-
-                <div>
+                <div
+                    class="card"
+                    style="margin-top:20px;"
+                >
 
                     <h2>
-                        トレーニング
+                        🚀 学習を始める
                     </h2>
 
-                    <p>
-                        鍛えたい技能を選択してください。
+                    <p style="color:var(--muted);">
+                        デッキを選んで学習を開始しましょう。
+                    </p>
+
+                    <div class="button-row">
+
+                        <button
+                            type="button"
+                            class="btn btn-primary"
+                            data-go-page="decks"
+                        >
+                            📚 デッキを見る
+                        </button>
+
+                        <button
+                            type="button"
+                            class="btn btn-secondary"
+                            data-go-page="import"
+                        >
+                            📥 教材を取り込む
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <div
+                    class="card"
+                    style="margin-top:20px;"
+                >
+
+                    <h2>
+                        🌱 今日のメッセージ
+                    </h2>
+
+                    <p id="daily-message">
+                        今日も一歩前進！
                     </p>
 
                 </div>
 
-            </div>
+            </section>
 
 
+            <!-- =========================
+                 DECKS
+                 ========================= -->
 
-            <div class="training-grid">
-
-
-                <button
-                    class="training-card"
-                    data-training="vocabulary"
-                    data-page="decks"
-                    type="button"
-                >
-
-                    <span class="training-title">
-                        Vocabulary
-                    </span>
-
-                    <span class="training-description">
-                        単語・表現
-                    </span>
-
-                </button>
-
-
-
-                <button
-                    class="training-card"
-                    data-training="reading"
-                    data-page="decks"
-                    type="button"
-                >
-
-                    <span class="training-title">
-                        Reading
-                    </span>
-
-                    <span class="training-description">
-                        読解
-                    </span>
-
-                </button>
-
-
-
-                <button
-                    class="training-card"
-                    data-training="listening"
-                    data-page="decks"
-                    type="button"
-                >
-
-                    <span class="training-title">
-                        Listening
-                    </span>
-
-                    <span class="training-description">
-                        聴解
-                    </span>
-
-                </button>
-
-
-
-                <button
-                    class="training-card"
-                    data-training="writing"
-                    data-page="decks"
-                    type="button"
-                >
-
-                    <span class="training-title">
-                        Writing
-                    </span>
-
-                    <span class="training-description">
-                        作文
-                    </span>
-
-                </button>
-
-
-
-                <button
-                    class="training-card"
-                    data-training="speaking"
-                    data-page="decks"
-                    type="button"
-                >
-
-                    <span class="training-title">
-                        Speaking
-                    </span>
-
-                    <span class="training-description">
-                        会話
-                    </span>
-
-                </button>
-
-
-            </div>
-
-
-
-            <!-- RECENT LEARNING -->
-
-            <div class="section-header">
-
-                <div>
-
-                    <h2>
-                        最近の学習
-                    </h2>
-
-                </div>
-
-            </div>
-
-
-            <div
-                id="recent-learning"
-                class="empty-state"
+            <section
+                id="page-decks"
+                class="page"
             >
 
-                <div class="empty-icon">
-                    —
-                </div>
+                <div class="page-header">
 
-                <h3>
-                    まだ学習記録がありません
-                </h3>
-
-                <p>
-                    最初のトレーニングを始めてみましょう。
-                </p>
-
-                <button
-                    class="primary-button"
-                    data-page="decks"
-                    type="button"
-                >
-                    デッキを見る
-                </button>
-
-            </div>
-
-        </section>
-
-
-
-        <!-- =================================================
-             DECKS
-        ================================================== -->
-
-        <section
-            id="page-decks"
-            class="page"
-        >
-
-
-            <div class="page-header">
-
-                <div>
-
-                    <p class="eyebrow">
-                        YOUR MATERIALS
-                    </p>
-
-                    <h1>
-                        デッキ
+                    <h1 class="page-title">
+                        📚 デッキ
                     </h1>
 
                     <p class="page-description">
@@ -527,907 +918,1181 @@
                 </div>
 
 
-                <button
-                    class="primary-button"
-                    data-page="import"
-                    type="button"
+                <div
+                    id="deck-list"
+                    class="deck-list"
                 >
-                    ＋ 教材を追加
-                </button>
 
-            </div>
+                    <div class="empty-state">
 
+                        <div class="empty-icon">
+                            📚
+                        </div>
 
+                        <p>
+                            まだデッキがありません。
+                        </p>
 
-            <div
-                id="deck-list"
-                class="deck-list"
-            >
+                        <button
+                            type="button"
+                            class="btn btn-primary"
+                            data-go-page="import"
+                        >
+                            教材をインポート
+                        </button>
 
-                <div class="empty-state">
-
-                    <div class="empty-icon">
-                        📚
                     </div>
-
-                    <h3>
-                        デッキがありません
-                    </h3>
-
-                    <p>
-                        TXT・CSV・PDFなどの教材を追加して、
-                        最初のデッキを作りましょう。
-                    </p>
-
-                    <button
-                        class="primary-button"
-                        data-page="import"
-                        type="button"
-                    >
-                        教材を追加する
-                    </button>
 
                 </div>
 
-            </div>
 
-        </section>
+                <!-- SEARCH -->
+
+                <div
+                    class="card"
+                    style="margin-top:24px;"
+                >
+
+                    <h2>
+                        🔎 カード検索
+                    </h2>
+
+                    <div class="form-group">
+
+                        <input
+                            id="card-search-input"
+                            class="input"
+                            type="search"
+                            placeholder="カードの表・裏を検索"
+                            autocomplete="off"
+                        >
+
+                    </div>
+
+                    <div id="card-search-results">
+                    </div>
+
+                </div>
+
+            </section>
 
 
+            <!-- =========================
+                 STUDY
+                 ========================= -->
 
-        <!-- =================================================
-             STUDY
-        ================================================== -->
+            <section
+                id="page-study"
+                class="page"
+            >
 
-        <section
-            id="page-study"
-            class="page"
-        >
+                <div class="page-header">
 
-
-            <div class="page-header">
-
-                <div>
-
-                    <p class="eyebrow">
-                        TRAINING MODE
-                    </p>
-
-                    <h1>
-                        学習
+                    <h1 class="page-title">
+                        🏋️ 学習
                     </h1>
 
                     <p
-                        id="study-description"
                         class="page-description"
+                        id="study-deck-name"
                     >
-                        デッキを選択して学習を開始してください。
+                        デッキを選択してください。
                     </p>
 
                 </div>
 
-            </div>
 
+                <div class="study-container">
 
-            <!-- 学習終了 -->
+                    <div
+                        class="card study-card"
+                        id="study-card"
+                    >
 
-            <div
-                style="
-                    display:flex;
-                    justify-content:flex-start;
-                    margin:0 0 24px 0;
-                "
-            >
+                        <div
+                            id="study-front"
+                            class="study-front"
+                        >
+                            学習を開始すると
+                            ここにカードが表示されます。
+                        </div>
 
-                <button
-                    id="study-exit-button"
-                    type="button"
-                    style="
-                        display:inline-flex;
-                        align-items:center;
-                        gap:8px;
-                        padding:10px 18px;
-                        border:1px solid rgba(139,124,246,.35);
-                        border-radius:12px;
-                        background:rgba(139,124,246,.08);
-                        color:inherit;
-                        font-weight:600;
-                        cursor:pointer;
-                    "
-                >
-                    ← 勉強を終了して戻る
-                </button>
+                        <div
+                            id="study-back"
+                            class="study-back"
+                            hidden
+                        >
+                        </div>
 
-            </div>
-
-
-
-            <div id="study-content">
-
-                <div class="empty-state">
-
-                    <div class="empty-icon">
-                        📖
                     </div>
 
-                    <h3>
-                        トレーニングを開始しましょう
-                    </h3>
 
-                    <p>
-                        デッキから学習する教材を選択してください。
-                    </p>
-
-                    <button
-                        class="primary-button"
-                        data-page="decks"
-                        type="button"
+                    <div
+                        class="card"
+                        style="margin-top:18px;"
                     >
-                        デッキを選択
-                    </button>
+
+                        <div
+                            id="study-timer"
+                            class="study-timer"
+                        >
+                            0秒
+                        </div>
+
+                        <div
+                            id="study-progress"
+                            style="margin-bottom:15px;"
+                        >
+                            0 / 0
+                        </div>
+
+
+                        <div class="button-row">
+
+                            <button
+                                type="button"
+                                class="btn btn-primary"
+                                id="show-answer-button"
+                            >
+                                👀 答えを見る
+                            </button>
+
+                            <button
+                                type="button"
+                                class="btn btn-danger"
+                                id="wrong-button"
+                                disabled
+                            >
+                                ❌ わからない
+                            </button>
+
+                            <button
+                                type="button"
+                                class="btn btn-primary"
+                                id="correct-button"
+                                disabled
+                            >
+                                ⭕ 正解
+                            </button>
+
+                            <button
+                                type="button"
+                                class="btn btn-outline"
+                                id="finish-study-button"
+                            >
+                                学習終了
+                            </button>
+
+                        </div>
+
+                    </div>
 
                 </div>
 
-            </div>
-
-        </section>
+            </section>
 
 
+            <!-- =========================
+                 PROGRESS
+                 ========================= -->
 
-        <!-- =================================================
-             PROGRESS
-        ================================================== -->
+            <section
+                id="page-progress"
+                class="page"
+            >
 
-        <section
-            id="page-progress"
-            class="page"
-        >
+                <div class="page-header">
 
-
-            <div class="page-header">
-
-                <div>
-
-                    <p class="eyebrow">
-                        YOUR PROGRESS
-                    </p>
-
-                    <h1>
-                        学習記録
+                    <h1 class="page-title">
+                        📊 学習記録
                     </h1>
 
                     <p class="page-description">
-                        トレーニングの成果を確認できます。
+                        学習時間・回答数・正答率を確認できます。
                     </p>
 
                 </div>
 
-            </div>
+
+                <div class="grid">
+
+                    <div class="card">
+
+                        <div
+                            class="stat-value"
+                            id="progress-total-time"
+                        >
+                            0秒
+                        </div>
+
+                        <div class="stat-label">
+                            累計学習時間
+                        </div>
+
+                    </div>
 
 
+                    <div class="card">
 
-            <!-- PROGRESS OVERVIEW -->
+                        <div
+                            class="stat-value"
+                            id="progress-total-answers"
+                        >
+                            0
+                        </div>
 
-            <div class="progress-overview">
+                        <div class="stat-label">
+                            累計回答数
+                        </div>
+
+                    </div>
 
 
-                <div class="progress-card">
+                    <div class="card">
 
-                    <span>
-                        累計学習時間
-                    </span>
+                        <div
+                            class="stat-value"
+                            id="progress-total-correct"
+                        >
+                            0
+                        </div>
 
-                    <strong id="total-time">
-                        0時間
-                    </strong>
+                        <div class="stat-label">
+                            正解数
+                        </div>
+
+                    </div>
+
+
+                    <div class="card">
+
+                        <div
+                            class="stat-value"
+                            id="progress-accuracy"
+                        >
+                            0%
+                        </div>
+
+                        <div class="stat-label">
+                            正答率
+                        </div>
+
+                    </div>
 
                 </div>
 
 
+                <div
+                    class="card"
+                    style="margin-top:22px;"
+                >
 
-                <div class="progress-card">
+                    <h2>
+                        学習履歴
+                    </h2>
 
-                    <span>
-                        累計回答数
-                    </span>
+                    <div
+                        class="table-wrapper"
+                        id="progress-table"
+                    >
 
-                    <strong id="total-answers">
-                        0
-                    </strong>
+                        <div class="empty-state">
+                            まだ学習記録がありません。
+                        </div>
 
-                </div>
-
-
-
-                <div class="progress-card">
-
-                    <span>
-                        累計正答率
-                    </span>
-
-                    <strong id="total-accuracy">
-                        0%
-                    </strong>
+                    </div>
 
                 </div>
 
+            </section>
 
 
-                <div class="progress-card">
+            <!-- =========================
+                 IMPORT
+                 ========================= -->
 
-                    <span>
-                        不正解数
-                    </span>
+            <section
+                id="page-import"
+                class="page"
+            >
 
-                    <strong id="total-wrong">
-                        0
-                    </strong>
+                <div class="page-header">
 
-                </div>
-
-
-            </div>
-
-
-
-            <!-- DYNAMIC PROGRESS -->
-
-            <div class="section-header">
-
-                <h2>
-                    学習記録
-                </h2>
-
-            </div>
-
-
-            <div id="progress-content"></div>
-
-
-
-            <!-- DECK PROGRESS -->
-
-            <div
-                id="deck-progress"
-                style="display:none;"
-            ></div>
-
-        </section>
-
-
-
-        <!-- =================================================
-             IMPORT
-        ================================================== -->
-
-        <section
-            id="page-import"
-            class="page"
-        >
-
-
-            <div class="page-header">
-
-                <div>
-
-                    <p class="eyebrow">
-                        IMPORT MATERIAL
-                    </p>
-
-                    <h1>
-                        教材を追加
+                    <h1 class="page-title">
+                        📥 インポート
                     </h1>
 
                     <p class="page-description">
-                        教材をLanguage Gymに取り込みます。
+                        TXT・CSV・PDFなどの教材を取り込みます。
                     </p>
 
                 </div>
 
-            </div>
+
+                <div class="card">
+
+                    <!-- 追加先デッキ -->
+
+                    <div class="form-group">
+
+                        <label
+                            class="form-label"
+                            for="import-deck-select"
+                        >
+                            📚 追加先デッキ
+                        </label>
+
+                        <select
+                            id="import-deck-select"
+                            class="select"
+                        >
+
+                            <option value="">
+                                新しいデッキを作成
+                            </option>
+
+                        </select>
+
+                        <p
+                            style="
+                                color:var(--muted);
+                                margin:7px 0 0;
+                            "
+                        >
+                            既存デッキを選ぶと、そのデッキにカードを追加します。
+                        </p>
+
+                    </div>
 
 
+                    <!-- 学習言語 -->
 
-            <div class="import-card">
+                    <div class="form-group">
+
+                        <label
+                            class="form-label"
+                            for="import-language-select"
+                        >
+                            🌐 学習言語
+                        </label>
+
+                        <select
+                            id="import-language-select"
+                            class="select"
+                        >
+
+                            <option value="zh">
+                                中国語
+                            </option>
+
+                            <option value="ja">
+                                日本語
+                            </option>
+
+                            <option value="ko">
+                                韓国語
+                            </option>
+
+                            <option value="de">
+                                ドイツ語
+                            </option>
+
+                            <option value="fr">
+                                フランス語
+                            </option>
+
+                            <option value="es">
+                                スペイン語
+                            </option>
+
+                            <option value="it">
+                                イタリア語
+                            </option>
+
+                            <option value="fi">
+                                フィンランド語
+                            </option>
+
+                        </select>
+
+                    </div>
 
 
-                <div class="import-icon">
-                    +
+                    <!-- FILE DROP -->
+
+                    <div
+                        id="drop-zone"
+                        class="drop-zone"
+                    >
+
+                        <div
+                            style="font-size:48px;"
+                        >
+                            📄
+                        </div>
+
+                        <h2>
+                            教材を選択
+                        </h2>
+
+                        <p>
+                            TXT / CSV / PDF
+                        </p>
+
+                        <p
+                            style="
+                                color:var(--muted);
+                                font-size:14px;
+                            "
+                        >
+                            複数ファイルをまとめて選択できます
+                        </p>
+
+                        <input
+                            id="file-input"
+                            type="file"
+                            accept=".txt,.csv,.pdf,text/plain,text/csv,application/pdf"
+                            multiple
+                            hidden
+                        >
+
+                        <button
+                            type="button"
+                            class="btn btn-primary"
+                            id="select-file-button"
+                        >
+                            📂 ファイルを選択
+                        </button>
+
+                    </div>
+
+
+                    <!-- 選択ファイル一覧 -->
+
+                    <div
+                        id="selected-files"
+                        class="selected-files"
+                    >
+                    </div>
+
+
+                    <!-- IMPORT STATUS -->
+
+                    <div
+                        id="import-status"
+                        style="margin-top:20px;"
+                    >
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- =========================
+                 DATA SHARE
+                 ========================= -->
+
+            <section
+                id="page-data-share"
+                class="page"
+            >
+
+                <div class="page-header">
+
+                    <h1 class="page-title">
+                        🔄 データ共有
+                    </h1>
+
+                    <p class="page-description">
+                        PC・スマホ間でLanguage Gymのデータを共有します。
+                    </p>
+
                 </div>
 
 
-                <h2>
-                    教材をインポート
-                </h2>
+                <div class="grid">
+
+                    <div class="card">
+
+                        <h2>
+                            📤 データを書き出す
+                        </h2>
+
+                        <p>
+                            学習記録・デッキ・設定などをJSONファイルとして保存します。
+                        </p>
+
+                        <button
+                            type="button"
+                            class="btn btn-primary"
+                            id="export-data-button"
+                        >
+                            データを書き出す
+                        </button>
+
+                    </div>
 
 
-                <p>
-                    TXT・CSV・PDFなどの教材を
-                    デッキとして利用できます。
-                </p>
+                    <div class="card">
+
+                        <h2>
+                            📥 データを読み込む
+                        </h2>
+
+                        <p>
+                            別の端末で書き出したJSONファイルを読み込みます。
+                        </p>
+
+                        <input
+                            id="data-import-input"
+                            type="file"
+                            accept=".json,application/json"
+                            hidden
+                        >
+
+                        <button
+                            type="button"
+                            class="btn btn-primary"
+                            id="data-import-button"
+                        >
+                            JSONを読み込む
+                        </button>
+
+                    </div>
 
 
+                    <div class="card">
 
-                <!-- FILE -->
+                        <h2>
+                            🛟 自動バックアップ
+                        </h2>
 
-                <label
-                    for="file-input"
-                    class="file-button"
+                        <p>
+                            最新データの自動バックアップから復元します。
+                        </p>
+
+                        <button
+                            type="button"
+                            class="btn btn-secondary"
+                            id="restore-backup-button"
+                        >
+                            バックアップから復元
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- =========================
+                 SETTINGS
+                 ========================= -->
+
+            <section
+                id="page-settings"
+                class="page"
+            >
+
+                <div class="page-header">
+
+                    <h1 class="page-title">
+                        ⚙️ 設定
+                    </h1>
+
+                    <p class="page-description">
+                        Language Gymを自分好みに設定できます。
+                    </p>
+
+                </div>
+
+
+                <!-- COLOR -->
+
+                <div class="card">
+
+                    <h2>
+                        🎨 テーマカラー
+                    </h2>
+
+                    <p style="color:var(--muted);">
+                        12色から好きな色を選べます。
+                    </p>
+
+
+                    <div
+                        id="preset-colors"
+                        class="color-grid"
+                    >
+
+                        <button
+                            type="button"
+                            class="color-option"
+                            data-color="#F7B2C4"
+                            style="background:#F7B2C4;"
+                            title="さくら"
+                        ></button>
+
+                        <button
+                            type="button"
+                            class="color-option"
+                            data-color="#8ED8F8"
+                            style="background:#8ED8F8;"
+                            title="水色"
+                        ></button>
+
+                        <button
+                            type="button"
+                            class="color-option"
+                            data-color="#9AD88B"
+                            style="background:#9AD88B;"
+                            title="若葉"
+                        ></button>
+
+                        <button
+                            type="button"
+                            class="color-option"
+                            data-color="#F6A85F"
+                            style="background:#F6A85F;"
+                            title="みかん"
+                        ></button>
+
+                        <button
+                            type="button"
+                            class="color-option"
+                            data-color="#F5D77A"
+                            style="background:#F5D77A;"
+                            title="バター"
+                        ></button>
+
+                        <button
+                            type="button"
+                            class="color-option"
+                            data-color="#8B7CF6"
+                            style="background:#8B7CF6;"
+                            title="紫"
+                        ></button>
+
+                        <button
+                            type="button"
+                            class="color-option"
+                            data-color="#F28B82"
+                            style="background:#F28B82;"
+                            title="コーラル"
+                        ></button>
+
+                        <button
+                            type="button"
+                            class="color-option"
+                            data-color="#7DD3C7"
+                            style="background:#7DD3C7;"
+                            title="ミント"
+                        ></button>
+
+                        <button
+                            type="button"
+                            class="color-option"
+                            data-color="#4F6FAE"
+                            style="background:#4F6FAE;"
+                            title="ネイビー"
+                        ></button>
+
+                        <button
+                            type="button"
+                            class="color-option"
+                            data-color="#A8D64F"
+                            style="background:#A8D64F;"
+                            title="ライム"
+                        ></button>
+
+                        <button
+                            type="button"
+                            class="color-option"
+                            data-color="#A98274"
+                            style="background:#A98274;"
+                            title="モカ"
+                        ></button>
+
+                        <button
+                            type="button"
+                            class="color-option"
+                            data-color="#9B4D6A"
+                            style="background:#9B4D6A;"
+                            title="ワイン"
+                        ></button>
+
+                    </div>
+
+
+                    <div class="color-picker-row">
+
+                        <label for="custom-color">
+                            カスタムカラー
+                        </label>
+
+                        <input
+                            id="custom-color"
+                            type="color"
+                            value="#8B7CF6"
+                        >
+
+                        <span id="custom-color-value">
+                            #8B7CF6
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <!-- VOICE -->
+
+                <div
+                    class="card"
+                    style="margin-top:20px;"
                 >
-                    📂 ファイルを選択
-                </label>
+
+                    <h2>
+                        🔊 音声
+                    </h2>
+
+                    <div class="form-group">
+
+                        <label class="form-label">
+                            自動音声
+                        </label>
+
+                        <label>
+                            <input
+                                id="auto-voice"
+                                type="checkbox"
+                            >
+                            カード表示時に自動再生
+                        </label>
+                    </div>
+
+                    <label
+    style="
+        display:flex;
+        align-items:center;
+        gap:10px;
+        cursor:pointer;
+        margin-top:16px;
+    "
+>
+    <input
+        type="checkbox"
+        id="random-study"
+        checked
+    >
+
+    <span>
+        🎲 学習カードをランダムにする
+    </span>
+</label>
 
 
-                <input
-                    id="file-input"
-                    type="file"
-                    accept=".txt,.csv,.pdf,text/plain,text/csv,application/pdf"
-                    multiple
-                    hidden
-                >
+                    <div class="form-group">
+
+                        <label
+                            class="form-label"
+                            for="voice-rate"
+                        >
+                            音声速度
+                        </label>
+
+                        <input
+                            id="voice-rate"
+                            class="input"
+                            type="number"
+                            min="0.5"
+                            max="2"
+                            step="0.1"
+                            value="1"
+                        >
+
+                    </div>
 
 
-                <p id="selected-file">
-                    ファイルが選択されていません
-                </p>
+                    <div class="form-group">
 
+                        <label
+                            class="form-label"
+                            for="voice-pitch"
+                        >
+                            音声ピッチ
+                        </label>
+
+                        <input
+                            id="voice-pitch"
+                            class="input"
+                            type="number"
+                            min="0"
+                            max="2"
+                            step="0.1"
+                            value="1"
+                        >
+
+                    </div>
+
+                </div>
 
 
                 <!-- LANGUAGE -->
 
-                <div class="import-language">
-
-
-                    <label
-                        for="import-language-select"
-                    >
-                        この教材の言語
-                    </label>
-
-
-                    <select
-                        id="import-language-select"
-                    >
-
-                        <option value="zh">
-                            🇨🇳 中文
-                        </option>
-
-                        <option value="en">
-                            🇬🇧 English
-                        </option>
-
-                        <option value="de">
-                            🇩🇪 Deutsch
-                        </option>
-
-                        <option value="es">
-                            🇪🇸 Español
-                        </option>
-
-                        <option value="ja">
-                            🇯🇵 日本語
-                        </option>
-
-                        <option value="fr">
-                            🇫🇷 Français
-                        </option>
-
-                        <option value="it">
-                            🇮🇹 Italiano
-                        </option>
-
-                        <option value="ko">
-                            🇰🇷 한국어
-                        </option>
-
-                        <option value="other">
-                            🌏 Other
-                        </option>
-
-                    </select>
-
-
-                    <p class="setting-hint">
-                        この言語設定はデッキごとに保存されます。
-                    </p>
-
-                </div>
-
-
-            </div>
-
-        </section>
-
-
-
-        <!-- =================================================
-             DATA SHARE
-        ================================================== -->
-
-        <section
-            id="page-data-share"
-            class="page"
-        >
-
-
-            <div class="page-header">
-
-                <div>
-
-                    <p class="eyebrow">
-                        DATA MANAGEMENT
-                    </p>
-
-                    <h1>
-                        データ共有
-                    </h1>
-
-                    <p class="page-description">
-                        Language Gymの学習データを
-                        別の端末へ移動・共有できます。
-                    </p>
-
-                </div>
-
-            </div>
-
-
-
-            <div
-                id="data-share-content"
-            >
-
-                <!-- app.jsで生成 -->
-
-            </div>
-
-
-        </section>
-
-
-
-        <!-- =================================================
-             SETTINGS
-        ================================================== -->
-
-        <section
-            id="page-settings"
-            class="page"
-        >
-
-
-            <div class="page-header">
-
-                <div>
-
-                    <p class="eyebrow">
-                        SETTINGS
-                    </p>
-
-                    <h1>
-                        設定
-                    </h1>
-
-                    <p class="page-description">
-                        Language Gymをカスタマイズします。
-                    </p>
-
-                </div>
-
-            </div>
-
-
-
-            <!-- THEME COLOR -->
-
-            <div class="settings-card">
-
-
-                <h2>
-                    🎨 テーマカラー
-                </h2>
-
-
-                <p>
-                    好きなカラーを選択してください。
-                </p>
-
-
                 <div
-                    id="theme-colors"
-                    class="theme-colors"
-                ></div>
-
-
-            </div>
-
-
-
-            <!-- DEFAULT LANGUAGE -->
-
-            <div class="settings-card">
-
-
-                <h2>
-                    🌏 アプリのデフォルト言語
-                </h2>
-
-
-                <p>
-                    新しい教材を追加するときの
-                    初期設定として使用します。
-                </p>
-
-
-
-                <div class="language-selector">
-
-
-                    <label
-                        for="language-select"
-                    >
-                        デフォルト言語
-                    </label>
-
-
-                    <select
-                        id="language-select"
-                    >
-
-                        <option value="zh">
-                            🇨🇳 中文
-                        </option>
-
-                        <option value="en">
-                            🇬🇧 English
-                        </option>
-
-                        <option value="de">
-                            🇩🇪 Deutsch
-                        </option>
-
-                        <option value="es">
-                            🇪🇸 Español
-                        </option>
-
-                        <option value="ja">
-                            🇯🇵 日本語
-                        </option>
-
-                        <option value="fr">
-                            🇫🇷 Français
-                        </option>
-
-                        <option value="it">
-                            🇮🇹 Italiano
-                        </option>
-
-                        <option value="ko">
-                            🇰🇷 한국어
-                        </option>
-
-                        <option value="other">
-                            🌏 Other
-                        </option>
-
-                    </select>
-
-
-                    <p class="setting-hint">
-                        教材ごとの言語設定とは別に保存されます。
-                    </p>
-
-
-                </div>
-
-            </div>
-
-
-
-            <!-- AUTO VOICE -->
-
-            <div class="settings-card">
-
-
-                <h2>
-                    🔊 自動音声
-                </h2>
-
-
-                <p>
-                    学習中に教材を自動で読み上げます。
-                </p>
-
-
-
-                <label
-                    class="setting-toggle"
+                    class="card"
+                    style="margin-top:20px;"
                 >
 
-                    <input
-                        id="auto-voice"
-                        type="checkbox"
-                    >
+                    <h2>
+                        🌐 言語設定
+                    </h2>
 
 
-                    <span>
-                        学習開始時に自動読み上げ
-                    </span>
+                    <div class="form-group">
 
-                </label>
+                        <label
+                            class="form-label"
+                            for="ui-language"
+                        >
+                            UI言語
+                        </label>
 
+                        <select
+                            id="ui-language"
+                            class="select"
+                        >
 
-                <p class="setting-hint">
-                    ブラウザの音声合成機能を使用します。
-                </p>
+                            <option value="ja">
+                                日本語
+                            </option>
 
+                            <option value="en">
+                                English
+                            </option>
 
-            </div>
+                            <option value="zh">
+                                中文
+                            </option>
 
+                        </select>
 
-
-            <!-- VOICE RATE -->
-
-            <div class="settings-card">
-
-
-                <h2>
-                    🎙 音声速度
-                </h2>
-
-
-                <p>
-                    自動読み上げの速度を設定します。
-                </p>
-
-
-                <div
-                    style="
-                        display:flex;
-                        align-items:center;
-                        gap:16px;
-                        flex-wrap:wrap;
-                    "
-                >
-
-                    <input
-                        id="voice-rate"
-                        type="range"
-                        min="0.5"
-                        max="2"
-                        step="0.1"
-                        value="1"
-                    >
+                    </div>
 
 
-                    <span
-                        id="voice-rate-value"
-                    >
-                        1.0
-                    </span>
+                    <div class="form-group">
 
-                </div>
+                        <label
+                            class="form-label"
+                            for="learning-language"
+                        >
+                            学習言語
+                        </label>
 
+                        <select
+                            id="learning-language"
+                            class="select"
+                        >
 
-            </div>
+                            <option value="zh">
+                                中国語
+                            </option>
 
+                            <option value="de">
+                                ドイツ語
+                            </option>
 
+                            <option value="es">
+                                スペイン語
+                            </option>
 
-            <!-- VOICE PITCH -->
+                            <option value="ko">
+                                韓国語
+                            </option>
 
-            <div class="settings-card">
+                            <option value="fr">
+                                フランス語
+                            </option>
 
+                            <option value="it">
+                                イタリア語
+                            </option>
 
-                <h2>
-                    🎵 音声の高さ
-                </h2>
+                            <option value="fi">
+                                フィンランド語
+                            </option>
 
+                        </select>
 
-                <p>
-                    自動読み上げの声の高さを設定します。
-                </p>
-
-
-                <div
-                    style="
-                        display:flex;
-                        align-items:center;
-                        gap:16px;
-                        flex-wrap:wrap;
-                    "
-                >
-
-                    <input
-                        id="voice-pitch"
-                        type="range"
-                        min="0.5"
-                        max="2"
-                        step="0.1"
-                        value="1"
-                    >
-
-
-                    <span
-                        id="voice-pitch-value"
-                    >
-                        1.0
-                    </span>
+                    </div>
 
                 </div>
 
+            </section>
 
-            </div>
-
-
-        </section>
-
+        </div>
 
     </main>
 
 </div>
 
 
+<!-- =========================
+     APP.JS
+     ========================= -->
 
-<!-- =========================================================
-     MOBILE MENU OVERLAY
-========================================================== -->
-
-
-
-
-<!-- =========================================================
-     PDF.JS
-========================================================== -->
-
-<script
-    src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"
-></script>
+<script src="./app.js"></script>
 
 
-<script>
-
-if (
-    typeof pdfjsLib !== "undefined"
-) {
-
-    pdfjsLib.GlobalWorkerOptions.workerSrc =
-        "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
-
-}
-
-</script>
-
-
-
-<!-- =========================================================
-     APPLICATION
-========================================================== -->
-
-<script src="app.js"></script>
-
-
-
-<!-- =========================================================
-     UI / SETTINGS / BACK BUTTON
-========================================================== -->
+<!-- =========================
+     HTML EVENT BRIDGE
+     ========================= -->
 
 <script>
 
 document.addEventListener(
     "DOMContentLoaded",
-    () => {
+    function () {
 
+        /* =================================
+           MOBILE MENU
+           ================================= */
 
-        /* =================================================
-           DEFAULT LANGUAGE
-        ================================================== */
-
-        const languageSelect =
+        const menuButton =
             document.getElementById(
-                "language-select"
+                "mobile-menu-button"
             );
 
-        const importLanguageSelect =
+        const sidebar =
             document.getElementById(
-                "import-language-select"
+                "sidebar"
             );
 
+        if (
+            menuButton &&
+            sidebar
+        ) {
 
-        try {
+            menuButton.addEventListener(
+                "click",
+                function () {
 
-            if (
-                typeof appData !== "undefined" &&
-                appData.settings
-            ) {
-
-                const language =
-                    appData.settings.learningLanguage ||
-                    "zh";
-
-                if (
-                    languageSelect
-                ) {
-
-                    languageSelect.value =
-                        language;
+                    sidebar.classList.toggle(
+                        "open"
+                    );
 
                 }
-
-                if (
-                    importLanguageSelect
-                ) {
-
-                    importLanguageSelect.value =
-                        language;
-
-                }
-
-            }
-
-        } catch (error) {
-
-            console.warn(
-                "言語設定の読み込みに失敗しました。",
-                error
             );
 
         }
 
 
+        /* =================================
+           NAVIGATION
+           ================================= */
 
-        /* =================================================
-           DEFAULT LANGUAGE CHANGE
-        ================================================== */
+        document
+            .querySelectorAll(
+                ".nav-item"
+            )
+            .forEach(
+                function (button) {
 
-        if (
-            languageSelect
-        ) {
+                    button.addEventListener(
+                        "click",
+                        function () {
 
-            languageSelect.addEventListener(
-                "change",
-                () => {
-
-                    try {
-
-                        if (
-                            typeof appData !==
-                            "undefined"
-                        ) {
-
-                            appData.settings =
-                                appData.settings ||
-                                {};
-
-                            appData.settings
-                                .learningLanguage =
-                                languageSelect.value;
+                            const page =
+                                this.dataset.page;
 
                             if (
-                                importLanguageSelect
+                                page &&
+                                typeof showPage ===
+                                    "function"
                             ) {
 
-                                importLanguageSelect.value =
-                                    languageSelect.value;
+                                showPage(page);
 
-                            }
-
-                            if (
-                                typeof saveData ===
-                                "function"
-                            ) {
-
-                                saveData();
+                                if (sidebar) {
+                                    sidebar.classList.remove(
+                                        "open"
+                                    );
+                                }
 
                             }
 
                         }
+                    );
 
-                    } catch (error) {
+                }
+            );
 
-                        console.error(
-                            "言語設定保存エラー:",
-                            error
+
+        document
+            .querySelectorAll(
+                "[data-go-page]"
+            )
+            .forEach(
+                function (button) {
+
+                    button.addEventListener(
+                        "click",
+                        function () {
+
+                            const page =
+                                this.dataset.goPage;
+
+                            if (
+                                page &&
+                                typeof showPage ===
+                                    "function"
+                            ) {
+
+                                showPage(page);
+
+                            }
+
+                        }
+                    );
+
+                }
+            );
+
+
+        /* =================================
+           STUDY
+           ================================= */
+
+        const showAnswerButton =
+            document.getElementById(
+                "show-answer-button"
+            );
+
+        const wrongButton =
+            document.getElementById(
+                "wrong-button"
+            );
+
+        const correctButton =
+            document.getElementById(
+                "correct-button"
+            );
+
+        const finishStudyButton =
+            document.getElementById(
+                "finish-study-button"
+            );
+
+
+        if (showAnswerButton) {
+
+            showAnswerButton.addEventListener(
+                "click",
+                function () {
+
+                    if (
+                        typeof showStudyAnswer ===
+                            "function"
+                    ) {
+
+                        showStudyAnswer();
+
+                    }
+
+                }
+            );
+
+        }
+
+
+        if (wrongButton) {
+
+            wrongButton.addEventListener(
+                "click",
+                function () {
+
+                    if (
+                        typeof handleStudyWrong ===
+                            "function"
+                    ) {
+
+                        handleStudyWrong();
+
+                    }
+
+                }
+            );
+
+        }
+
+
+        if (correctButton) {
+
+            correctButton.addEventListener(
+                "click",
+                function () {
+
+                    if (
+                        typeof handleStudyCorrect ===
+                            "function"
+                    ) {
+
+                        handleStudyCorrect();
+
+                    }
+
+                }
+            );
+
+        }
+
+
+        if (finishStudyButton) {
+
+            finishStudyButton.addEventListener(
+                "click",
+                function () {
+
+                    if (
+                        typeof finishStudy ===
+                            "function"
+                    ) {
+
+                        finishStudy();
+
+                    }
+
+                }
+            );
+
+        }
+
+
+        /* =================================
+           SEARCH
+           ================================= */
+
+        const searchInput =
+            document.getElementById(
+                "card-search-input"
+            );
+
+        if (searchInput) {
+
+            searchInput.addEventListener(
+                "input",
+                function () {
+
+                    if (
+                        typeof renderCardSearchResults ===
+                            "function"
+                    ) {
+
+                        renderCardSearchResults(
+                            this.value
                         );
 
                     }
@@ -1438,281 +2103,712 @@ document.addEventListener(
         }
 
 
+        /* =================================
+           FILE IMPORT
+           ================================= */
 
-        /* =================================================
-           AUTO VOICE
-        ================================================== */
+        const selectFileButton =
+            document.getElementById(
+                "select-file-button"
+            );
+
+        const fileInput =
+            document.getElementById(
+                "file-input"
+            );
+
+        if (
+            selectFileButton &&
+            fileInput
+        ) {
+
+            selectFileButton.addEventListener(
+                "click",
+                function () {
+
+                    fileInput.click();
+
+                }
+            );
+
+
+            fileInput.addEventListener(
+                "change",
+                async function () {
+
+                    const files =
+                        Array.from(
+                            this.files || []
+                        );
+
+                    const selectedFiles =
+                        document.getElementById(
+                            "selected-files"
+                        );
+
+                    if (selectedFiles) {
+
+                        selectedFiles.innerHTML =
+                            files
+                                .map(
+                                    function (file) {
+
+                                        return `
+                                            <div class="selected-file">
+                                                <span>
+                                                    📄
+                                                    ${escapeHTML(
+                                                        file.name
+                                                    )}
+                                                </span>
+                                                <span>
+                                                    ${Math.round(
+                                                        file.size / 1024
+                                                    )} KB
+                                                </span>
+                                            </div>
+                                        `;
+
+                                    }
+                                )
+                                .join("");
+
+                    }
+
+
+                    /*
+                     * 複数ファイルを順番に処理
+                     */
+
+                    for (
+                        const file of files
+                    ) {
+
+                        if (
+                            typeof handleFileImport ===
+                                "function"
+                        ) {
+
+                            await handleFileImport(
+                                file
+                            );
+
+                        }
+
+                    }
+
+                    this.value = "";
+
+                }
+            );
+
+        }
+
+
+        /* =================================
+           JSON IMPORT
+           ================================= */
+
+        const dataImportButton =
+            document.getElementById(
+                "data-import-button"
+            );
+
+        const dataImportInput =
+            document.getElementById(
+                "data-import-input"
+            );
+
+        if (
+            dataImportButton &&
+            dataImportInput
+        ) {
+
+            dataImportButton.addEventListener(
+                "click",
+                function () {
+
+                    dataImportInput.click();
+
+                }
+            );
+
+
+            dataImportInput.addEventListener(
+                "change",
+                function () {
+
+                    const file =
+                        this.files &&
+                        this.files[0];
+
+                    if (
+                        file &&
+                        typeof importDataJSON ===
+                            "function"
+                    ) {
+
+                        importDataJSON(
+                            file
+                        );
+
+                    }
+
+                    this.value = "";
+
+                }
+            );
+
+        }
+
+
+        /* =================================
+           EXPORT
+           ================================= */
+
+        const exportButton =
+            document.getElementById(
+                "export-data-button"
+            );
+
+        if (exportButton) {
+
+            exportButton.addEventListener(
+                "click",
+                function () {
+
+                    if (
+                        typeof exportDataJSON ===
+                            "function"
+                    ) {
+
+                        exportDataJSON();
+
+                    }
+
+                }
+            );
+
+        }
+
+
+        /* =================================
+           BACKUP
+           ================================= */
+
+        const restoreButton =
+            document.getElementById(
+                "restore-backup-button"
+            );
+
+        if (restoreButton) {
+
+            restoreButton.addEventListener(
+                "click",
+                function () {
+
+                    if (
+                        typeof restoreAutomaticBackup ===
+                            "function"
+                    ) {
+
+                        restoreAutomaticBackup();
+
+                    }
+
+                }
+            );
+
+        }
+
+
+        /* =================================
+           COLORS
+           ================================= */
+
+        const colorButtons =
+            document.querySelectorAll(
+                ".color-option"
+            );
+
+        const customColor =
+            document.getElementById(
+                "custom-color"
+            );
+
+        const customColorValue =
+            document.getElementById(
+                "custom-color-value"
+            );
+
+
+        function setColor(color) {
+
+            if (
+                !/^#[0-9A-Fa-f]{6}$/.test(
+                    color
+                )
+            ) {
+                return;
+            }
+
+
+            if (
+                typeof applyTheme ===
+                    "function"
+            ) {
+
+                applyTheme(color);
+
+            }
+
+
+            if (
+                typeof appData !==
+                    "undefined" &&
+                appData.settings
+            ) {
+
+                appData.settings.customColor =
+                    color;
+
+                if (
+                    typeof saveData ===
+                        "function"
+                ) {
+
+                    saveData();
+
+                }
+
+            }
+
+
+            if (customColor) {
+
+                customColor.value =
+                    color;
+
+            }
+
+
+            if (customColorValue) {
+
+                customColorValue.textContent =
+                    color.toUpperCase();
+
+            }
+
+
+            colorButtons.forEach(
+                function (button) {
+
+                    button.classList.toggle(
+                        "selected",
+                        button.dataset.color
+                            .toUpperCase() ===
+                        color.toUpperCase()
+                    );
+
+                }
+            );
+
+        }
+
+
+        colorButtons.forEach(
+            function (button) {
+
+                button.addEventListener(
+                    "click",
+                    function () {
+
+                        setColor(
+                            this.dataset.color
+                        );
+
+                    }
+                );
+
+            }
+        );
+
+
+        if (customColor) {
+
+            customColor.addEventListener(
+                "input",
+                function () {
+
+                    setColor(
+                        this.value
+                    );
+
+                }
+            );
+
+        }
+
+
+        /* =================================
+           SETTINGS
+           ================================= */
+
+        if (
+            typeof appData !==
+                "undefined" &&
+            appData.settings
+        ) {
+
+            const settings =
+                appData.settings;
+
+
+            const autoVoice =
+                document.getElementById(
+                    "auto-voice"
+                );
+
+            const voiceRate =
+                document.getElementById(
+                    "voice-rate"
+                );
+
+            const voicePitch =
+                document.getElementById(
+                    "voice-pitch"
+                );
+
+            const uiLanguage =
+                document.getElementById(
+                    "ui-language"
+                );
+
+            const learningLanguage =
+                document.getElementById(
+                    "learning-language"
+                );
+
+
+            if (autoVoice) {
+
+                autoVoice.checked =
+                    Boolean(
+                        settings.autoVoice
+                    );
+
+            }
+
+
+            if (voiceRate) {
+
+                voiceRate.value =
+                    settings.voiceRate || 1;
+
+            }
+
+
+            if (voicePitch) {
+
+                voicePitch.value =
+                    settings.voicePitch || 1;
+
+            }
+
+
+            if (uiLanguage) {
+
+                uiLanguage.value =
+                    settings.uiLanguage || "ja";
+
+            }
+
+
+            if (learningLanguage) {
+
+                learningLanguage.value =
+                    settings.learningLanguage ||
+                    "zh";
+
+            }
+
+
+            if (
+                settings.customColor &&
+                customColor
+            ) {
+
+                setColor(
+                    settings.customColor
+                );
+
+            }
+
+        }
+
+
+        function saveSetting(
+            key,
+            value
+        ) {
+
+            if (
+                typeof appData ===
+                    "undefined" ||
+                !appData.settings
+            ) {
+                return;
+            }
+
+
+            appData.settings[key] =
+                value;
+
+
+            if (
+                typeof saveData ===
+                    "function"
+            ) {
+
+                saveData();
+
+            }
+
+        }
+
 
         const autoVoice =
             document.getElementById(
                 "auto-voice"
             );
 
-
-        if (
-            autoVoice
-        ) {
-
-            try {
-
-                if (
-                    typeof appData !==
-                    "undefined"
-                ) {
-
-                    autoVoice.checked =
-                        Boolean(
-                            appData.settings
-                                ?.autoVoice
-                        );
-
-                }
-
-            } catch (error) {
-
-                console.warn(
-                    "音声設定読み込みエラー:",
-                    error
-                );
-
-            }
-
-
-            autoVoice.addEventListener(
-                "change",
-                () => {
-
-                    try {
-
-                        if (
-                            typeof appData !==
-                            "undefined"
-                        ) {
-
-                            appData.settings =
-                                appData.settings ||
-                                {};
-
-                            appData.settings
-                                .autoVoice =
-                                autoVoice.checked;
-
-                            if (
-                                typeof saveData ===
-                                "function"
-                            ) {
-
-                                saveData();
-
-                            }
-
-                        }
-
-                    } catch (error) {
-
-                        console.error(
-                            "自動音声設定保存エラー:",
-                            error
-                        );
-
-                    }
-
-                }
-            );
-
-        }
-
-
-
-        /* =================================================
-           VOICE RATE
-        ================================================== */
-
         const voiceRate =
             document.getElementById(
                 "voice-rate"
             );
-
-        const voiceRateValue =
-            document.getElementById(
-                "voice-rate-value"
-            );
-
-
-        if (
-            voiceRate
-        ) {
-
-            try {
-
-                const savedRate =
-                    Number(
-                        appData
-                            ?.settings
-                            ?.voiceRate
-                    ) || 1;
-
-                voiceRate.value =
-                    savedRate;
-
-                if (
-                    voiceRateValue
-                ) {
-
-                    voiceRateValue.textContent =
-                        Number(
-                            savedRate
-                        ).toFixed(1);
-
-                }
-
-            } catch (error) {}
-
-
-            voiceRate.addEventListener(
-                "input",
-                () => {
-
-                    const value =
-                        Number(
-                            voiceRate.value
-                        );
-
-
-                    if (
-                        voiceRateValue
-                    ) {
-
-                        voiceRateValue.textContent =
-                            value.toFixed(1);
-
-                    }
-
-
-                    try {
-
-                        appData.settings =
-                            appData.settings ||
-                            {};
-
-                        appData.settings.voiceRate =
-                            value;
-
-                        if (
-                            typeof saveData ===
-                            "function"
-                        ) {
-
-                            saveData();
-
-                        }
-
-                    } catch (error) {
-
-                        console.error(
-                            "音声速度保存エラー:",
-                            error
-                        );
-
-                    }
-
-                }
-            );
-
-        }
-
-
-
-        /* =================================================
-           VOICE PITCH
-        ================================================== */
 
         const voicePitch =
             document.getElementById(
                 "voice-pitch"
             );
 
-        const voicePitchValue =
+        const uiLanguage =
             document.getElementById(
-                "voice-pitch-value"
+                "ui-language"
+            );
+
+        const learningLanguage =
+            document.getElementById(
+                "learning-language"
+            );
+
+
+        if (autoVoice) {
+
+            autoVoice.addEventListener(
+                "change",
+                function () {
+
+                    saveSetting(
+                        "autoVoice",
+                        this.checked
+                    );
+
+                }
+            );
+
+        }
+
+
+        if (voiceRate) {
+
+            voiceRate.addEventListener(
+                "change",
+                function () {
+
+                    saveSetting(
+                        "voiceRate",
+                        Number(
+                            this.value
+                        )
+                    );
+
+                }
+            );
+
+        }
+
+
+        if (voicePitch) {
+
+            voicePitch.addEventListener(
+                "change",
+                function () {
+
+                    saveSetting(
+                        "voicePitch",
+                        Number(
+                            this.value
+                        )
+                    );
+
+                }
+            );
+
+        }
+
+
+        if (uiLanguage) {
+
+            uiLanguage.addEventListener(
+                "change",
+                function () {
+
+                    saveSetting(
+                        "uiLanguage",
+                        this.value
+                    );
+
+                }
+            );
+
+        }
+
+
+        if (learningLanguage) {
+
+            learningLanguage.addEventListener(
+                "change",
+                function () {
+
+                    saveSetting(
+                        "learningLanguage",
+                        this.value
+                    );
+
+                }
+            );
+
+        }
+
+
+        /* =================================
+           IMPORT DECK SELECT
+           ================================= */
+
+        if (
+            typeof renderImportDeckSelect ===
+                "function"
+        ) {
+
+            renderImportDeckSelect();
+
+        }
+
+
+        /* =================================
+           DROP ZONE
+           ================================= */
+
+        const dropZone =
+            document.getElementById(
+                "drop-zone"
             );
 
 
         if (
-            voicePitch
+            dropZone &&
+            fileInput
         ) {
 
-            try {
+            dropZone.addEventListener(
+                "dragover",
+                function (event) {
 
-                const savedPitch =
-                    Number(
-                        appData
-                            ?.settings
-                            ?.voicePitch
-                    ) || 1;
+                    event.preventDefault();
 
-                voicePitch.value =
-                    savedPitch;
-
-                if (
-                    voicePitchValue
-                ) {
-
-                    voicePitchValue.textContent =
-                        Number(
-                            savedPitch
-                        ).toFixed(1);
+                    dropZone.classList.add(
+                        "dragover"
+                    );
 
                 }
+            );
 
-            } catch (error) {}
+
+            dropZone.addEventListener(
+                "dragleave",
+                function () {
+
+                    dropZone.classList.remove(
+                        "dragover"
+                    );
+
+                }
+            );
 
 
-            voicePitch.addEventListener(
-                "input",
-                () => {
+            dropZone.addEventListener(
+                "drop",
+                async function (event) {
 
-                    const value =
-                        Number(
-                            voicePitch.value
+                    event.preventDefault();
+
+                    dropZone.classList.remove(
+                        "dragover"
+                    );
+
+
+                    const files =
+                        Array.from(
+                            event.dataTransfer
+                                .files || []
                         );
 
 
-                    if (
-                        voicePitchValue
-                    ) {
+                    const selectedFiles =
+                        document.getElementById(
+                            "selected-files"
+                        );
 
-                        voicePitchValue.textContent =
-                            value.toFixed(1);
+
+                    if (selectedFiles) {
+
+                        selectedFiles.innerHTML =
+                            files
+                                .map(
+                                    function (file) {
+
+                                        return `
+                                            <div class="selected-file">
+                                                📄
+                                                ${escapeHTML(
+                                                    file.name
+                                                )}
+                                            </div>
+                                        `;
+
+                                    }
+                                )
+                                .join("");
 
                     }
 
 
-                    try {
-
-                        appData.settings =
-                            appData.settings ||
-                            {};
-
-                        appData.settings.voicePitch =
-                            value;
+                    for (
+                        const file of files
+                    ) {
 
                         if (
-                            typeof saveData ===
-                            "function"
+                            typeof handleFileImport ===
+                                "function"
                         ) {
 
-                            saveData();
+                            await handleFileImport(
+                                file
+                            );
 
                         }
 
-                    } catch (error) {
-
-                        console.error(
-                            "音声高さ保存エラー:",
-                            error
-                        );
-
                     }
 
                 }
@@ -1720,189 +2816,10 @@ document.addEventListener(
 
         }
 
-
-
-        /* =================================================
-           PAGE HISTORY / BACK BUTTON - FINAL
-        ================================================== */
-
-        const backButton = document.getElementById("app-back-button");
-        let pageHistory = [];
-        let currentPage = getCurrentPage();
-        let changingByBack = false;
-
-        function getCurrentPage() {
-            const active = document.querySelector(".page.active-page");
-            if (active && active.id) return active.id.replace("page-", "");
-
-            const pages = document.querySelectorAll(".page");
-            for (const page of pages) {
-                if (getComputedStyle(page).display !== "none") {
-                    return page.id.replace("page-", "");
-                }
-            }
-            return "home";
-        }
-
-        function updateBackButton() {
-            if (!backButton) return;
-            const page = getCurrentPage();
-            backButton.style.setProperty(
-                "display",
-                page === "home" ? "none" : "inline-flex",
-                "important"
-            );
-        }
-
-        function findPageButton(pageName) {
-            return document.querySelector(
-                `[data-page="${CSS.escape(pageName)}"]`
-            );
-        }
-
-        function navigateTo(pageName) {
-            const button = findPageButton(pageName);
-            if (!button) return false;
-            button.click();
-            return true;
-        }
-
-        function recordNavigation() {
-            const next = getCurrentPage();
-            if (!next || next === currentPage) {
-                updateBackButton();
-                return;
-            }
-
-            if (!changingByBack) {
-                /* 同じページが連続するのを防止 */
-                if (pageHistory[pageHistory.length - 1] !== currentPage) {
-                    pageHistory.push(currentPage);
-                }
-            }
-
-            currentPage = next;
-            updateBackButton();
-        }
-
-        /*
-         * すべての data-page 遷移を監視。
-         * app.jsの既存処理を先に動かし、その後で履歴を記録します。
-         */
-        document.addEventListener("click", event => {
-            const target = event.target.closest("[data-page]");
-            if (!target || target === backButton) return;
-
-            setTimeout(recordNavigation, 30);
-            setTimeout(recordNavigation, 150);
-        }, true);
-
-        /* app.jsが直接ページを切り替える場合にも対応 */
-        const pageObserver = new MutationObserver(() => {
-            setTimeout(recordNavigation, 0);
-        });
-
-        document.querySelectorAll(".page").forEach(page => {
-            pageObserver.observe(page, {
-                attributes: true,
-                attributeFilter: ["class", "style"]
-            });
-        });
-
-        /*
-         * 学習画面の「勉強を終了して戻る」
-         * 学習途中でも安全に学習画面を終了し、
-         * 学習を開始した直前のページへ戻ります。
-         *
-         * 学習中の回答記録や既存の保存処理は触りません。
-         */
-        const studyExitButton = document.getElementById("study-exit-button");
-
-        if (studyExitButton) {
-            studyExitButton.addEventListener("click", event => {
-                event.preventDefault();
-                event.stopPropagation();
-
-                const current = getCurrentPage();
-                if (current !== "study") return;
-
-                /* 学習画面は基本的にデッキから開始するため、
-                   履歴があればそれを優先し、なければデッキへ戻す。 */
-                let target = pageHistory.length
-                    ? pageHistory[pageHistory.length - 1]
-                    : "decks";
-
-                if (!target || target === "study") {
-                    target = "decks";
-                }
-
-                changingByBack = true;
-
-                if (!navigateTo(target)) {
-                    navigateTo("decks");
-                }
-
-                /* 学習ページ自身を履歴に残さない */
-                pageHistory = pageHistory.filter(page => page !== "study");
-
-                setTimeout(() => {
-                    currentPage = getCurrentPage();
-                    changingByBack = false;
-                    updateBackButton();
-                }, 200);
-            });
-        }
-
-
-        /*
-         * 戻るボタン
-         * ・学習画面 → 必ずデッキへ
-         * ・その他 → 直前のページへ
-         * ・履歴がなければホームへ
-         */
-        if (backButton) {
-            backButton.addEventListener("click", event => {
-                event.preventDefault();
-                event.stopImmediatePropagation();
-
-                const current = getCurrentPage();
-                let target;
-
-                if (current === "study") {
-                    target = "decks";
-                    /* 学習画面から戻った後にさらに戻れるようにする */
-                    pageHistory = pageHistory.filter(page => page !== "study");
-                } else {
-                    target = pageHistory.pop();
-                    if (!target || target === current) target = "home";
-                }
-
-                changingByBack = true;
-
-                if (!navigateTo(target)) {
-                    target = "home";
-                    navigateTo("home");
-                }
-
-                setTimeout(() => {
-                    currentPage = getCurrentPage();
-                    changingByBack = false;
-                    updateBackButton();
-                }, 200);
-            });
-        }
-
-        currentPage = getCurrentPage();
-        pageHistory = [];
-        updateBackButton();
-
     }
-
-
 );
 
-
+</script>
 
 </body>
-
 </html>
