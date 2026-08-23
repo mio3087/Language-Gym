@@ -5162,25 +5162,7 @@ function setupEvents() {
     }
 
 
-    const randomStudy =
-    document.getElementById(
-        "random-study"
-    );
-
-if (randomStudy) {
-
-    randomStudy.addEventListener(
-        "change",
-        function() {
-
-            saveSettingsValue(
-                "randomStudy",
-                this.checked
-            );
-
-        }
-    );
-}
+    
 
     /*
      * voice rate
