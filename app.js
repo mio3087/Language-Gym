@@ -4678,7 +4678,7 @@ function renderAll() {
    ========================================================= */
 
 function setupEvents() {
-
+    
     /*
      * bodyのイベント委譲
      *
@@ -5276,39 +5276,163 @@ function setupEvents() {
     }
 
 
-    /*
+
+        /*
      * Mobile menu
+     *
+     * スマホで確実に反応するように
+     * document側でイベントを受け取る。
      */
 
-    const menuButton =
-        document.getElementById(
-            "mobile-menu-button"
-        );
+    document.addEventListener(
 
+        "click",
+        function(event) {
 
-    const sidebar =
-        document.getElementById(
-            "sidebar"
-        );
+            const menuButton =
+                event.target.closest(
+                    "#mobile-menu-button"
+                );
 
+            if (!menuButton) {
+                return;
+            }
 
-    if (
-        menuButton &&
-        sidebar
-    ) {
+            event.preventDefault();
+            event.stopPropagation();
 
-        menuButton.addEventListener(
-            "click",
-            function(event) {
+            const sidebar =
+                document.getElementById(
+                    "sidebar"
+                );
 
-                event.preventDefault();
+            if (!sidebar) {
+                console.warn(
+                    "sidebar が見つかりません。"
+                );
+                return;
+            }
 
+            const isOpen =
                 sidebar.classList.toggle(
                     "open"
                 );
+
+            /*
+             * アクセシビリティ用
+             */
+
+            menuButton.setAttribute(
+                "aria-expanded",
+                String(isOpen)
+            );
+
+        },
+        true
+    );
+
+
+    /*
+     * サイドバー外をタップしたら閉じる
+     */
+
+    document.addEventListener(
+        "click",
+        function(event) {
+
+            const sidebar =
+                document.getElementById(
+                    "sidebar"
+                );
+
+            const menuButton =
+                document.getElementById(
+                    "mobile-menu-button"
+                );
+
+            if (
+                !sidebar ||
+                !menuButton
+            ) {
+                return;
             }
-        );
-    }
+
+
+            if (
+                !sidebar.classList.contains(
+                    "open"
+                )
+            ) {
+                return;
+            }
+
+
+            if (
+                sidebar.contains(
+                    event.target
+                ) ||
+                menuButton.contains(
+                    event.target
+                )
+            ) {
+                return;
+            }
+
+
+            sidebar.classList.remove(
+                "open"
+            );
+
+            menuButton.setAttribute(
+                "aria-expanded",
+                "false"
+            );
+
+        },
+        true
+    );
+
+
+    /*
+     * ESCキーでも閉じる
+     */
+
+    document.addEventListener(
+        "keydown",
+        function(event) {
+
+            if (
+                event.key !== "Escape"
+            ) {
+                return;
+            }
+
+            const sidebar =
+                document.getElementById(
+                    "sidebar"
+                );
+
+            const menuButton =
+                document.getElementById(
+                    "mobile-menu-button"
+                );
+
+            if (sidebar) {
+
+                sidebar.classList.remove(
+                    "open"
+                );
+            }
+
+            if (menuButton) {
+
+                menuButton.setAttribute(
+                    "aria-expanded",
+                    "false"
+                );
+            }
+        }
+    );
 
 
     /*
@@ -5399,32 +5523,37 @@ document.addEventListener(
     "DOMContentLoaded",
     function() {
 
-        loadTheme();
-
+        /*
+         * イベントを最初に設定
+         *
+         * ハンバーガーメニュー、
+         * ナビゲーション、
+         * 学習ボタン、
+         * 戻る・進む、
+         * 設定など
+         * すべてここで有効になる。
+         */
         setupEvents();
 
 
+        /*
+         * 初期ページ
+         */
+
         const hash =
             window.location.hash
-
                 ? decodeURIComponent(
-                    window.location.hash
-                        .substring(1)
+                    window.location.hash.substring(1)
                 )
-
                 : "";
 
 
         const initialPage =
-
             hash &&
-
             document.getElementById(
                 `page-${hash}`
             )
-
                 ? hash
-
                 : "home";
 
 
@@ -5448,29 +5577,38 @@ document.addEventListener(
                 initialPage
             );
 
-
             navigationState.historyIndex =
                 1;
         }
 
 
+        /*
+         * 初期ページを表示
+         */
+
         showPage(
-
             initialPage,
-
             {
                 pushHistory: false,
-
                 browserHistory: false,
-
                 scroll: false
             }
         );
 
 
+        /*
+         * 全画面を描画
+         */
+
         renderAll();
 
+
+        /*
+         * 戻る・進むボタンを更新
+         */
+
         updateNavigationButtons();
+
     }
 );
 

@@ -1,145 +1,260 @@
+/* =========================================================
+   Language Gym
+   style.css
+   ========================================================= */
+
 :root {
     --primary: #8B7CF6;
     --primary-light: #EEEAFE;
-    --background: #F8F7FC;
-    --surface: #FFFFFF;
-    --text: #29263A;
-    --text-light: #817D92;
-    --border: #E9E6F2;
-    --danger: #EF7777;
-    --shadow: 0 8px 24px rgba(60, 50, 100, 0.07);
+    --bg: #f7f7fb;
+    --card: #ffffff;
+    --text: #222222;
+    --muted: #777777;
+    --border: #e7e7ee;
+    --danger: #e85d75;
     --radius: 18px;
+    --shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
 }
 
 * {
     box-sizing: border-box;
-    margin: 0;
-    padding: 0;
+}
+
+html {
+    scroll-behavior: smooth;
 }
 
 body {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--bg);
+    color: var(--text);
     font-family:
         -apple-system,
         BlinkMacSystemFont,
         "Segoe UI",
-        "Hiragino Sans",
-        "Yu Gothic",
+        "Noto Sans JP",
         sans-serif;
-    background: var(--background);
-    color: var(--text);
-    min-height: 100vh;
+}
+
+body.mobile-menu-open {
+    overflow: hidden;
 }
 
 button,
 input,
-select {
+select,
+textarea {
     font: inherit;
 }
 
 button {
-    border: none;
     cursor: pointer;
 }
 
-
-/* =========================
-   LAYOUT
-========================= */
-
-#app {
-    display: flex;
-    min-height: 100vh;
+button:disabled {
+    cursor: not-allowed;
+    opacity: 0.45;
 }
 
+/* =========================================================
+   APP
+   ========================================================= */
 
-/* =========================
+.app {
+    min-height: 100vh;
+    display: flex;
+}
+
+/* =========================================================
    SIDEBAR
-========================= */
+   ========================================================= */
 
 .sidebar {
-    width: 250px;
-    min-height: 100vh;
-    background: var(--surface);
-    border-right: 1px solid var(--border);
-    padding: 28px 18px;
-    display: flex;
-    flex-direction: column;
     position: fixed;
     left: 0;
     top: 0;
     bottom: 0;
-    z-index: 20;
+
+    width: 250px;
+
+    background: var(--card);
+    border-right: 1px solid var(--border);
+
+    padding: 24px 16px;
+
+    z-index: 100;
+
+    overflow-y: auto;
+
+    transition: transform 0.25s ease;
 }
 
 .logo {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 20px;
+    padding: 8px 12px 24px;
+}
+
+.logo-title {
+    font-size: 24px;
     font-weight: 800;
-    color: var(--text);
-    padding: 0 10px;
+    color: var(--primary);
 }
 
-.logo-icon {
-    font-size: 27px;
+.logo-subtitle {
+    margin-top: 4px;
+    font-size: 12px;
+    color: var(--muted);
 }
 
-.navigation {
-    margin-top: 42px;
+.nav {
     display: flex;
     flex-direction: column;
-    gap: 7px;
-}
-
-.sidebar-bottom {
-    margin-top: auto;
+    gap: 6px;
 }
 
 .nav-item {
     width: 100%;
+
+    border: 0;
+    background: transparent;
+    color: var(--text);
+
+    padding: 13px 14px;
+
+    border-radius: 13px;
+
+    text-align: left;
+
     display: flex;
     align-items: center;
-    gap: 13px;
-    padding: 13px 14px;
-    border-radius: 13px;
-    background: transparent;
-    color: var(--text-light);
-    text-align: left;
-    transition: 0.2s ease;
+
+    gap: 10px;
+
+    transition: 0.2s;
 }
 
-.nav-item:hover {
+.nav-item:hover,
+.nav-item.active {
     background: var(--primary-light);
-    color: var(--primary);
 }
 
 .nav-item.active {
-    background: var(--primary-light);
     color: var(--primary);
     font-weight: 700;
 }
 
+.nav-icon {
+    width: 24px;
+    text-align: center;
+}
 
-/* =========================
+/* =========================================================
    MAIN
-========================= */
+   ========================================================= */
 
-.main-content {
+.main {
     margin-left: 250px;
+
     width: calc(100% - 250px);
+
     min-height: 100vh;
-    padding: 42px 48px;
 }
 
-.mobile-header {
-    display: none;
+/* =========================================================
+   TOPBAR
+   ========================================================= */
+
+.topbar {
+    position: sticky;
+    top: 0;
+
+    z-index: 50;
+
+    height: 70px;
+
+    background: rgba(255, 255, 255, 0.94);
+
+    backdrop-filter: blur(12px);
+
+    border-bottom: 1px solid var(--border);
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 0 28px;
 }
+
+.topbar-left,
+.topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.icon-button {
+    width: 40px;
+    height: 40px;
+
+    border: 1px solid var(--border);
+
+    background: white;
+
+    border-radius: 12px;
+
+    color: var(--text);
+}
+
+.icon-button:hover:not(:disabled) {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+/* =========================================================
+   MOBILE MENU BUTTON
+   ========================================================= */
+
+.mobile-menu-button {
+    display: none;
+
+    flex-shrink: 0;
+
+    width: 40px;
+    height: 40px;
+
+    padding: 0;
+
+    align-items: center;
+    justify-content: center;
+
+    font-size: 22px;
+    line-height: 1;
+
+    -webkit-tap-highlight-color: transparent;
+
+    touch-action: manipulation;
+
+    user-select: none;
+}
+
+/* =========================================================
+   CONTENT
+   ========================================================= */
+
+.content {
+    max-width: 1200px;
+
+    margin: 0 auto;
+
+    padding: 32px;
+}
+
+/* =========================================================
+   PAGE
+   ========================================================= */
 
 .page {
     display: none;
-    max-width: 1200px;
-    margin: 0 auto;
 }
 
 .page.active-page {
@@ -147,710 +262,631 @@ button {
 }
 
 .page-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 20px;
-    margin-bottom: 32px;
+    margin-bottom: 28px;
 }
 
-.eyebrow {
-    color: var(--primary);
-    font-size: 12px;
+.page-title {
+    margin: 0;
+
+    font-size: 30px;
+
     font-weight: 800;
-    letter-spacing: 0.12em;
-    margin-bottom: 8px;
-}
-
-h1 {
-    font-size: clamp(28px, 4vw, 40px);
-    line-height: 1.2;
-    letter-spacing: -0.03em;
-}
-
-h2 {
-    font-size: 22px;
-}
-
-h3 {
-    font-size: 18px;
 }
 
 .page-description {
-    margin-top: 9px;
-    color: var(--text-light);
+    margin: 8px 0 0;
+
+    color: var(--muted);
 }
 
+/* =========================================================
+   GRID
+   ========================================================= */
 
-/* =========================
-   BUTTONS
-========================= */
-
-.primary-button {
-    background: var(--primary);
-    color: white;
-    border-radius: 13px;
-    padding: 12px 18px;
-    font-weight: 700;
-    box-shadow: 0 5px 14px rgba(139, 124, 246, 0.22);
-    transition: 0.2s ease;
-}
-
-.primary-button:hover {
-    transform: translateY(-2px);
-    filter: brightness(0.98);
-}
-
-.secondary-button {
-    background: var(--surface);
-    color: var(--text);
-    border: 1px solid var(--border);
-    border-radius: 13px;
-    padding: 12px 18px;
-    font-weight: 700;
-    transition: 0.2s ease;
-}
-
-.secondary-button:hover {
-    background: var(--primary-light);
-    color: var(--primary);
-    border-color: var(--primary);
-}
-
-.delete-deck-button:hover {
-    background: #FFF0F0;
-    color: var(--danger);
-    border-color: var(--danger);
-}
-
-.icon-button {
-    background: var(--primary-light);
-    color: var(--primary);
-    width: 42px;
-    height: 42px;
-    border-radius: 12px;
-}
-
-
-/* =========================
-   STATS
-========================= */
-
-.stats-grid {
+.grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 16px;
-    margin-bottom: 42px;
+
+    grid-template-columns:
+        repeat(auto-fit, minmax(220px, 1fr));
+
+    gap: 18px;
 }
 
-.stat-card {
-    background: var(--surface);
+/* =========================================================
+   CARD
+   ========================================================= */
+
+.card {
+    background: var(--card);
+
     border: 1px solid var(--border);
+
     border-radius: var(--radius);
-    padding: 20px;
-    display: flex;
-    align-items: center;
-    gap: 14px;
+
+    padding: 22px;
+
     box-shadow: var(--shadow);
 }
 
-.stat-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: 14px;
-    background: var(--primary-light);
-    display: grid;
-    place-items: center;
-    font-size: 22px;
+.stat-value {
+    font-size: 32px;
+
+    font-weight: 800;
+
+    color: var(--primary);
 }
 
 .stat-label {
-    display: block;
-    color: var(--text-light);
-    font-size: 12px;
-    margin-bottom: 4px;
-}
+    color: var(--muted);
 
-.stat-card strong {
-    font-size: 22px;
-}
-
-
-/* =========================
-   SECTION
-========================= */
-
-.section-header {
-    margin: 30px 0 16px;
-}
-
-.section-header p {
-    color: var(--text-light);
     margin-top: 5px;
 }
 
+/* =========================================================
+   BUTTONS
+   ========================================================= */
 
-/* =========================
-   TRAINING
-========================= */
+.btn {
+    border: 0;
 
-.training-grid {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 15px;
+    border-radius: 12px;
+
+    padding: 11px 17px;
+
+    transition: 0.2s;
 }
 
-.training-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 25px 18px;
-    text-align: left;
-    box-shadow: var(--shadow);
-    transition: 0.2s ease;
+.btn:hover:not(:disabled) {
+    transform: translateY(-1px);
 }
 
-.training-card:hover {
-    transform: translateY(-4px);
-    border-color: var(--primary);
-}
-
-.training-icon {
-    display: block;
-    font-size: 30px;
-    margin-bottom: 16px;
-}
-
-.training-title {
-    display: block;
-    font-weight: 800;
-    font-size: 17px;
-}
-
-.training-description {
-    display: block;
-    color: var(--text-light);
-    font-size: 12px;
-    margin-top: 6px;
-}
-
-
-/* =========================
-   EMPTY
-========================= */
-
-.empty-state {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 55px 25px;
-    text-align: center;
-    box-shadow: var(--shadow);
-}
-
-.empty-icon {
-    font-size: 42px;
-    margin-bottom: 14px;
-}
-
-.empty-state p {
-    color: var(--text-light);
-    margin: 8px 0 20px;
-}
-
-
-/* =========================
-   DECK
-========================= */
-
-.deck-list {
-    display: grid;
-    gap: 14px;
-}
-
-.deck-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 22px;
-    box-shadow: var(--shadow);
-}
-
-.deck-card h3 {
-    margin-bottom: 8px;
-}
-
-.deck-card p {
-    color: var(--text-light);
-    margin-top: 5px;
-}
-
-.deck-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-top: 16px;
-}
-
-
-/* =========================
-   STUDY
-========================= */
-
-.study-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 20px;
-    margin-bottom: 25px;
-}
-
-.study-timer {
-    background: var(--primary-light);
-    color: var(--primary);
-    border-radius: 13px;
-    padding: 10px 16px;
-    font-weight: 800;
-    font-variant-numeric: tabular-nums;
-}
-
-.study-progress {
-    margin-bottom: 20px;
-    color: var(--text-light);
-}
-
-.study-progress-bar {
-    width: 100%;
-    height: 8px;
-    background: var(--border);
-    border-radius: 999px;
-    overflow: hidden;
-    margin-top: 8px;
-}
-
-.study-progress-bar > div {
-    height: 100%;
+.btn-primary {
     background: var(--primary);
-    border-radius: 999px;
+
+    color: white;
 }
 
-.study-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 30px;
-    box-shadow: var(--shadow);
-    margin-bottom: 18px;
-}
-
-.study-card-label {
-    color: var(--primary);
-    font-size: 12px;
-    font-weight: 800;
-    margin-bottom: 12px;
-}
-
-.study-question {
-    font-size: 22px;
-    line-height: 1.7;
-    margin-bottom: 25px;
-}
-
-.text-study-item {
-    white-space: pre-wrap;
-}
-
-.csv-study-item {
-    display: grid;
-    gap: 10px;
-}
-
-.csv-study-item > div {
-    padding: 12px;
-    background: var(--background);
-    border-radius: 10px;
-}
-
-.study-answer {
+.btn-secondary {
     background: var(--primary-light);
-    border-radius: 13px;
-    padding: 18px;
-    margin-bottom: 22px;
-    line-height: 1.7;
+
+    color: var(--primary);
 }
 
-.study-feedback-title {
-    font-weight: 700;
-    margin-bottom: 12px;
+.btn-outline {
+    background: white;
+
+    border: 1px solid var(--border);
+
+    color: var(--text);
 }
 
-.answer-buttons {
-    display: flex;
-    gap: 10px;
-}
+.btn-danger {
+    background: #fff0f2;
 
-.wrong-button,
-.correct-button {
-    flex: 1;
-    padding: 13px 18px;
-    border-radius: 13px;
-    font-weight: 700;
-}
-
-.wrong-button {
-    background: #FFF0F0;
     color: var(--danger);
 }
 
-.correct-button {
-    background: var(--primary-light);
-    color: var(--primary);
+.button-row {
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 10px;
 }
 
+/* =========================================================
+   FORM
+   ========================================================= */
 
-/* =========================
-   PROGRESS
-========================= */
-
-.progress-overview {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 16px;
-    margin-bottom: 35px;
+.form-group {
+    margin-bottom: 18px;
 }
 
-.progress-card {
-    background: var(--surface);
+.form-label {
+    display: block;
+
+    font-weight: 700;
+
+    margin-bottom: 7px;
+}
+
+.input,
+.select,
+.textarea {
+    width: 100%;
+
     border: 1px solid var(--border);
+
+    background: white;
+
+    border-radius: 12px;
+
+    padding: 12px 14px;
+
+    outline: none;
+}
+
+.input:focus,
+.select:focus,
+.textarea:focus {
+    border-color: var(--primary);
+
+    box-shadow:
+        0 0 0 3px var(--primary-light);
+}
+
+.textarea {
+    min-height: 120px;
+
+    resize: vertical;
+}
+
+/* =========================================================
+   DECK
+   ========================================================= */
+
+.deck-list {
+    display: grid;
+
+    grid-template-columns:
+        repeat(auto-fill, minmax(260px, 1fr));
+
+    gap: 18px;
+}
+
+.deck-card {
+    background: white;
+
+    border: 1px solid var(--border);
+
     border-radius: var(--radius);
-    padding: 23px;
+
+    padding: 20px;
+
     box-shadow: var(--shadow);
 }
 
-.progress-card span {
-    display: block;
-    color: var(--text-light);
-    font-size: 13px;
+.deck-name {
+    font-size: 20px;
+
+    font-weight: 800;
+
     margin-bottom: 8px;
 }
 
-.progress-card strong {
-    font-size: 28px;
+.deck-meta {
+    color: var(--muted);
+
+    font-size: 14px;
 }
 
+/* =========================================================
+   STUDY
+   ========================================================= */
 
-/* =========================
-   IMPORT
-========================= */
+.study-container {
+    max-width: 760px;
 
-.import-card {
-    max-width: 700px;
     margin: 0 auto;
-    background: var(--surface);
-    border: 2px dashed var(--border);
-    border-radius: 24px;
-    padding: 60px 30px;
+}
+
+.study-card {
+    min-height: 360px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    justify-content: center;
+
+    align-items: center;
+
     text-align: center;
 }
 
-.import-icon {
-    font-size: 55px;
-    margin-bottom: 18px;
+.study-front {
+    font-size: 34px;
+
+    font-weight: 800;
+
+    margin-bottom: 30px;
+
+    white-space: pre-wrap;
+
+    word-break: break-word;
 }
 
-.import-card p {
-    color: var(--text-light);
-    margin: 10px 0 25px;
-}
+.study-back {
+    font-size: 24px;
 
-.file-button {
-    display: inline-block;
-    background: var(--primary);
-    color: white;
-    padding: 13px 22px;
-    border-radius: 13px;
-    font-weight: 700;
-    cursor: pointer;
-}
-
-#selected-file {
-    font-size: 13px;
-    margin-top: 20px;
-}
-
-
-/* =========================
-   SETTINGS
-========================= */
-
-.settings-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 25px;
-    margin-bottom: 18px;
-    box-shadow: var(--shadow);
-}
-
-.settings-card p {
-    color: var(--text-light);
-    margin-top: 6px;
-}
-
-.theme-colors {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 14px;
-    margin-top: 22px;
-}
-
-.theme-color {
-    width: 45px;
-    height: 45px;
-    border-radius: 50%;
-    background: var(--theme-color);
-    border: 4px solid white;
-    box-shadow: 0 0 0 1px var(--border);
-    transition: 0.2s ease;
-}
-
-.theme-color:hover {
-    transform: scale(1.1);
-}
-
-.theme-color.selected {
-    box-shadow:
-        0 0 0 2px var(--primary),
-        0 0 0 5px white;
-}
-
-.language-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-top: 20px;
-}
-
-.language-tags span {
-    background: var(--primary-light);
     color: var(--primary);
-    border-radius: 999px;
-    padding: 8px 13px;
-    font-size: 13px;
-    font-weight: 700;
+
+    white-space: pre-wrap;
+
+    word-break: break-word;
 }
 
+.study-timer {
+    color: var(--muted);
 
-/* =========================
-   RESPONSIVE
-========================= */
+    margin-bottom: 12px;
+}
 
-@media (max-width: 1000px) {
+/* =========================================================
+   SEARCH
+   ========================================================= */
+
+.card-search-item {
+    padding: 16px 0;
+
+    border-bottom: 1px solid var(--border);
+}
+
+.card-search-item:last-child {
+    border-bottom: 0;
+}
+
+.search-card-front {
+    font-weight: 800;
+
+    font-size: 17px;
+}
+
+.search-card-back {
+    color: var(--muted);
+
+    margin-top: 5px;
+
+    white-space: pre-wrap;
+}
+
+.search-card-meta {
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    gap: 10px;
+
+    margin-top: 10px;
+}
+
+/* =========================================================
+   TABLE
+   ========================================================= */
+
+.table-wrapper {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+
+    border-collapse: collapse;
+
+    background: white;
+}
+
+th,
+td {
+    padding: 13px;
+
+    border-bottom: 1px solid var(--border);
+
+    text-align: left;
+}
+
+th {
+    background: var(--primary-light);
+}
+
+/* =========================================================
+   COLOR
+   ========================================================= */
+
+.color-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(6, 1fr);
+
+    gap: 10px;
+
+    max-width: 500px;
+}
+
+.color-option {
+    width: 100%;
+
+    aspect-ratio: 1;
+
+    border-radius: 14px;
+
+    border: 3px solid white;
+
+    box-shadow:
+        0 0 0 1px var(--border);
+}
+
+.color-option.selected {
+    box-shadow:
+        0 0 0 3px var(--primary),
+        0 5px 12px rgba(0, 0, 0, 0.12);
+}
+
+.color-picker-row {
+    display: flex;
+
+    align-items: center;
+
+    gap: 14px;
+
+    margin-top: 18px;
+
+    flex-wrap: wrap;
+}
+
+#custom-color {
+    width: 60px;
+
+    height: 42px;
+
+    border: 0;
+
+    padding: 0;
+
+    background: transparent;
+}
+
+/* =========================================================
+   IMPORT
+   ========================================================= */
+
+.drop-zone {
+    border: 2px dashed var(--border);
+
+    border-radius: 18px;
+
+    padding: 50px 25px;
+
+    text-align: center;
+
+    background: white;
+
+    transition: 0.2s;
+}
+
+.drop-zone:hover {
+    border-color: var(--primary);
+
+    background: var(--primary-light);
+}
+
+.drop-zone.dragover {
+    border-color: var(--primary);
+
+    background: var(--primary-light);
+}
+
+.selected-files {
+    margin-top: 15px;
+}
+
+.selected-file {
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    gap: 10px;
+
+    padding: 10px 12px;
+
+    border: 1px solid var(--border);
+
+    border-radius: 10px;
+
+    margin-top: 8px;
+
+    background: white;
+}
+
+/* =========================================================
+   EMPTY
+   ========================================================= */
+
+.empty-state {
+    text-align: center;
+
+    padding: 60px 20px;
+
+    color: var(--muted);
+}
+
+.empty-icon {
+    font-size: 48px;
+
+    margin-bottom: 15px;
+}
+
+/* =========================================================
+   MOBILE OVERLAY
+   ========================================================= */
+
+.mobile-menu-overlay {
+    display: none;
+}
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 800px) {
 
     .sidebar {
-        width: 220px;
-    }
+        position: fixed;
 
-    .main-content {
-        margin-left: 220px;
-        width: calc(100% - 220px);
-        padding: 32px;
-    }
+        left: 0;
+        top: 0;
+        bottom: 0;
 
-    .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
+        width: 250px;
 
-    .training-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
+        max-width: 85vw;
 
-    .progress-overview {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
+        transform: translate3d(-100%, 0, 0);
 
+        transition:
+            transform 0.25s ease;
 
-@media (max-width: 700px) {
+        z-index: 1100;
 
-    #app {
         display: block;
+
+        box-shadow:
+            8px 0 30px rgba(0, 0, 0, 0.12);
+
+        overflow-y: auto;
+
+        -webkit-overflow-scrolling: touch;
     }
 
-    .sidebar {
-        display: none;
+    .sidebar.open {
+        transform: translate3d(0, 0, 0);
     }
 
-    .main-content {
+    .main {
         margin-left: 0;
+
         width: 100%;
-        padding: 18px;
     }
 
-    .mobile-header {
+    .mobile-menu-button {
         display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 28px;
+
+        position: relative;
+
+        z-index: 1200;
     }
 
-    .mobile-header .logo {
-        padding: 0;
-        font-size: 18px;
+    .topbar {
+        position: sticky;
+
+        top: 0;
+
+        z-index: 1000;
+
+        padding: 0 16px;
     }
 
-    .mobile-header .logo-icon {
-        font-size: 23px;
-    }
-
-    .page-header {
-        flex-direction: column;
-        margin-bottom: 25px;
-    }
-
-    h1 {
-        font-size: 29px;
-    }
-
-    .stats-grid {
-        grid-template-columns: 1fr 1fr;
-        gap: 10px;
-    }
-
-    .stat-card {
-        padding: 15px;
-    }
-
-    .stat-icon {
-        width: 40px;
-        height: 40px;
-        font-size: 18px;
-    }
-
-    .stat-card strong {
-        font-size: 18px;
-    }
-
-    .training-grid {
-        grid-template-columns: 1fr 1fr;
-        gap: 10px;
-    }
-
-    .training-card {
-        padding: 20px 15px;
-    }
-
-    .progress-overview {
-        grid-template-columns: 1fr 1fr;
-    }
-
-    .progress-card strong {
-        font-size: 22px;
-    }
-
-    .import-card {
-        padding: 45px 20px;
-    }
-
-    .deck-actions {
-        flex-direction: column;
-    }
-
-    .deck-actions .primary-button,
-    .deck-actions .secondary-button {
-        width: 100%;
-    }
-
-    .answer-buttons {
-        flex-direction: column;
-    }
-
-    .study-header {
-        align-items: flex-start;
-    }
-}
-
-
-@media (max-width: 430px) {
-
-    .main-content {
-        padding: 15px;
-    }
-
-    .stats-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .training-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .progress-overview {
-        grid-template-columns: 1fr;
-    }
-
-    .page-header .primary-button {
-        width: 100%;
-    }
-
-    .logo {
-        font-size: 17px;
-    }
-
-    .study-card {
+    .content {
         padding: 20px;
     }
 
-    .study-question {
-        font-size: 19px;
+    .color-grid {
+        grid-template-columns:
+            repeat(4, 1fr);
+    }
+
+    .study-front {
+        font-size: 27px;
+    }
+
+    .study-back {
+        font-size: 21px;
+    }
+
+    /* -------------------------
+       OVERLAY
+       ------------------------- */
+
+    .mobile-menu-overlay {
+        display: block;
+
+        position: fixed;
+
+        inset: 0;
+
+        z-index: 1050;
+
+        background:
+            rgba(0, 0, 0, 0.25);
+
+        opacity: 0;
+
+        pointer-events: none;
+
+        transition:
+            opacity 0.25s ease;
+    }
+
+    .mobile-menu-overlay.open {
+        opacity: 1;
+
+        pointer-events: auto;
+    }
+
+    body.mobile-menu-open {
+        overflow: hidden;
+    }
+
+    /* -------------------------
+       MOBILE BUTTONS
+       ------------------------- */
+
+    .button-row {
+        width: 100%;
+    }
+
+    .button-row .btn {
+        min-height: 44px;
+    }
+
+    /* -------------------------
+       SEARCH
+       ------------------------- */
+
+    .search-card-meta {
+        flex-direction: column;
+
+        align-items: stretch;
     }
 }
 
-/* =====================================================
-   MOBILE HAMBURGER MENU
-===================================================== */
+/* =========================================================
+   SMALL MOBILE
+   ========================================================= */
 
-@media (max-width: 768px) {
+@media (max-width: 430px) {
 
-    .sidebar {
-        position: fixed;
-        top: 0;
-        left: 0;
-        bottom: 0;
-        width: 280px;
-        z-index: 1001;
-
-        transform: translateX(-100%);
-        transition: transform 0.25s ease;
-
-        display: flex;
+    .content {
+        padding: 15px;
     }
 
-    .sidebar.mobile-open {
-        transform: translateX(0);
+    .page-title {
+        font-size: 26px;
     }
 
-    #mobile-menu-overlay {
-        position: fixed;
-        inset: 0;
-        z-index: 1000;
-
-        background: rgba(0, 0, 0, 0.35);
+    .card {
+        padding: 18px;
     }
 
-    #mobile-menu-overlay[hidden] {
-        display: none;
+    .study-card {
+        min-height: 300px;
     }
 
-    .mobile-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
+    .study-front {
+        font-size: 24px;
     }
 
-    #mobile-menu-button {
-        position: relative;
-        z-index: 1002;
-        cursor: pointer;
+    .study-back {
+        font-size: 20px;
+    }
+
+    .color-grid {
+        grid-template-columns:
+            repeat(4, 1fr);
     }
 }
