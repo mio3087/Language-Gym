@@ -3740,7 +3740,6 @@ function renderProgress() {
    データ管理
    ========================================= */
 
-const STORAGE_KEY = "languageGymData";
 const BACKUP_KEY = "languageGymBackup";
 
 let appData = loadData();
