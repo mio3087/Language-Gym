@@ -1,1391 +1,146 @@
 /* =========================================================
    Language Gym
-   app.js
-   Complete version
+   Application
    ========================================================= */
 
 "use strict";
+
 
 /* =========================================================
    CONSTANTS
    ========================================================= */
 
 const STORAGE_KEY = "languageGymData";
-const BACKUP_KEY = "languageGymBackup";
-const HISTORY_KEY = "languageGymHistory";
-
-const DEFAULT_COLOR = "#8B7CF6";
-
-const LANGUAGE_NAMES = {
-    ja: "日本語",
-    en: "English",
-    zh: "中文",
-    de: "Deutsch",
-    es: "Español",
-    fr: "Français",
-    ko: "한국어",
-    it: "Italiano",
-    fi: "Suomi",
-    ru: "Русский",
-    pt: "Português"
-};
-
-const LANGUAGE_LOCALES = {
-    ja: "ja-JP",
-    en: "en-US",
-    zh: "zh-CN",
-    de: "de-DE",
-    es: "es-ES",
-    fr: "fr-FR",
-    ko: "ko-KR",
-    it: "it-IT",
-    fi: "fi-FI",
-    ru: "ru-RU",
-    pt: "pt-PT"
-};
-
-
-/* =========================================================
-   TRANSLATIONS
-   ========================================================= */
-
-const I18N = {
-
-    ja: {
-        home: "ホーム",
-        decks: "デッキ",
-        study: "学習",
-        progress: "学習記録",
-        import: "インポート",
-        dataShare: "データ共有",
-        settings: "設定",
-
-        subtitle: "多言語学習トレーニング",
-
-        homeTitle: "Language Gym",
-        homeDescription: "今日も少しずつ、外国語を鍛えよう。",
-        deck: "デッキ",
-        cards: "カード",
-        totalStudyTime: "累計学習時間",
-        accuracy: "正答率",
-        startLearning: "🚀 学習を始める",
-        chooseDeck: "デッキを選んで学習を開始しましょう。",
-        viewDecks: "📚 デッキを見る",
-        importMaterial: "📥 教材を取り込む",
-        todayMessage: "🌱 今日のメッセージ",
-        todayForward: "今日も一歩前進！",
-
-        deckTitle: "📚 デッキ",
-        deckDescription: "学習する教材を管理します。",
-        noDecks: "まだデッキがありません。",
-        createDeck: "教材をインポート",
-        cardSearch: "🔎 カード検索",
-        searchPlaceholder: "カードの表・裏を検索",
-        edit: "編集",
-        delete: "削除",
-        cardsCount: "カード",
-
-        studyTitle: "🏋️ 学習",
-        chooseDeckToStudy: "デッキを選択してください。",
-        studyStartMessage: "学習を開始するとここにカードが表示されます。",
-        showAnswer: "👀 答えを見る",
-        dontKnow: "❌ わからない",
-        correct: "⭕ 正解",
-        finishStudy: "学習終了",
-        noCards: "このデッキにはカードがありません。",
-        studyFinished: "学習を終了しました。",
-        correctRate: "正答率",
-
-        progressTitle: "📊 学習記録",
-        progressDescription: "学習時間・回答数・正答率を確認できます。",
-        totalAnswers: "累計回答数",
-        correctAnswers: "正解数",
-        history: "学習履歴",
-        noHistory: "まだ学習記録がありません。",
-        date: "日時",
-        deckName: "デッキ",
-        answers: "回答",
-        correctColumn: "正解",
-
-        importTitle: "📥 インポート",
-        importDescription: "TXT・CSV・PDFなどの教材を取り込みます。",
-        targetDeck: "📚 追加先デッキ",
-        newDeck: "新しいデッキを作成",
-        addToExisting: "既存デッキを選ぶと、そのデッキにカードを追加します。",
-        learningLanguage: "🌐 学習言語",
-        selectMaterial: "教材を選択",
-        multipleFiles: "複数ファイルをまとめて選択できます",
-        selectFile: "📂 ファイルを選択",
-        importing: "インポート中…",
-        imported: "インポートしました",
-        importError: "インポートに失敗しました",
-        noCardsDetected: "カードとして読み取れる内容がありませんでした。",
-
-        dataShareTitle: "🔄 データ共有",
-        dataShareDescription: "PC・スマホ間でLanguage Gymのデータを共有します。",
-        exportTitle: "📤 データを書き出す",
-        exportDescription: "学習記録・デッキ・設定などをJSONファイルとして保存します。",
-        exportData: "データを書き出す",
-        importData: "📥 データを読み込む",
-        importDataDescription: "別の端末で書き出したJSONファイルを読み込みます。",
-        readJSON: "JSONを読み込む",
-        backupTitle: "🛟 自動バックアップ",
-        backupDescription: "最新データの自動バックアップから復元します。",
-        restoreBackup: "バックアップから復元",
-
-        settingsTitle: "⚙️ 設定",
-        settingsDescription: "Language Gymを自分好みに設定できます。",
-        themeColor: "🎨 テーマカラー",
-        themeDescription: "12色から好きな色を選べます。",
-        customColor: "カスタムカラー",
-        voice: "🔊 音声",
-        autoVoice: "自動音声",
-        autoVoiceDescription: "カード表示時に自動再生",
-        randomStudy: "🎲 学習カードをランダムにする",
-        voiceRate: "音声速度",
-        voicePitch: "音声ピッチ",
-        languageSettings: "🌐 言語設定",
-        uiLanguage: "UI言語",
-        learningLanguageSetting: "学習言語",
-
-        languageChanged: "UI言語を変更しました。",
-        learningLanguageChanged: "学習言語を変更しました。",
-        deleteConfirm: "このカードを削除しますか？",
-        deckDeleteConfirm: "このデッキを削除しますか？",
-        backupRestored: "バックアップから復元しました。",
-        dataImported: "データを読み込みました。",
-        dataExported: "データを書き出しました。",
-
-        back: "戻る",
-        forward: "進む"
-    },
-
-    en: {
-        home: "Home",
-        decks: "Decks",
-        study: "Study",
-        progress: "Progress",
-        import: "Import",
-        dataShare: "Data",
-        settings: "Settings",
-
-        subtitle: "Multilingual Learning Training",
-
-        homeTitle: "Language Gym",
-        homeDescription: "Train your languages little by little every day.",
-        deck: "Decks",
-        cards: "Cards",
-        totalStudyTime: "Total Study Time",
-        accuracy: "Accuracy",
-        startLearning: "🚀 Start Learning",
-        chooseDeck: "Choose a deck to start learning.",
-        viewDecks: "📚 View Decks",
-        importMaterial: "📥 Import Materials",
-        todayMessage: "🌱 Today's Message",
-        todayForward: "One step forward today!",
-
-        deckTitle: "📚 Decks",
-        deckDescription: "Manage your study materials.",
-        noDecks: "There are no decks yet.",
-        createDeck: "Import Materials",
-        cardSearch: "🔎 Search Cards",
-        searchPlaceholder: "Search front or back",
-        edit: "Edit",
-        delete: "Delete",
-        cardsCount: "cards",
-
-        studyTitle: "🏋️ Study",
-        chooseDeckToStudy: "Please select a deck.",
-        studyStartMessage: "Cards will appear here when you start studying.",
-        showAnswer: "👀 Show Answer",
-        dontKnow: "❌ Don't Know",
-        correct: "⭕ Correct",
-        finishStudy: "Finish",
-        noCards: "This deck has no cards.",
-        studyFinished: "Study session finished.",
-        correctRate: "Accuracy",
-
-        progressTitle: "📊 Progress",
-        progressDescription: "Check your study time, answers, and accuracy.",
-        totalAnswers: "Total Answers",
-        correctAnswers: "Correct Answers",
-        history: "Study History",
-        noHistory: "There is no study history yet.",
-        date: "Date",
-        deckName: "Deck",
-        answers: "Answers",
-        correctColumn: "Correct",
-
-        importTitle: "📥 Import",
-        importDescription: "Import TXT, CSV, PDF and other study materials.",
-        targetDeck: "📚 Target Deck",
-        newDeck: "Create a new deck",
-        addToExisting: "Choose an existing deck to add cards to it.",
-        learningLanguage: "🌐 Learning Language",
-        selectMaterial: "Select Materials",
-        multipleFiles: "You can select multiple files at once.",
-        selectFile: "📂 Select Files",
-        importing: "Importing…",
-        imported: "Imported",
-        importError: "Import failed",
-        noCardsDetected: "No card-like content was found.",
-
-        dataShareTitle: "🔄 Data Sharing",
-        dataShareDescription: "Share Language Gym data between PC and smartphone.",
-        exportTitle: "📤 Export Data",
-        exportDescription: "Save study records, decks, and settings as a JSON file.",
-        exportData: "Export Data",
-        importData: "📥 Import Data",
-        importDataDescription: "Import a JSON file exported from another device.",
-        readJSON: "Import JSON",
-        backupTitle: "🛟 Automatic Backup",
-        backupDescription: "Restore from the latest automatic backup.",
-        restoreBackup: "Restore Backup",
-
-        settingsTitle: "⚙️ Settings",
-        settingsDescription: "Customize Language Gym.",
-        themeColor: "🎨 Theme Color",
-        themeDescription: "Choose your favorite color from 12 presets.",
-        customColor: "Custom Color",
-        voice: "🔊 Voice",
-        autoVoice: "Auto Voice",
-        autoVoiceDescription: "Play automatically when a card appears",
-        randomStudy: "🎲 Randomize study cards",
-        voiceRate: "Voice Rate",
-        voicePitch: "Voice Pitch",
-        languageSettings: "🌐 Language Settings",
-        uiLanguage: "UI Language",
-        learningLanguageSetting: "Learning Language",
-
-        languageChanged: "UI language changed.",
-        learningLanguageChanged: "Learning language changed.",
-        deleteConfirm: "Delete this card?",
-        deckDeleteConfirm: "Delete this deck?",
-        backupRestored: "Backup restored.",
-        dataImported: "Data imported.",
-        dataExported: "Data exported.",
-
-        back: "Back",
-        forward: "Forward"
-    },
-
-    zh: {
-        home: "首页",
-        decks: "卡组",
-        study: "学习",
-        progress: "学习记录",
-        import: "导入",
-        dataShare: "数据共享",
-        settings: "设置",
-
-        subtitle: "多语言学习训练",
-
-        homeTitle: "Language Gym",
-        homeDescription: "每天一点点，持续提升外语能力。",
-        deck: "卡组",
-        cards: "卡片",
-        totalStudyTime: "累计学习时间",
-        accuracy: "正确率",
-        startLearning: "🚀 开始学习",
-        chooseDeck: "选择卡组开始学习。",
-        viewDecks: "📚 查看卡组",
-        importMaterial: "📥 导入教材",
-        todayMessage: "🌱 今日消息",
-        todayForward: "今天也向前一步！",
-
-        deckTitle: "📚 卡组",
-        deckDescription: "管理学习教材。",
-        noDecks: "还没有卡组。",
-        createDeck: "导入教材",
-        cardSearch: "🔎 搜索卡片",
-        searchPlaceholder: "搜索正面或背面",
-        edit: "编辑",
-        delete: "删除",
-        cardsCount: "张卡片",
-
-        studyTitle: "🏋️ 学习",
-        chooseDeckToStudy: "请选择卡组。",
-        studyStartMessage: "开始学习后，卡片会显示在这里。",
-        showAnswer: "👀 查看答案",
-        dontKnow: "❌ 不知道",
-        correct: "⭕ 正确",
-        finishStudy: "结束学习",
-        noCards: "这个卡组没有卡片。",
-        studyFinished: "学习结束。",
-        correctRate: "正确率",
-
-        progressTitle: "📊 学习记录",
-        progressDescription: "查看学习时间、回答次数和正确率。",
-        totalAnswers: "累计回答",
-        correctAnswers: "正确数",
-        history: "学习历史",
-        noHistory: "还没有学习记录。",
-        date: "日期",
-        deckName: "卡组",
-        answers: "回答",
-        correctColumn: "正确",
-
-        importTitle: "📥 导入",
-        importDescription: "导入TXT、CSV、PDF等教材。",
-        targetDeck: "📚 添加到卡组",
-        newDeck: "创建新卡组",
-        addToExisting: "选择已有卡组即可添加卡片。",
-        learningLanguage: "🌐 学习语言",
-        selectMaterial: "选择教材",
-        multipleFiles: "可以一次选择多个文件。",
-        selectFile: "📂 选择文件",
-        importing: "正在导入…",
-        imported: "导入成功",
-        importError: "导入失败",
-        noCardsDetected: "没有找到可以制作成卡片的内容。",
-
-        dataShareTitle: "🔄 数据共享",
-        dataShareDescription: "在电脑和手机之间共享Language Gym数据。",
-        exportTitle: "📤 导出数据",
-        exportDescription: "将学习记录、卡组和设置保存为JSON文件。",
-        exportData: "导出数据",
-        importData: "📥 导入数据",
-        importDataDescription: "导入其他设备导出的JSON文件。",
-        readJSON: "导入JSON",
-        backupTitle: "🛟 自动备份",
-        backupDescription: "从最新的自动备份恢复。",
-        restoreBackup: "恢复备份",
-
-        settingsTitle: "⚙️ 设置",
-        settingsDescription: "自定义Language Gym。",
-        themeColor: "🎨 主题颜色",
-        themeDescription: "从12种颜色中选择喜欢的颜色。",
-        customColor: "自定义颜色",
-        voice: "🔊 语音",
-        autoVoice: "自动语音",
-        autoVoiceDescription: "显示卡片时自动播放",
-        randomStudy: "🎲 随机学习卡片",
-        voiceRate: "语速",
-        voicePitch: "音调",
-        languageSettings: "🌐 语言设置",
-        uiLanguage: "界面语言",
-        learningLanguageSetting: "学习语言",
-
-        languageChanged: "界面语言已更改。",
-        learningLanguageChanged: "学习语言已更改。",
-        deleteConfirm: "删除这张卡片吗？",
-        deckDeleteConfirm: "删除这个卡组吗？",
-        backupRestored: "已从备份恢复。",
-        dataImported: "数据已导入。",
-        dataExported: "数据已导出。",
-
-        back: "返回",
-        forward: "前进"
-    },
-
-    de: {
-        home: "Start",
-        decks: "Decks",
-        study: "Lernen",
-        progress: "Fortschritt",
-        import: "Import",
-        dataShare: "Daten",
-        settings: "Einstellungen",
-        subtitle: "Mehrsprachiges Sprachtraining",
-        homeTitle: "Language Gym",
-        homeDescription: "Trainiere deine Sprachen jeden Tag ein bisschen.",
-        deck: "Decks",
-        cards: "Karten",
-        totalStudyTime: "Gesamte Lernzeit",
-        accuracy: "Trefferquote",
-        startLearning: "🚀 Lernen beginnen",
-        chooseDeck: "Wähle ein Deck zum Lernen.",
-        viewDecks: "📚 Decks ansehen",
-        importMaterial: "📥 Material importieren",
-        todayMessage: "🌱 Nachricht des Tages",
-        todayForward: "Heute einen Schritt weiter!",
-        deckTitle: "📚 Decks",
-        deckDescription: "Verwalte deine Lernmaterialien.",
-        noDecks: "Noch keine Decks vorhanden.",
-        createDeck: "Material importieren",
-        cardSearch: "🔎 Karten suchen",
-        searchPlaceholder: "Vorder- oder Rückseite suchen",
-        edit: "Bearbeiten",
-        delete: "Löschen",
-        cardsCount: "Karten",
-        studyTitle: "🏋️ Lernen",
-        chooseDeckToStudy: "Bitte wähle ein Deck.",
-        studyStartMessage: "Beim Starten des Lernens werden hier Karten angezeigt.",
-        showAnswer: "👀 Antwort zeigen",
-        dontKnow: "❌ Nicht gewusst",
-        correct: "⭕ Richtig",
-        finishStudy: "Beenden",
-        noCards: "Dieses Deck enthält keine Karten.",
-        studyFinished: "Lerneinheit beendet.",
-        correctRate: "Trefferquote",
-        progressTitle: "📊 Fortschritt",
-        progressDescription: "Lernzeit, Antworten und Trefferquote anzeigen.",
-        totalAnswers: "Antworten insgesamt",
-        correctAnswers: "Richtig",
-        history: "Lernverlauf",
-        noHistory: "Noch kein Lernverlauf vorhanden.",
-        date: "Datum",
-        deckName: "Deck",
-        answers: "Antworten",
-        correctColumn: "Richtig",
-        importTitle: "📥 Import",
-        importDescription: "TXT-, CSV-, PDF- und andere Materialien importieren.",
-        targetDeck: "📚 Ziel-Deck",
-        newDeck: "Neues Deck erstellen",
-        addToExisting: "Wähle ein vorhandenes Deck, um Karten hinzuzufügen.",
-        learningLanguage: "🌐 Lernsprache",
-        selectMaterial: "Material auswählen",
-        multipleFiles: "Mehrere Dateien können gleichzeitig ausgewählt werden.",
-        selectFile: "📂 Dateien auswählen",
-        importing: "Importiere…",
-        imported: "Importiert",
-        importError: "Import fehlgeschlagen",
-        noCardsDetected: "Keine Karteninhalte gefunden.",
-        dataShareTitle: "🔄 Datenaustausch",
-        dataShareDescription: "Language-Gym-Daten zwischen PC und Smartphone teilen.",
-        exportTitle: "📤 Daten exportieren",
-        exportDescription: "Lernverlauf, Decks und Einstellungen als JSON speichern.",
-        exportData: "Daten exportieren",
-        importData: "📥 Daten importieren",
-        importDataDescription: "Eine JSON-Datei von einem anderen Gerät importieren.",
-        readJSON: "JSON importieren",
-        backupTitle: "🛟 Automatisches Backup",
-        backupDescription: "Aus dem letzten automatischen Backup wiederherstellen.",
-        restoreBackup: "Backup wiederherstellen",
-        settingsTitle: "⚙️ Einstellungen",
-        settingsDescription: "Language Gym anpassen.",
-        themeColor: "🎨 Themenfarbe",
-        themeDescription: "Wähle eine von 12 Farben.",
-        customColor: "Benutzerdefinierte Farbe",
-        voice: "🔊 Stimme",
-        autoVoice: "Automatische Stimme",
-        autoVoiceDescription: "Beim Anzeigen einer Karte automatisch abspielen",
-        randomStudy: "🎲 Lernkarten zufällig auswählen",
-        voiceRate: "Sprechgeschwindigkeit",
-        voicePitch: "Tonhöhe",
-        languageSettings: "🌐 Spracheinstellungen",
-        uiLanguage: "Oberflächensprache",
-        learningLanguageSetting: "Lernsprache",
-        languageChanged: "Oberflächensprache geändert.",
-        learningLanguageChanged: "Lernsprache geändert.",
-        deleteConfirm: "Diese Karte löschen?",
-        deckDeleteConfirm: "Dieses Deck löschen?",
-        backupRestored: "Backup wiederhergestellt.",
-        dataImported: "Daten importiert.",
-        dataExported: "Daten exportiert.",
-        back: "Zurück",
-        forward: "Weiter"
-    },
-
-    es: {
-        home: "Inicio",
-        decks: "Mazos",
-        study: "Estudiar",
-        progress: "Progreso",
-        import: "Importar",
-        dataShare: "Datos",
-        settings: "Configuración",
-        subtitle: "Entrenamiento multilingüe",
-        homeTitle: "Language Gym",
-        homeDescription: "Entrena tus idiomas un poco cada día.",
-        deck: "Mazos",
-        cards: "Tarjetas",
-        totalStudyTime: "Tiempo total de estudio",
-        accuracy: "Precisión",
-        startLearning: "🚀 Empezar a estudiar",
-        chooseDeck: "Elige un mazo para empezar.",
-        viewDecks: "📚 Ver mazos",
-        importMaterial: "📥 Importar material",
-        todayMessage: "🌱 Mensaje de hoy",
-        todayForward: "¡Hoy también, un paso adelante!",
-        deckTitle: "📚 Mazos",
-        deckDescription: "Gestiona tus materiales de estudio.",
-        noDecks: "Todavía no hay mazos.",
-        createDeck: "Importar material",
-        cardSearch: "🔎 Buscar tarjetas",
-        searchPlaceholder: "Buscar delante o detrás",
-        edit: "Editar",
-        delete: "Eliminar",
-        cardsCount: "tarjetas",
-        studyTitle: "🏋️ Estudiar",
-        chooseDeckToStudy: "Selecciona un mazo.",
-        studyStartMessage: "Las tarjetas aparecerán aquí al comenzar.",
-        showAnswer: "👀 Ver respuesta",
-        dontKnow: "❌ No lo sé",
-        correct: "⭕ Correcto",
-        finishStudy: "Terminar",
-        noCards: "Este mazo no tiene tarjetas.",
-        studyFinished: "Sesión terminada.",
-        correctRate: "Precisión",
-        progressTitle: "📊 Progreso",
-        progressDescription: "Consulta tiempo, respuestas y precisión.",
-        totalAnswers: "Respuestas totales",
-        correctAnswers: "Correctas",
-        history: "Historial",
-        noHistory: "Todavía no hay historial.",
-        date: "Fecha",
-        deckName: "Mazo",
-        answers: "Respuestas",
-        correctColumn: "Correctas",
-        importTitle: "📥 Importar",
-        importDescription: "Importa materiales TXT, CSV, PDF y más.",
-        targetDeck: "📚 Mazo de destino",
-        newDeck: "Crear un nuevo mazo",
-        addToExisting: "Elige un mazo existente para añadir tarjetas.",
-        learningLanguage: "🌐 Idioma de aprendizaje",
-        selectMaterial: "Seleccionar material",
-        multipleFiles: "Puedes seleccionar varios archivos a la vez.",
-        selectFile: "📂 Seleccionar archivos",
-        importing: "Importando…",
-        imported: "Importado",
-        importError: "Error de importación",
-        noCardsDetected: "No se encontraron contenidos para tarjetas.",
-        dataShareTitle: "🔄 Compartir datos",
-        dataShareDescription: "Comparte datos entre PC y móvil.",
-        exportTitle: "📤 Exportar datos",
-        exportDescription: "Guarda registros, mazos y configuración como JSON.",
-        exportData: "Exportar datos",
-        importData: "📥 Importar datos",
-        importDataDescription: "Importa un JSON exportado desde otro dispositivo.",
-        readJSON: "Importar JSON",
-        backupTitle: "🛟 Copia de seguridad",
-        backupDescription: "Restaura desde la última copia automática.",
-        restoreBackup: "Restaurar copia",
-        settingsTitle: "⚙️ Configuración",
-        settingsDescription: "Personaliza Language Gym.",
-        themeColor: "🎨 Color del tema",
-        themeDescription: "Elige uno de los 12 colores.",
-        customColor: "Color personalizado",
-        voice: "🔊 Voz",
-        autoVoice: "Voz automática",
-        autoVoiceDescription: "Reproducir automáticamente al mostrar una tarjeta",
-        randomStudy: "🎲 Tarjetas aleatorias",
-        voiceRate: "Velocidad",
-        voicePitch: "Tono",
-        languageSettings: "🌐 Idiomas",
-        uiLanguage: "Idioma de la interfaz",
-        learningLanguageSetting: "Idioma de aprendizaje",
-        languageChanged: "Idioma de la interfaz cambiado.",
-        learningLanguageChanged: "Idioma de aprendizaje cambiado.",
-        deleteConfirm: "¿Eliminar esta tarjeta?",
-        deckDeleteConfirm: "¿Eliminar este mazo?",
-        backupRestored: "Copia restaurada.",
-        dataImported: "Datos importados.",
-        dataExported: "Datos exportados.",
-        back: "Atrás",
-        forward: "Adelante"
-    },
-
-    fr: {
-        home: "Accueil",
-        decks: "Paquets",
-        study: "Étudier",
-        progress: "Progression",
-        import: "Importer",
-        dataShare: "Données",
-        settings: "Paramètres",
-        subtitle: "Entraînement multilingue",
-        homeTitle: "Language Gym",
-        homeDescription: "Entraînez vos langues un peu chaque jour.",
-        deck: "Paquets",
-        cards: "Cartes",
-        totalStudyTime: "Temps total d'étude",
-        accuracy: "Précision",
-        startLearning: "🚀 Commencer",
-        chooseDeck: "Choisissez un paquet.",
-        viewDecks: "📚 Voir les paquets",
-        importMaterial: "📥 Importer du matériel",
-        todayMessage: "🌱 Message du jour",
-        todayForward: "Un pas de plus aujourd'hui !",
-        deckTitle: "📚 Paquets",
-        deckDescription: "Gérez vos supports d'étude.",
-        noDecks: "Aucun paquet pour le moment.",
-        createDeck: "Importer du matériel",
-        cardSearch: "🔎 Rechercher des cartes",
-        searchPlaceholder: "Rechercher recto ou verso",
-        edit: "Modifier",
-        delete: "Supprimer",
-        cardsCount: "cartes",
-        studyTitle: "🏋️ Étudier",
-        chooseDeckToStudy: "Veuillez choisir un paquet.",
-        studyStartMessage: "Les cartes apparaîtront ici.",
-        showAnswer: "👀 Voir la réponse",
-        dontKnow: "❌ Je ne sais pas",
-        correct: "⭕ Correct",
-        finishStudy: "Terminer",
-        noCards: "Ce paquet ne contient aucune carte.",
-        studyFinished: "Session terminée.",
-        correctRate: "Précision",
-        progressTitle: "📊 Progression",
-        progressDescription: "Consultez le temps, les réponses et la précision.",
-        totalAnswers: "Réponses totales",
-        correctAnswers: "Réponses correctes",
-        history: "Historique",
-        noHistory: "Aucun historique.",
-        date: "Date",
-        deckName: "Paquet",
-        answers: "Réponses",
-        correctColumn: "Correctes",
-        importTitle: "📥 Importer",
-        importDescription: "Importez des fichiers TXT, CSV, PDF et plus.",
-        targetDeck: "📚 Paquet cible",
-        newDeck: "Créer un nouveau paquet",
-        addToExisting: "Choisissez un paquet existant.",
-        learningLanguage: "🌐 Langue d'apprentissage",
-        selectMaterial: "Sélectionner",
-        multipleFiles: "Plusieurs fichiers peuvent être sélectionnés.",
-        selectFile: "📂 Sélectionner les fichiers",
-        importing: "Importation…",
-        imported: "Importé",
-        importError: "Échec de l'importation",
-        noCardsDetected: "Aucun contenu exploitable trouvé.",
-        dataShareTitle: "🔄 Partage de données",
-        dataShareDescription: "Partagez vos données entre PC et smartphone.",
-        exportTitle: "📤 Exporter les données",
-        exportDescription: "Enregistrez vos données au format JSON.",
-        exportData: "Exporter",
-        importData: "📥 Importer les données",
-        importDataDescription: "Importez un fichier JSON.",
-        readJSON: "Importer JSON",
-        backupTitle: "🛟 Sauvegarde automatique",
-        backupDescription: "Restaurer la dernière sauvegarde.",
-        restoreBackup: "Restaurer",
-        settingsTitle: "⚙️ Paramètres",
-        settingsDescription: "Personnalisez Language Gym.",
-        themeColor: "🎨 Couleur du thème",
-        themeDescription: "Choisissez parmi 12 couleurs.",
-        customColor: "Couleur personnalisée",
-        voice: "🔊 Voix",
-        autoVoice: "Voix automatique",
-        autoVoiceDescription: "Lire automatiquement à l'affichage",
-        randomStudy: "🎲 Mélanger les cartes",
-        voiceRate: "Vitesse",
-        voicePitch: "Hauteur",
-        languageSettings: "🌐 Langues",
-        uiLanguage: "Langue de l'interface",
-        learningLanguageSetting: "Langue d'apprentissage",
-        languageChanged: "Langue de l'interface modifiée.",
-        learningLanguageChanged: "Langue d'apprentissage modifiée.",
-        deleteConfirm: "Supprimer cette carte ?",
-        deckDeleteConfirm: "Supprimer ce paquet ?",
-        backupRestored: "Sauvegarde restaurée.",
-        dataImported: "Données importées.",
-        dataExported: "Données exportées.",
-        back: "Retour",
-        forward: "Avancer"
-    },
-
-    ko: {
-        home: "홈",
-        decks: "덱",
-        study: "학습",
-        progress: "학습 기록",
-        import: "가져오기",
-        dataShare: "데이터",
-        settings: "설정",
-        subtitle: "다국어 학습 트레이닝",
-        homeTitle: "Language Gym",
-        homeDescription: "매일 조금씩 외국어를 훈련해 보세요.",
-        deck: "덱",
-        cards: "카드",
-        totalStudyTime: "총 학습 시간",
-        accuracy: "정답률",
-        startLearning: "🚀 학습 시작",
-        chooseDeck: "덱을 선택하세요.",
-        viewDecks: "📚 덱 보기",
-        importMaterial: "📥 교재 가져오기",
-        todayMessage: "🌱 오늘의 메시지",
-        todayForward: "오늘도 한 걸음 앞으로!",
-        deckTitle: "📚 덱",
-        deckDescription: "학습 자료를 관리합니다.",
-        noDecks: "아직 덱이 없습니다.",
-        createDeck: "교재 가져오기",
-        cardSearch: "🔎 카드 검색",
-        searchPlaceholder: "앞면 또는 뒷면 검색",
-        edit: "편집",
-        delete: "삭제",
-        cardsCount: "카드",
-        studyTitle: "🏋️ 학습",
-        chooseDeckToStudy: "덱을 선택하세요.",
-        studyStartMessage: "학습을 시작하면 카드가 표시됩니다.",
-        showAnswer: "👀 정답 보기",
-        dontKnow: "❌ 모르겠음",
-        correct: "⭕ 정답",
-        finishStudy: "학습 종료",
-        noCards: "이 덱에는 카드가 없습니다.",
-        studyFinished: "학습을 종료했습니다.",
-        correctRate: "정답률",
-        progressTitle: "📊 학습 기록",
-        progressDescription: "학습 시간, 답변 수, 정답률을 확인하세요.",
-        totalAnswers: "총 답변 수",
-        correctAnswers: "정답 수",
-        history: "학습 기록",
-        noHistory: "아직 학습 기록이 없습니다.",
-        date: "날짜",
-        deckName: "덱",
-        answers: "답변",
-        correctColumn: "정답",
-        importTitle: "📥 가져오기",
-        importDescription: "TXT, CSV, PDF 등의 교재를 가져옵니다.",
-        targetDeck: "📚 대상 덱",
-        newDeck: "새 덱 만들기",
-        addToExisting: "기존 덱을 선택하면 카드가 추가됩니다.",
-        learningLanguage: "🌐 학습 언어",
-        selectMaterial: "교재 선택",
-        multipleFiles: "여러 파일을 한 번에 선택할 수 있습니다.",
-        selectFile: "📂 파일 선택",
-        importing: "가져오는 중…",
-        imported: "가져왔습니다",
-        importError: "가져오기 실패",
-        noCardsDetected: "카드로 만들 수 있는 내용을 찾지 못했습니다.",
-        dataShareTitle: "🔄 데이터 공유",
-        dataShareDescription: "PC와 스마트폰 사이에서 데이터를 공유합니다.",
-        exportTitle: "📤 데이터 내보내기",
-        exportDescription: "학습 기록, 덱, 설정을 JSON으로 저장합니다.",
-        exportData: "데이터 내보내기",
-        importData: "📥 데이터 가져오기",
-        importDataDescription: "다른 기기에서 내보낸 JSON을 가져옵니다.",
-        readJSON: "JSON 가져오기",
-        backupTitle: "🛟 자동 백업",
-        backupDescription: "최신 자동 백업에서 복원합니다.",
-        restoreBackup: "백업 복원",
-        settingsTitle: "⚙️ 설정",
-        settingsDescription: "Language Gym을 원하는 대로 설정합니다.",
-        themeColor: "🎨 테마 색상",
-        themeDescription: "12가지 색상 중 선택하세요.",
-        customColor: "사용자 지정 색상",
-        voice: "🔊 음성",
-        autoVoice: "자동 음성",
-        autoVoiceDescription: "카드 표시 시 자동 재생",
-        randomStudy: "🎲 학습 카드를 무작위로",
-        voiceRate: "음성 속도",
-        voicePitch: "음성 높이",
-        languageSettings: "🌐 언어 설정",
-        uiLanguage: "UI 언어",
-        learningLanguageSetting: "학습 언어",
-        languageChanged: "UI 언어가 변경되었습니다.",
-        learningLanguageChanged: "학습 언어가 변경되었습니다.",
-        deleteConfirm: "이 카드를 삭제할까요?",
-        deckDeleteConfirm: "이 덱을 삭제할까요?",
-        backupRestored: "백업에서 복원했습니다.",
-        dataImported: "데이터를 가져왔습니다.",
-        dataExported: "데이터를 내보냈습니다.",
-        back: "뒤로",
-        forward: "앞으로"
-    },
-
-    it: {
-        home: "Home",
-        decks: "Mazzi",
-        study: "Studio",
-        progress: "Progressi",
-        import: "Importa",
-        dataShare: "Dati",
-        settings: "Impostazioni",
-        subtitle: "Allenamento multilingue",
-        homeTitle: "Language Gym",
-        homeDescription: "Allena le tue lingue un po' ogni giorno.",
-        deck: "Mazzi",
-        cards: "Carte",
-        totalStudyTime: "Tempo totale",
-        accuracy: "Precisione",
-        startLearning: "🚀 Inizia a studiare",
-        chooseDeck: "Scegli un mazzo.",
-        viewDecks: "📚 Vedi mazzi",
-        importMaterial: "📥 Importa materiale",
-        todayMessage: "🌱 Messaggio di oggi",
-        todayForward: "Un passo avanti anche oggi!",
-        deckTitle: "📚 Mazzi",
-        deckDescription: "Gestisci il materiale di studio.",
-        noDecks: "Nessun mazzo.",
-        createDeck: "Importa materiale",
-        cardSearch: "🔎 Cerca carte",
-        searchPlaceholder: "Cerca fronte o retro",
-        edit: "Modifica",
-        delete: "Elimina",
-        cardsCount: "carte",
-        studyTitle: "🏋️ Studio",
-        chooseDeckToStudy: "Seleziona un mazzo.",
-        studyStartMessage: "Le carte appariranno qui.",
-        showAnswer: "👀 Mostra risposta",
-        dontKnow: "❌ Non lo so",
-        correct: "⭕ Corretto",
-        finishStudy: "Termina",
-        noCards: "Questo mazzo non contiene carte.",
-        studyFinished: "Sessione terminata.",
-        correctRate: "Precisione",
-        progressTitle: "📊 Progressi",
-        progressDescription: "Controlla tempo, risposte e precisione.",
-        totalAnswers: "Risposte totali",
-        correctAnswers: "Risposte corrette",
-        history: "Cronologia",
-        noHistory: "Nessuna cronologia.",
-        date: "Data",
-        deckName: "Mazzo",
-        answers: "Risposte",
-        correctColumn: "Corrette",
-        importTitle: "📥 Importa",
-        importDescription: "Importa materiali TXT, CSV, PDF e altro.",
-        targetDeck: "📚 Mazzo di destinazione",
-        newDeck: "Crea un nuovo mazzo",
-        addToExisting: "Scegli un mazzo esistente.",
-        learningLanguage: "🌐 Lingua di studio",
-        selectMaterial: "Seleziona materiale",
-        multipleFiles: "Puoi selezionare più file.",
-        selectFile: "📂 Seleziona file",
-        importing: "Importazione…",
-        imported: "Importato",
-        importError: "Importazione fallita",
-        noCardsDetected: "Nessun contenuto trovato.",
-        dataShareTitle: "🔄 Condivisione dati",
-        dataShareDescription: "Condividi i dati tra PC e smartphone.",
-        exportTitle: "📤 Esporta dati",
-        exportDescription: "Salva dati e impostazioni in JSON.",
-        exportData: "Esporta dati",
-        importData: "📥 Importa dati",
-        importDataDescription: "Importa un JSON da un altro dispositivo.",
-        readJSON: "Importa JSON",
-        backupTitle: "🛟 Backup automatico",
-        backupDescription: "Ripristina l'ultimo backup.",
-        restoreBackup: "Ripristina backup",
-        settingsTitle: "⚙️ Impostazioni",
-        settingsDescription: "Personalizza Language Gym.",
-        themeColor: "🎨 Colore tema",
-        themeDescription: "Scegli tra 12 colori.",
-        customColor: "Colore personalizzato",
-        voice: "🔊 Voce",
-        autoVoice: "Voce automatica",
-        autoVoiceDescription: "Riproduci automaticamente quando appare una carta",
-        randomStudy: "🎲 Carte casuali",
-        voiceRate: "Velocità",
-        voicePitch: "Tono",
-        languageSettings: "🌐 Lingue",
-        uiLanguage: "Lingua interfaccia",
-        learningLanguageSetting: "Lingua di studio",
-        languageChanged: "Lingua dell'interfaccia modificata.",
-        learningLanguageChanged: "Lingua di studio modificata.",
-        deleteConfirm: "Eliminare questa carta?",
-        deckDeleteConfirm: "Eliminare questo mazzo?",
-        backupRestored: "Backup ripristinato.",
-        dataImported: "Dati importati.",
-        dataExported: "Dati esportati.",
-        back: "Indietro",
-        forward: "Avanti"
-    },
-
-    fi: {
-        home: "Etusivu",
-        decks: "Pakot",
-        study: "Opiskelu",
-        progress: "Edistyminen",
-        import: "Tuo",
-        dataShare: "Data",
-        settings: "Asetukset",
-        subtitle: "Monikielinen kieliharjoittelu",
-        homeTitle: "Language Gym",
-        homeDescription: "Harjoittele kieliäsi vähän joka päivä.",
-        deck: "Pakot",
-        cards: "Kortit",
-        totalStudyTime: "Opiskeluaika",
-        accuracy: "Tarkkuus",
-        startLearning: "🚀 Aloita opiskelu",
-        chooseDeck: "Valitse pakka.",
-        viewDecks: "📚 Näytä pakat",
-        importMaterial: "📥 Tuo materiaalia",
-        todayMessage: "🌱 Päivän viesti",
-        todayForward: "Askel eteenpäin tänäänkin!",
-        deckTitle: "📚 Pakot",
-        deckDescription: "Hallitse opiskelumateriaaleja.",
-        noDecks: "Pakkoja ei vielä ole.",
-        createDeck: "Tuo materiaalia",
-        cardSearch: "🔎 Hae kortteja",
-        searchPlaceholder: "Hae etu- tai takapuolelta",
-        edit: "Muokkaa",
-        delete: "Poista",
-        cardsCount: "korttia",
-        studyTitle: "🏋️ Opiskelu",
-        chooseDeckToStudy: "Valitse pakka.",
-        studyStartMessage: "Kortit näkyvät tässä, kun aloitat.",
-        showAnswer: "👀 Näytä vastaus",
-        dontKnow: "❌ En tiedä",
-        correct: "⭕ Oikein",
-        finishStudy: "Lopeta",
-        noCards: "Tässä pakassa ei ole kortteja.",
-        studyFinished: "Opiskelu päättyi.",
-        correctRate: "Tarkkuus",
-        progressTitle: "📊 Edistyminen",
-        progressDescription: "Tarkista opiskeluaika, vastaukset ja tarkkuus.",
-        totalAnswers: "Vastauksia yhteensä",
-        correctAnswers: "Oikeat vastaukset",
-        history: "Opiskeluhistoria",
-        noHistory: "Opiskeluhistoriaa ei vielä ole.",
-        date: "Päivä",
-        deckName: "Pakka",
-        answers: "Vastaukset",
-        correctColumn: "Oikein",
-        importTitle: "📥 Tuo",
-        importDescription: "Tuo TXT-, CSV- ja PDF-materiaaleja.",
-        targetDeck: "📚 Kohdepakka",
-        newDeck: "Luo uusi pakka",
-        addToExisting: "Valitse olemassa oleva pakka.",
-        learningLanguage: "🌐 Opiskelukieli",
-        selectMaterial: "Valitse materiaali",
-        multipleFiles: "Voit valita useita tiedostoja.",
-        selectFile: "📂 Valitse tiedostot",
-        importing: "Tuodaan…",
-        imported: "Tuotu",
-        importError: "Tuonti epäonnistui",
-        noCardsDetected: "Korttisisältöä ei löytynyt.",
-        dataShareTitle: "🔄 Tietojen jako",
-        dataShareDescription: "Jaa tiedot tietokoneen ja puhelimen välillä.",
-        exportTitle: "📤 Vie tiedot",
-        exportDescription: "Tallenna tiedot JSON-tiedostona.",
-        exportData: "Vie tiedot",
-        importData: "📥 Tuo tiedot",
-        importDataDescription: "Tuo toisella laitteella viety JSON.",
-        readJSON: "Tuo JSON",
-        backupTitle: "🛟 Automaattinen varmuuskopio",
-        backupDescription: "Palauta viimeisin varmuuskopio.",
-        restoreBackup: "Palauta varmuuskopio",
-        settingsTitle: "⚙️ Asetukset",
-        settingsDescription: "Muokkaa Language Gymiä.",
-        themeColor: "🎨 Teemaväri",
-        themeDescription: "Valitse 12 väristä.",
-        customColor: "Mukautettu väri",
-        voice: "🔊 Ääni",
-        autoVoice: "Automaattinen ääni",
-        autoVoiceDescription: "Toista automaattisesti kortin näkyessä",
-        randomStudy: "🎲 Satunnaiset kortit",
-        voiceRate: "Puhenopeus",
-        voicePitch: "Äänen korkeus",
-        languageSettings: "🌐 Kieliasetukset",
-        uiLanguage: "Käyttöliittymän kieli",
-        learningLanguageSetting: "Opiskelukieli",
-        languageChanged: "Käyttöliittymän kieli vaihdettu.",
-        learningLanguageChanged: "Opiskelukieli vaihdettu.",
-        deleteConfirm: "Poistetaanko tämä kortti?",
-        deckDeleteConfirm: "Poistetaanko tämä pakka?",
-        backupRestored: "Varmuuskopio palautettu.",
-        dataImported: "Tiedot tuotu.",
-        dataExported: "Tiedot viety.",
-        back: "Takaisin",
-        forward: "Eteenpäin"
-    },
-
-    ru: {
-        home: "Главная",
-        decks: "Колоды",
-        study: "Обучение",
-        progress: "Прогресс",
-        import: "Импорт",
-        dataShare: "Данные",
-        settings: "Настройки",
-        subtitle: "Многоязычная тренировка",
-        homeTitle: "Language Gym",
-        homeDescription: "Тренируйте языки понемногу каждый день.",
-        deck: "Колоды",
-        cards: "Карточки",
-        totalStudyTime: "Общее время",
-        accuracy: "Точность",
-        startLearning: "🚀 Начать обучение",
-        chooseDeck: "Выберите колоду.",
-        viewDecks: "📚 Колоды",
-        importMaterial: "📥 Импортировать",
-        todayMessage: "🌱 Сообщение дня",
-        todayForward: "Ещё один шаг вперёд!",
-        deckTitle: "📚 Колоды",
-        deckDescription: "Управляйте учебными материалами.",
-        noDecks: "Колод пока нет.",
-        createDeck: "Импортировать материал",
-        cardSearch: "🔎 Поиск карточек",
-        searchPlaceholder: "Поиск по лицевой или обратной стороне",
-        edit: "Изменить",
-        delete: "Удалить",
-        cardsCount: "карточек",
-        studyTitle: "🏋️ Обучение",
-        chooseDeckToStudy: "Выберите колоду.",
-        studyStartMessage: "После начала обучения здесь появятся карточки.",
-        showAnswer: "👀 Показать ответ",
-        dontKnow: "❌ Не знаю",
-        correct: "⭕ Верно",
-        finishStudy: "Завершить",
-        noCards: "В этой колоде нет карточек.",
-        studyFinished: "Сеанс завершён.",
-        correctRate: "Точность",
-        progressTitle: "📊 Прогресс",
-        progressDescription: "Проверяйте время, ответы и точность.",
-        totalAnswers: "Всего ответов",
-        correctAnswers: "Правильных",
-        history: "История обучения",
-        noHistory: "Истории пока нет.",
-        date: "Дата",
-        deckName: "Колода",
-        answers: "Ответы",
-        correctColumn: "Верно",
-        importTitle: "📥 Импорт",
-        importDescription: "Импортируйте TXT, CSV, PDF и другие материалы.",
-        targetDeck: "📚 Целевая колода",
-        newDeck: "Создать новую колоду",
-        addToExisting: "Выберите существующую колоду.",
-        learningLanguage: "🌐 Язык обучения",
-        selectMaterial: "Выбрать материал",
-        multipleFiles: "Можно выбрать несколько файлов.",
-        selectFile: "📂 Выбрать файлы",
-        importing: "Импорт…",
-        imported: "Импортировано",
-        importError: "Ошибка импорта",
-        noCardsDetected: "Подходящего содержимого не найдено.",
-        dataShareTitle: "🔄 Обмен данными",
-        dataShareDescription: "Обменивайтесь данными между ПК и телефоном.",
-        exportTitle: "📤 Экспорт данных",
-        exportDescription: "Сохраните данные и настройки в JSON.",
-        exportData: "Экспортировать",
-        importData: "📥 Импорт данных",
-        importDataDescription: "Импортируйте JSON с другого устройства.",
-        readJSON: "Импортировать JSON",
-        backupTitle: "🛟 Резервная копия",
-        backupDescription: "Восстановить последнюю копию.",
-        restoreBackup: "Восстановить",
-        settingsTitle: "⚙️ Настройки",
-        settingsDescription: "Настройте Language Gym.",
-        themeColor: "🎨 Цвет темы",
-        themeDescription: "Выберите один из 12 цветов.",
-        customColor: "Пользовательский цвет",
-        voice: "🔊 Голос",
-        autoVoice: "Автоматический голос",
-        autoVoiceDescription: "Автоматически воспроизводить при показе карточки",
-        randomStudy: "🎲 Случайные карточки",
-        voiceRate: "Скорость",
-        voicePitch: "Высота",
-        languageSettings: "🌐 Языки",
-        uiLanguage: "Язык интерфейса",
-        learningLanguageSetting: "Язык обучения",
-        languageChanged: "Язык интерфейса изменён.",
-        learningLanguageChanged: "Язык обучения изменён.",
-        deleteConfirm: "Удалить эту карточку?",
-        deckDeleteConfirm: "Удалить эту колоду?",
-        backupRestored: "Резервная копия восстановлена.",
-        dataImported: "Данные импортированы.",
-        dataExported: "Данные экспортированы.",
-        back: "Назад",
-        forward: "Вперёд"
-    },
-
-    pt: {
-        home: "Início",
-        decks: "Baralhos",
-        study: "Estudar",
-        progress: "Progresso",
-        import: "Importar",
-        dataShare: "Dados",
-        settings: "Definições",
-        subtitle: "Treino multilingue",
-        homeTitle: "Language Gym",
-        homeDescription: "Treine os seus idiomas um pouco todos os dias.",
-        deck: "Baralhos",
-        cards: "Cartões",
-        totalStudyTime: "Tempo total",
-        accuracy: "Precisão",
-        startLearning: "🚀 Começar",
-        chooseDeck: "Escolha um baralho.",
-        viewDecks: "📚 Ver baralhos",
-        importMaterial: "📥 Importar material",
-        todayMessage: "🌱 Mensagem do dia",
-        todayForward: "Mais um passo hoje!",
-        deckTitle: "📚 Baralhos",
-        deckDescription: "Gira os seus materiais de estudo.",
-        noDecks: "Ainda não existem baralhos.",
-        createDeck: "Importar material",
-        cardSearch: "🔎 Pesquisar cartões",
-        searchPlaceholder: "Pesquisar frente ou verso",
-        edit: "Editar",
-        delete: "Eliminar",
-        cardsCount: "cartões",
-        studyTitle: "🏋️ Estudar",
-        chooseDeckToStudy: "Selecione um baralho.",
-        studyStartMessage: "Os cartões aparecerão aqui.",
-        showAnswer: "👀 Ver resposta",
-        dontKnow: "❌ Não sei",
-        correct: "⭕ Correto",
-        finishStudy: "Terminar",
-        noCards: "Este baralho não tem cartões.",
-        studyFinished: "Sessão terminada.",
-        correctRate: "Precisão",
-        progressTitle: "📊 Progresso",
-        progressDescription: "Consulte tempo, respostas e precisão.",
-        totalAnswers: "Respostas totais",
-        correctAnswers: "Respostas corretas",
-        history: "Histórico",
-        noHistory: "Ainda não existe histórico.",
-        date: "Data",
-        deckName: "Baralho",
-        answers: "Respostas",
-        correctColumn: "Corretas",
-        importTitle: "📥 Importar",
-        importDescription: "Importe TXT, CSV, PDF e outros materiais.",
-        targetDeck: "📚 Baralho de destino",
-        newDeck: "Criar novo baralho",
-        addToExisting: "Escolha um baralho existente.",
-        learningLanguage: "🌐 Idioma de estudo",
-        selectMaterial: "Selecionar material",
-        multipleFiles: "Pode selecionar vários ficheiros.",
-        selectFile: "📂 Selecionar ficheiros",
-        importing: "A importar…",
-        imported: "Importado",
-        importError: "Falha na importação",
-        noCardsDetected: "Não foi encontrado conteúdo para cartões.",
-        dataShareTitle: "🔄 Partilha de dados",
-        dataShareDescription: "Partilhe dados entre PC e smartphone.",
-        exportTitle: "📤 Exportar dados",
-        exportDescription: "Guarde dados e definições em JSON.",
-        exportData: "Exportar dados",
-        importData: "📥 Importar dados",
-        importDataDescription: "Importe um JSON de outro dispositivo.",
-        readJSON: "Importar JSON",
-        backupTitle: "🛟 Cópia de segurança",
-        backupDescription: "Restaurar a última cópia automática.",
-        restoreBackup: "Restaurar cópia",
-        settingsTitle: "⚙️ Definições",
-        settingsDescription: "Personalize o Language Gym.",
-        themeColor: "🎨 Cor do tema",
-        themeDescription: "Escolha uma das 12 cores.",
-        customColor: "Cor personalizada",
-        voice: "🔊 Voz",
-        autoVoice: "Voz automática",
-        autoVoiceDescription: "Reproduzir automaticamente ao mostrar um cartão",
-        randomStudy: "🎲 Cartões aleatórios",
-        voiceRate: "Velocidade",
-        voicePitch: "Tom",
-        languageSettings: "🌐 Idiomas",
-        uiLanguage: "Idioma da interface",
-        learningLanguageSetting: "Idioma de estudo",
-        languageChanged: "Idioma da interface alterado.",
-        learningLanguageChanged: "Idioma de estudo alterado.",
-        deleteConfirm: "Eliminar este cartão?",
-        deckDeleteConfirm: "Eliminar este baralho?",
-        backupRestored: "Cópia restaurada.",
-        dataImported: "Dados importados.",
-        dataExported: "Dados exportados.",
-        back: "Voltar",
-        forward: "Avançar"
-    }
-};
-
-
-/* =========================================================
-   DATA
-   ========================================================= */
-
-let appData = loadData();
-
-let studyState = {
-    deckId: null,
-    cards: [],
-    index: 0,
-    answerShown: false,
-    startedAt: null,
-    timerId: null,
-    correct: 0,
-    answers: 0
-};
-
-let pageHistory = [];
-let historyIndex = -1;
+const BACKUP_KEY = "languageGymAutomaticBackup";
 
 
 /* =========================================================
    DEFAULT DATA
    ========================================================= */
 
-function createDefaultData() {
+const DEFAULT_SETTINGS = {
+    customColor: "#8B7CF6",
+    autoVoice: false,
+    voiceRate: 1,
+    voicePitch: 1,
+    uiLanguage: "ja",
+    learningLanguage: "zh",
+    randomStudy: true
+};
 
-    return {
-        version: 2,
 
-        decks: [],
+const DEFAULT_DATA = {
+    version: 1,
 
-        settings: {
-            themeColor: DEFAULT_COLOR,
-            customColor: DEFAULT_COLOR,
+    settings: {
+        ...DEFAULT_SETTINGS
+    },
 
-            autoVoice: false,
-            voiceRate: 1,
-            voicePitch: 1,
+    decks: [],
 
-            uiLanguage: "ja",
-            learningLanguage: "zh",
+    studyHistory: [],
 
-            randomStudy: true
-        },
+    totalStudyTime: 0,
 
-        progress: {
-            totalStudyTime: 0,
-            totalAnswers: 0,
-            totalCorrect: 0,
-            history: []
-        }
-    };
+    totalAnswers: 0,
+
+    totalCorrect: 0
+};
+
+
+/* =========================================================
+   GLOBAL DATA
+   ========================================================= */
+
+let appData = loadData();
+
+
+/* =========================================================
+   STUDY STATE
+   ========================================================= */
+
+let studyState = {
+    deckId: null,
+    cards: [],
+    currentIndex: 0,
+    answered: false,
+    startTime: null,
+    timerInterval: null
+};
+
+
+/* =========================================================
+   UTILITY
+   ========================================================= */
+
+function escapeHTML(value) {
+
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
+}
+
+
+function generateId(prefix = "id") {
+
+    return (
+        prefix +
+        "_" +
+        Date.now() +
+        "_" +
+        Math.random()
+            .toString(36)
+            .slice(2, 10)
+    );
+
+}
+
+
+function nowISO() {
+
+    return new Date().toISOString();
+
+}
+
+
+function clamp(value, min, max) {
+
+    return Math.min(
+        Math.max(value, min),
+        max
+    );
+
 }
 
 
 /* =========================================================
-   LOAD / SAVE
+   DATA NORMALIZATION
    ========================================================= */
-
-function loadData() {
-
-    const defaults = createDefaultData();
-
-    try {
-
-        const raw =
-            localStorage.getItem(
-                STORAGE_KEY
-            );
-
-        if (!raw) {
-            return defaults;
-        }
-
-        const parsed =
-            JSON.parse(raw);
-
-        const data = {
-            ...defaults,
-            ...parsed,
-
-            settings: {
-                ...defaults.settings,
-                ...(parsed.settings || {})
-            },
-
-            progress: {
-                ...defaults.progress,
-                ...(parsed.progress || {})
-            }
-        };
-
-        if (!Array.isArray(data.decks)) {
-            data.decks = [];
-        }
-
-        if (!Array.isArray(data.progress.history)) {
-            data.progress.history = [];
-        }
-
-        data.decks =
-            data.decks.map(normalizeDeck);
-
-        return data;
-
-    } catch (error) {
-
-        console.error(
-            "Language Gym load error:",
-            error
-        );
-
-        return defaults;
-    }
-}
-
-
-function saveData() {
-
-    try {
-
-        /*
-         * 自動バックアップ
-         */
-
-        const oldData =
-            localStorage.getItem(
-                STORAGE_KEY
-            );
-
-        if (oldData) {
-
-            localStorage.setItem(
-                BACKUP_KEY,
-                oldData
-            );
-
-        }
-
-
-        localStorage.setItem(
-            STORAGE_KEY,
-            JSON.stringify(appData)
-        );
-
-    } catch (error) {
-
-        console.error(
-            "Language Gym save error:",
-            error
-        );
-
-        showStatus(
-            "データの保存に失敗しました。",
-            "error"
-        );
-
-    }
-}
-
-
-/* =========================================================
-   NORMALIZE
-   ========================================================= */
-
-function normalizeDeck(deck) {
-
-    const normalized = {
-
-        id:
-            deck.id ||
-            createId("deck"),
-
-        name:
-            deck.name ||
-            "Untitled Deck",
-
-        language:
-            deck.language ||
-            appData?.settings?.learningLanguage ||
-            "zh",
-
-        createdAt:
-            deck.createdAt ||
-            new Date().toISOString(),
-
-        updatedAt:
-            deck.updatedAt ||
-            new Date().toISOString(),
-
-        cards:
-            Array.isArray(deck.cards)
-                ? deck.cards.map(normalizeCard)
-                : []
-
-    };
-
-    return normalized;
-}
-
 
 function normalizeCard(card) {
+
+    if (!card || typeof card !== "object") {
+
+        return null;
+
+    }
+
 
     return {
 
         id:
             card.id ||
-            createId("card"),
+            generateId("card"),
 
         front:
             String(
                 card.front ??
                 card.question ??
+                card.term ??
                 ""
             ),
 
@@ -1393,6 +148,7 @@ function normalizeCard(card) {
             String(
                 card.back ??
                 card.answer ??
+                card.definition ??
                 ""
             ),
 
@@ -1403,132 +159,416 @@ function normalizeCard(card) {
 
         createdAt:
             card.createdAt ||
-            new Date().toISOString(),
+            nowISO(),
 
-        updatedAt:
-            card.updatedAt ||
-            new Date().toISOString(),
+        correct:
+            Number(card.correct || 0),
 
-        stats: {
-            answers:
-                Number(
-                    card.stats?.answers || 0
-                ),
+        wrong:
+            Number(card.wrong || 0),
 
-            correct:
-                Number(
-                    card.stats?.correct || 0
-                )
-        }
+        lastStudied:
+            card.lastStudied ||
+            null
+
     };
+
+}
+
+
+function normalizeDeck(deck) {
+
+    if (!deck || typeof deck !== "object") {
+
+        return null;
+
+    }
+
+
+    const cards =
+        Array.isArray(deck.cards)
+            ? deck.cards
+                .map(normalizeCard)
+                .filter(Boolean)
+            : [];
+
+
+    return {
+
+        id:
+            deck.id ||
+            generateId("deck"),
+
+        name:
+            String(
+                deck.name ||
+                "新しいデッキ"
+            ),
+
+        language:
+            deck.language ||
+            appData?.settings?.learningLanguage ||
+            "zh",
+
+        createdAt:
+            deck.createdAt ||
+            nowISO(),
+
+        cards
+
+    };
+
+}
+
+
+function normalizeData(data) {
+
+    const base = {
+        ...DEFAULT_DATA
+    };
+
+
+    if (
+        !data ||
+        typeof data !== "object"
+    ) {
+
+        return base;
+
+    }
+
+
+    const settings = {
+        ...DEFAULT_SETTINGS,
+        ...(data.settings || {})
+    };
+
+
+    const decks =
+        Array.isArray(data.decks)
+            ? data.decks
+                .map(normalizeDeck)
+                .filter(Boolean)
+            : [];
+
+
+    const studyHistory =
+        Array.isArray(data.studyHistory)
+            ? data.studyHistory
+            : [];
+
+
+    return {
+
+        version:
+            data.version ||
+            1,
+
+        settings,
+
+        decks,
+
+        studyHistory,
+
+        totalStudyTime:
+            Number(
+                data.totalStudyTime || 0
+            ),
+
+        totalAnswers:
+            Number(
+                data.totalAnswers || 0
+            ),
+
+        totalCorrect:
+            Number(
+                data.totalCorrect || 0
+            )
+
+    };
+
 }
 
 
 /* =========================================================
-   UTILS
+   LOAD / SAVE
    ========================================================= */
 
-function createId(prefix) {
+function loadData() {
 
-    return (
-        prefix +
-        "_" +
-        Date.now().toString(36) +
-        "_" +
-        Math.random()
-            .toString(36)
-            .slice(2, 9)
-    );
-}
+    try {
+
+        const raw =
+            localStorage.getItem(
+                STORAGE_KEY
+            );
 
 
-function escapeHTML(value) {
+        if (!raw) {
 
-    return String(value ?? "")
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
-}
+            return {
+                ...DEFAULT_DATA,
+                settings: {
+                    ...DEFAULT_SETTINGS
+                }
+            };
 
-
-function t(key) {
-
-    const lang =
-        appData.settings.uiLanguage || "ja";
-
-    return (
-        I18N[lang]?.[key] ??
-        I18N.ja[key] ??
-        key
-    );
-}
+        }
 
 
-function formatTime(seconds) {
+        const parsed =
+            JSON.parse(raw);
 
-    seconds =
-        Math.max(
-            0,
-            Math.floor(Number(seconds) || 0)
+
+        return normalizeData(parsed);
+
+    } catch (error) {
+
+        console.error(
+            "データ読み込みエラー:",
+            error
         );
 
-    const h =
-        Math.floor(seconds / 3600);
 
-    const m =
-        Math.floor(
-            (seconds % 3600) / 60
-        );
-
-    const s =
-        seconds % 60;
-
-    if (h > 0) {
-
-        return `${h}時間 ${m}分 ${s}秒`;
+        return {
+            ...DEFAULT_DATA,
+            settings: {
+                ...DEFAULT_SETTINGS
+            }
+        };
 
     }
 
-    if (m > 0) {
+}
 
-        return `${m}分 ${s}秒`;
+
+function saveData() {
+
+    try {
+
+        localStorage.setItem(
+            STORAGE_KEY,
+            JSON.stringify(appData)
+        );
+
+
+        createAutomaticBackup();
+
+        refreshAllUI();
+
+        return true;
+
+    } catch (error) {
+
+        console.error(
+            "データ保存エラー:",
+            error
+        );
+
+        showStatus(
+            "データの保存に失敗しました。",
+            "error"
+        );
+
+        return false;
 
     }
 
-    return `${s}秒`;
 }
 
 
-function getLearningLanguage() {
+/* =========================================================
+   AUTOMATIC BACKUP
+   ========================================================= */
 
-    return (
-        appData.settings.learningLanguage ||
-        "zh"
-    );
+function createAutomaticBackup() {
+
+    try {
+
+        localStorage.setItem(
+            BACKUP_KEY,
+            JSON.stringify({
+                savedAt: nowISO(),
+                data: appData
+            })
+        );
+
+    } catch (error) {
+
+        console.warn(
+            "自動バックアップ作成失敗:",
+            error
+        );
+
+    }
+
 }
 
 
-function getLearningLanguageName() {
+function restoreAutomaticBackup() {
 
-    return (
-        LANGUAGE_NAMES[
-            getLearningLanguage()
-        ] ||
-        getLearningLanguage()
-    );
+    try {
+
+        const raw =
+            localStorage.getItem(
+                BACKUP_KEY
+            );
+
+
+        if (!raw) {
+
+            alert(
+                "自動バックアップがありません。"
+            );
+
+            return;
+
+        }
+
+
+        const backup =
+            JSON.parse(raw);
+
+
+        if (
+            !backup ||
+            !backup.data
+        ) {
+
+            alert(
+                "バックアップデータが壊れています。"
+            );
+
+            return;
+
+        }
+
+
+        const confirmed =
+            confirm(
+                "自動バックアップからデータを復元しますか？\n\n現在のデータはバックアップされてから復元されます。"
+            );
+
+
+        if (!confirmed) {
+
+            return;
+
+        }
+
+
+        /*
+         * 復元前に現在データを保護
+         */
+
+        try {
+
+            localStorage.setItem(
+                BACKUP_KEY,
+                JSON.stringify({
+                    savedAt: nowISO(),
+                    data: appData
+                })
+            );
+
+        } catch (backupError) {
+
+            console.warn(
+                "復元前バックアップ失敗:",
+                backupError
+            );
+
+        }
+
+
+        appData =
+            normalizeData(
+                backup.data
+            );
+
+
+        localStorage.setItem(
+            STORAGE_KEY,
+            JSON.stringify(appData)
+        );
+
+
+        refreshAllUI();
+
+
+        alert(
+            "バックアップから復元しました。"
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "バックアップ復元エラー:",
+            error
+        );
+
+
+        alert(
+            "バックアップの復元に失敗しました。"
+        );
+
+    }
+
 }
 
 
-function getLearningLocale() {
+/* =========================================================
+   STATUS
+   ========================================================= */
 
-    return (
-        LANGUAGE_LOCALES[
-            getLearningLanguage()
-        ] ||
-        "en-US"
-    );
+function showStatus(
+    message,
+    type = "success"
+) {
+
+    const element =
+        document.getElementById(
+            "import-status"
+        );
+
+
+    if (!element) {
+
+        return;
+
+    }
+
+
+    const className =
+        type === "error"
+            ? "status-error"
+            : "status-success";
+
+
+    element.innerHTML =
+        `
+        <div
+            class="${className}"
+            style="
+                padding:12px 14px;
+                border-radius:12px;
+                background:${
+                    type === "error"
+                        ? "#fff0f2"
+                        : "var(--primary-light)"
+                };
+                color:${
+                    type === "error"
+                        ? "var(--danger)"
+                        : "var(--primary)"
+                };
+            "
+        >
+            ${escapeHTML(message)}
+        </div>
+        `;
+
 }
 
 
@@ -1539,136 +579,152 @@ function getLearningLocale() {
 function applyTheme(color) {
 
     if (
-        !/^#[0-9a-fA-F]{6}$/.test(color)
+        !/^#[0-9A-Fa-f]{6}$/.test(color)
     ) {
+
         return;
+
     }
 
-    const root =
-        document.documentElement;
 
-    root.style.setProperty(
-        "--primary",
-        color
-    );
-
-    root.style.setProperty(
-        "--primary-light",
-        hexToLight(color)
-    );
-
-    appData.settings.themeColor =
-        color;
-
-    updateColorSelection(color);
-}
-
-
-function hexToLight(hex) {
-
-    const r =
-        parseInt(
-            hex.slice(1, 3),
-            16
+    document.documentElement
+        .style
+        .setProperty(
+            "--primary",
+            color
         );
 
-    const g =
-        parseInt(
-            hex.slice(3, 5),
-            16
+
+    document.documentElement
+        .style
+        .setProperty(
+            "--primary-light",
+            makeLightColor(color)
         );
 
-    const b =
-        parseInt(
-            hex.slice(5, 7),
-            16
-        );
 
-    const factor = 0.86;
+    if (
+        document
+            .querySelector(
+                'meta[name="theme-color"]'
+            )
+    ) {
 
-    return (
-        "#" +
-        [r, g, b]
-            .map(
-                value =>
-                    Math.round(
-                        value +
-                        (255 - value) *
-                        factor
-                    )
-                        .toString(16)
-                        .padStart(2, "0")
-                )
-            .join("")
-    );
-}
+        document
+            .querySelector(
+                'meta[name="theme-color"]'
+            )
+            .setAttribute(
+                "content",
+                color
+            );
 
+    }
 
-function updateColorSelection(color) {
 
     document
         .querySelectorAll(
             ".color-option"
         )
-        .forEach(button => {
+        .forEach(
+            button => {
 
-            button.classList.toggle(
-                "selected",
-                (
-                    button.dataset.color ||
-                    ""
-                ).toUpperCase() ===
-                color.toUpperCase()
-            );
+                button.classList.toggle(
+                    "selected",
+                    (
+                        button.dataset.color ||
+                        ""
+                    ).toUpperCase() ===
+                    color.toUpperCase()
+                );
 
-        });
-
-    const custom =
-        document.getElementById(
-            "custom-color"
+            }
         );
 
-    const customValue =
-        document.getElementById(
-            "custom-color-value"
+}
+
+
+function makeLightColor(hex) {
+
+    const clean =
+        hex.replace("#", "");
+
+
+    const r =
+        parseInt(
+            clean.substring(0, 2),
+            16
         );
 
-    if (custom) {
-        custom.value = color;
-    }
+    const g =
+        parseInt(
+            clean.substring(2, 4),
+            16
+        );
 
-    if (customValue) {
-        customValue.textContent =
-            color.toUpperCase();
-    }
+    const b =
+        parseInt(
+            clean.substring(4, 6),
+            16
+        );
+
+
+    const mix = value =>
+        Math.round(
+            value +
+            (255 - value) * 0.86
+        );
+
+
+    return (
+        "rgb(" +
+        mix(r) +
+        ", " +
+        mix(g) +
+        ", " +
+        mix(b) +
+        ")"
+    );
+
 }
 
 
 /* =========================================================
-   NAVIGATION
+   PAGE NAVIGATION
    ========================================================= */
 
-function showPage(pageName, addHistory = true) {
+let pageHistory = ["home"];
+let pageHistoryIndex = 0;
+
+
+function showPage(pageName) {
 
     const page =
         document.getElementById(
             "page-" + pageName
         );
 
+
     if (!page) {
+
         return;
+
     }
 
 
     document
-        .querySelectorAll(".page")
-        .forEach(section => {
+        .querySelectorAll(
+            ".page"
+        )
+        .forEach(
+            element => {
 
-            section.classList.remove(
-                "active-page"
-            );
+                element.classList.remove(
+                    "active-page"
+                );
 
-        });
+            }
+        );
 
 
     page.classList.add(
@@ -1677,102 +733,227 @@ function showPage(pageName, addHistory = true) {
 
 
     document
-        .querySelectorAll(".nav-item")
-        .forEach(button => {
+        .querySelectorAll(
+            ".nav-item"
+        )
+        .forEach(
+            button => {
 
-            button.classList.toggle(
-                "active",
-                button.dataset.page ===
-                pageName
-            );
+                button.classList.toggle(
+                    "active",
+                    button.dataset.page ===
+                    pageName
+                );
 
-        });
+            }
+        );
 
 
-    if (addHistory) {
+    if (
+        pageHistory[
+            pageHistoryIndex
+        ] !== pageName
+    ) {
 
         pageHistory =
             pageHistory.slice(
                 0,
-                historyIndex + 1
+                pageHistoryIndex + 1
             );
+
 
         pageHistory.push(
             pageName
         );
 
-        historyIndex =
+
+        pageHistoryIndex =
             pageHistory.length - 1;
 
     }
 
 
+    updateNavigationButtons();
+
+
     if (pageName === "home") {
+
         renderHome();
+
     }
+
 
     if (pageName === "decks") {
+
         renderDecks();
+        renderCardSearchResults(
+            document.getElementById(
+                "card-search-input"
+            )?.value || ""
+        );
+
     }
+
 
     if (pageName === "progress") {
+
         renderProgress();
+
     }
+
 
     if (pageName === "import") {
+
         renderImportDeckSelect();
-        syncImportLanguage();
+
     }
+
+
+    if (pageName === "data-share") {
+
+        renderDataShare();
+
+    }
+
 
     if (pageName === "settings") {
+
         renderSettings();
+
     }
 
-    closeMobileMenu();
+}
 
-    window.scrollTo({
-        top: 0,
-        behavior: "smooth"
-    });
+
+function updateNavigationButtons() {
+
+    const back =
+        document.querySelector(
+            ".btn-back"
+        );
+
+    const forward =
+        document.querySelector(
+            ".btn-forward"
+        );
+
+
+    if (back) {
+
+        back.disabled =
+            pageHistoryIndex <= 0;
+
+    }
+
+
+    if (forward) {
+
+        forward.disabled =
+            pageHistoryIndex >=
+            pageHistory.length - 1;
+
+    }
+
 }
 
 
 function goBack() {
 
-    if (historyIndex <= 0) {
+    if (
+        pageHistoryIndex <= 0
+    ) {
+
         return;
+
     }
 
-    historyIndex--;
 
-    const page =
-        pageHistory[historyIndex];
+    pageHistoryIndex--;
 
-    showPage(
-        page,
-        false
+
+    showPageWithoutHistory(
+        pageHistory[
+            pageHistoryIndex
+        ]
     );
+
 }
 
 
 function goForward() {
 
     if (
-        historyIndex >=
+        pageHistoryIndex >=
         pageHistory.length - 1
     ) {
+
         return;
+
     }
 
-    historyIndex++;
+
+    pageHistoryIndex++;
+
+
+    showPageWithoutHistory(
+        pageHistory[
+            pageHistoryIndex
+        ]
+    );
+
+}
+
+
+function showPageWithoutHistory(
+    pageName
+) {
 
     const page =
-        pageHistory[historyIndex];
+        document.getElementById(
+            "page-" + pageName
+        );
 
-    showPage(
-        page,
-        false
+
+    if (!page) {
+
+        return;
+
+    }
+
+
+    document
+        .querySelectorAll(
+            ".page"
+        )
+        .forEach(
+            element =>
+                element.classList.remove(
+                    "active-page"
+                )
+        );
+
+
+    page.classList.add(
+        "active-page"
     );
+
+
+    document
+        .querySelectorAll(
+            ".nav-item"
+        )
+        .forEach(
+            button =>
+                button.classList.toggle(
+                    "active",
+                    button.dataset.page ===
+                    pageName
+                )
+        );
+
+
+    updateNavigationButtons();
+
 }
 
 
@@ -1783,70 +964,172 @@ function goForward() {
 function renderHome() {
 
     const deckCount =
-        document.getElementById(
-            "home-deck-count"
-        );
+        appData.decks.length;
+
 
     const cardCount =
-        document.getElementById(
-            "home-card-count"
+        appData.decks.reduce(
+            (total, deck) =>
+                total +
+                deck.cards.length,
+            0
         );
+
 
     const studyTime =
-        document.getElementById(
-            "home-study-time"
+        Number(
+            appData.totalStudyTime || 0
         );
+
 
     const accuracy =
+        appData.totalAnswers > 0
+            ? Math.round(
+                (
+                    appData.totalCorrect /
+                    appData.totalAnswers
+                ) * 100
+            )
+            : 0;
+
+
+    setText(
+        "home-deck-count",
+        deckCount
+    );
+
+
+    setText(
+        "home-card-count",
+        cardCount
+    );
+
+
+    setText(
+        "home-study-time",
+        formatTime(studyTime)
+    );
+
+
+    setText(
+        "home-accuracy",
+        accuracy + "%"
+    );
+
+
+    const message =
         document.getElementById(
-            "home-accuracy"
+            "daily-message"
         );
 
-    if (deckCount) {
 
-        deckCount.textContent =
-            appData.decks.length;
+    if (message) {
 
-    }
+        const messages = [
+            "今日も一歩前進！",
+            "少しずつでも、続けることが力になります。",
+            "昨日の自分より、今日の自分を一歩先へ。",
+            "5分だけでもやってみよう。",
+            "Language Gymで今日も鍛えよう！"
+        ];
 
-    if (cardCount) {
 
-        cardCount.textContent =
-            appData.decks.reduce(
-                (total, deck) =>
-                    total + deck.cards.length,
-                0
-            );
+        const day =
+            new Date()
+                .getDate();
 
-    }
 
-    if (studyTime) {
-
-        studyTime.textContent =
-            formatTime(
-                appData.progress.totalStudyTime
-            );
+        message.textContent =
+            messages[
+                day %
+                messages.length
+            ];
 
     }
 
-    if (accuracy) {
+}
 
-        accuracy.textContent =
-            calculateAccuracy() + "%";
+
+/* =========================================================
+   GENERIC TEXT
+   ========================================================= */
+
+function setText(
+    id,
+    value
+) {
+
+    const element =
+        document.getElementById(id);
+
+
+    if (element) {
+
+        element.textContent =
+            String(value);
 
     }
 
-    const header =
-        document.getElementById(
-            "header-language"
+}
+
+
+function formatTime(seconds) {
+
+    seconds =
+        Math.max(
+            0,
+            Math.floor(
+                Number(seconds) || 0
+            )
         );
 
-    if (header) {
 
-        header.textContent =
-            getLearningLanguageName();
+    if (seconds < 60) {
+
+        return seconds + "秒";
 
     }
+
+
+    const minutes =
+        Math.floor(
+            seconds / 60
+        );
+
+
+    const remainingSeconds =
+        seconds % 60;
+
+
+    if (minutes < 60) {
+
+        return (
+            minutes +
+            "分 " +
+            remainingSeconds +
+            "秒"
+        );
+
+    }
+
+
+    const hours =
+        Math.floor(
+            minutes / 60
+        );
+
+
+    const remainingMinutes =
+        minutes % 60;
+
+
+    return (
+        hours +
+        "時間 " +
+        remainingMinutes +
+        "分"
+    );
+
 }
 
 
@@ -1861,23 +1144,27 @@ function renderDecks() {
             "deck-list"
         );
 
+
     if (!container) {
+
         return;
+
     }
 
 
-    if (!appData.decks.length) {
+    if (
+        appData.decks.length === 0
+    ) {
 
-        container.innerHTML = `
-
+        container.innerHTML =
+            `
             <div class="empty-state">
-
                 <div class="empty-icon">
                     📚
                 </div>
 
                 <p>
-                    ${escapeHTML(t("noDecks"))}
+                    まだデッキがありません。
                 </p>
 
                 <button
@@ -1886,14 +1173,13 @@ function renderDecks() {
                     data-go-page="import"
                     onclick="showPage('import')"
                 >
-                    ${escapeHTML(t("createDeck"))}
+                    教材をインポート
                 </button>
-
             </div>
-
-        `;
+            `;
 
         return;
+
     }
 
 
@@ -1902,96 +1188,65 @@ function renderDecks() {
             .map(
                 deck => {
 
-                    const langName =
-                        LANGUAGE_NAMES[
-                            deck.language
-                        ] ||
-                        deck.language ||
-                        "";
-
                     return `
+                    <div class="deck-card">
+
+                        <div class="deck-name">
+                            ${escapeHTML(
+                                deck.name
+                            )}
+                        </div>
+
+                        <div class="deck-meta">
+                            ${escapeHTML(
+                                deck.language ||
+                                ""
+                            )}
+                            ・
+                            ${deck.cards.length}
+                            カード
+                        </div>
 
                         <div
-                            class="deck-card"
-                            data-deck-id="${escapeHTML(deck.id)}"
+                            class="button-row"
+                            style="margin-top:15px;"
                         >
 
-                            <div class="deck-name">
-                                ${escapeHTML(deck.name)}
-                            </div>
-
-                            <div class="deck-meta">
-                                ${escapeHTML(langName)}
-                                ・
-                                ${deck.cards.length}
-                                ${escapeHTML(t("cardsCount"))}
-                            </div>
-
-                            <div
-                                style="
-                                    margin-top:16px;
-                                    display:flex;
-                                    flex-wrap:wrap;
-                                    gap:8px;
-                                "
+                            <button
+                                type="button"
+                                class="btn btn-primary"
+                                onclick="startStudy('${deck.id}')"
                             >
+                                🏋️ 学習
+                            </button>
 
-                                <button
-                                    type="button"
-                                    class="btn btn-primary"
-                                    onclick="
-                                        startStudyFromDeck(
-                                            '${escapeHTML(deck.id)}'
-                                        )
-                                    "
-                                >
-                                    🏋️ ${escapeHTML(t("study"))}
-                                </button>
-
-                                <button
-                                    type="button"
-                                    class="btn btn-secondary"
-                                    onclick="
-                                        renameDeck(
-                                            '${escapeHTML(deck.id)}'
-                                        )
-                                    "
-                                >
-                                    ✏️ ${escapeHTML(t("edit"))}
-                                </button>
-
-                                <button
-                                    type="button"
-                                    class="btn btn-danger"
-                                    onclick="
-                                        deleteDeck(
-                                            '${escapeHTML(deck.id)}'
-                                        )
-                                    "
-                                >
-                                    🗑️ ${escapeHTML(t("delete"))}
-                                </button>
-
-                            </div>
+                            <button
+                                type="button"
+                                class="btn btn-outline"
+                                onclick="deleteDeck('${deck.id}')"
+                            >
+                                削除
+                            </button>
 
                         </div>
 
+                    </div>
                     `;
 
                 }
             )
             .join("");
 
-
-    renderCardSearchResults(
-        document.getElementById(
-            "card-search-input"
-        )?.value || ""
-    );
 }
 
 
-function renameDeck(deckId) {
+/* =========================================================
+   DECK DELETE
+   ========================================================= */
+
+function deleteDeck(
+    deckId
+) {
 
     const deck =
         appData.decks.find(
@@ -1999,57 +1254,26 @@ function renameDeck(deckId) {
                 item.id === deckId
         );
 
-    if (!deck) {
-        return;
-    }
-
-    const name =
-        window.prompt(
-            "デッキ名",
-            deck.name
-        );
-
-    if (
-        name === null ||
-        !name.trim()
-    ) {
-        return;
-    }
-
-    deck.name =
-        name.trim();
-
-    deck.updatedAt =
-        new Date().toISOString();
-
-    saveData();
-    renderDecks();
-    renderImportDeckSelect();
-    renderHome();
-}
-
-
-function deleteDeck(deckId) {
-
-    const deck =
-        appData.decks.find(
-            item =>
-                item.id === deckId
-        );
 
     if (!deck) {
+
         return;
+
     }
 
-    if (
-        !window.confirm(
-            t("deckDeleteConfirm") +
-            "\n\n" +
-            deck.name
-        )
-    ) {
+
+    const confirmed =
+        confirm(
+            `「${deck.name}」を削除しますか？\n\nこのデッキのカードも削除されます。`
+        );
+
+
+    if (!confirmed) {
+
         return;
+
     }
+
 
     appData.decks =
         appData.decks.filter(
@@ -2057,16 +1281,92 @@ function deleteDeck(deckId) {
                 item.id !== deckId
         );
 
+
     saveData();
 
     renderDecks();
-    renderHome();
+
     renderImportDeckSelect();
+
+    renderHome();
+
 }
 
 
 /* =========================================================
-   SEARCH
+   IMPORT DECK SELECT
+   ========================================================= */
+
+function renderImportDeckSelect() {
+
+    const select =
+        document.getElementById(
+            "import-deck-select"
+        );
+
+
+    if (!select) {
+
+        return;
+
+    }
+
+
+    const current =
+        select.value;
+
+
+    select.innerHTML =
+        `
+        <option value="">
+            新しいデッキを作成
+        </option>
+        `;
+
+
+    appData.decks
+        .forEach(
+            deck => {
+
+                const option =
+                    document.createElement(
+                        "option"
+                    );
+
+
+                option.value =
+                    deck.id;
+
+
+                option.textContent =
+                    `${deck.name} (${deck.cards.length}カード)`;
+
+
+                select.appendChild(
+                    option
+                );
+
+            }
+        );
+
+
+    if (
+        appData.decks.some(
+            deck =>
+                deck.id === current
+        )
+    ) {
+
+        select.value =
+            current;
+
+    }
+
+}
+
+
+/* =========================================================
+   CARD SEARCH
    ========================================================= */
 
 function renderCardSearchResults(
@@ -2078,15 +1378,37 @@ function renderCardSearchResults(
             "card-search-results"
         );
 
+
     if (!container) {
+
         return;
+
     }
 
 
-    const q =
-        query
+    const normalizedQuery =
+        String(query)
             .trim()
             .toLowerCase();
+
+
+    if (!normalizedQuery) {
+
+        container.innerHTML =
+            `
+            <div
+                style="
+                    color:var(--muted);
+                    padding:15px 0;
+                "
+            >
+                キーワードを入力するとカードを検索できます。
+            </div>
+            `;
+
+        return;
+
+    }
 
 
     const results = [];
@@ -2098,14 +1420,27 @@ function renderCardSearchResults(
             deck.cards.forEach(
                 card => {
 
+                    const front =
+                        String(
+                            card.front || ""
+                        );
+
+                    const back =
+                        String(
+                            card.back || ""
+                        );
+
+
                     if (
-                        !q ||
-                        card.front
+                        (
+                            front +
+                            "\n" +
+                            back
+                        )
                             .toLowerCase()
-                            .includes(q) ||
-                        card.back
-                            .toLowerCase()
-                            .includes(q)
+                            .includes(
+                                normalizedQuery
+                            )
                     ) {
 
                         results.push({
@@ -2122,35 +1457,29 @@ function renderCardSearchResults(
     );
 
 
-    if (!results.length) {
+    if (
+        results.length === 0
+    ) {
 
-        container.innerHTML = `
-            <div
-                style="
-                    padding:20px 0;
-                    color:var(--muted);
-                "
-            >
-                ${escapeHTML(
-                    q
-                        ? "検索結果がありません。"
-                        : "カードがありません。"
-                )}
+        container.innerHTML =
+            `
+            <div class="empty-state">
+                該当するカードがありません。
             </div>
-        `;
+            `;
 
         return;
+
     }
 
 
     container.innerHTML =
         results
             .map(
-                result => `
+                result => {
 
-                    <div
-                        class="card-search-item"
-                    >
+                    return `
+                    <div class="card-search-item">
 
                         <div class="search-card-front">
                             ${escapeHTML(
@@ -2166,167 +1495,1261 @@ function renderCardSearchResults(
 
                         <div class="search-card-meta">
 
-                            <span
-                                style="
-                                    color:var(--muted);
-                                    font-size:13px;
-                                "
-                            >
+                            <span>
+                                📚
                                 ${escapeHTML(
                                     result.deck.name
                                 )}
                             </span>
 
-                            <span
-                                style="
-                                    display:flex;
-                                    gap:6px;
-                                "
-                            >
-
-                                <button
-                                    type="button"
-                                    class="btn btn-secondary"
-                                    onclick="
-                                        editCard(
-                                            '${escapeHTML(result.deck.id)}',
-                                            '${escapeHTML(result.card.id)}'
-                                        )
-                                    "
-                                >
-                                    ✏️
-                                </button>
-
-                                <button
-                                    type="button"
-                                    class="btn btn-danger"
-                                    onclick="
-                                        deleteCard(
-                                            '${escapeHTML(result.deck.id)}',
-                                            '${escapeHTML(result.card.id)}'
-                                        )
-                                    "
-                                >
-                                    🗑️
-                                </button>
-
+                            <span>
+                                ${escapeHTML(
+                                    result.card.language ||
+                                    result.deck.language ||
+                                    ""
+                                )}
                             </span>
 
                         </div>
 
                     </div>
+                    `;
 
-                `
+                }
             )
             .join("");
+
 }
 
 
-function editCard(
-    deckId,
-    cardId
-) {
+/* =========================================================
+   FILE IMPORT
+   ========================================================= */
 
-    const deck =
-        appData.decks.find(
-            item =>
-                item.id === deckId
-        );
+/*
+ * スマホを含め、File.text() が使えない環境でも
+ * FileReader で確実に読み込めるようにする。
+ */
 
-    if (!deck) {
-        return;
-    }
+function readFileAsText(file) {
 
-    const card =
-        deck.cards.find(
-            item =>
-                item.id === cardId
-        );
+    return new Promise(
+        function (resolve, reject) {
 
-    if (!card) {
-        return;
-    }
+            if (!file) {
 
+                reject(
+                    new Error(
+                        "ファイルがありません。"
+                    )
+                );
 
-    const front =
-        window.prompt(
-            "カード表",
-            card.front
-        );
+                return;
 
-    if (front === null) {
-        return;
-    }
+            }
 
 
-    const back =
-        window.prompt(
-            "カード裏",
-            card.back
-        );
+            /*
+             * File.text() が利用できる場合
+             */
 
-    if (back === null) {
-        return;
-    }
+            if (
+                typeof file.text ===
+                "function"
+            ) {
+
+                file.text()
+                    .then(resolve)
+                    .catch(
+                        function () {
+
+                            readFileWithReader(
+                                file
+                            )
+                                .then(resolve)
+                                .catch(reject);
+
+                        }
+                    );
+
+                return;
+
+            }
 
 
-    card.front =
-        front.trim();
+            /*
+             * FileReader fallback
+             */
 
-    card.back =
-        back.trim();
+            readFileWithReader(file)
+                .then(resolve)
+                .catch(reject);
 
-    card.updatedAt =
-        new Date().toISOString();
+        }
+    );
 
-    deck.updatedAt =
-        new Date().toISOString();
-
-    saveData();
-
-    renderDecks();
-    renderHome();
 }
 
 
-function deleteCard(
-    deckId,
-    cardId
+function readFileWithReader(file) {
+
+    return new Promise(
+        function (resolve, reject) {
+
+            const reader =
+                new FileReader();
+
+
+            reader.onload =
+                function (event) {
+
+                    resolve(
+                        event.target.result
+                    );
+
+                };
+
+
+            reader.onerror =
+                function () {
+
+                    reject(
+                        new Error(
+                            "ファイルの読み込みに失敗しました。"
+                        )
+                    );
+
+                };
+
+
+            reader.onabort =
+                function () {
+
+                    reject(
+                        new Error(
+                            "ファイルの読み込みが中止されました。"
+                        )
+                    );
+
+                };
+
+
+            reader.readAsText(
+                file,
+                "UTF-8"
+            );
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   FILE TYPE
+   ========================================================= */
+
+function getFileExtension(file) {
+
+    const name =
+        String(
+            file?.name || ""
+        )
+            .toLowerCase();
+
+
+    const index =
+        name.lastIndexOf(".");
+
+
+    if (index === -1) {
+
+        return "";
+
+    }
+
+
+    return name
+        .substring(index + 1);
+
+}
+
+
+/* =========================================================
+   TXT / CSV IMPORT
+   ========================================================= */
+
+async function handleFileImport(
+    file
 ) {
 
-    const deck =
-        appData.decks.find(
-            item =>
-                item.id === deckId
+    if (!file) {
+
+        return;
+
+    }
+
+
+    const extension =
+        getFileExtension(file);
+
+
+    try {
+
+        /*
+         * PDF
+         */
+
+        if (
+            extension === "pdf"
+        ) {
+
+            await importPDF(file);
+
+            return;
+
+        }
+
+
+        /*
+         * JSON
+         *
+         * 通常教材インポートとしてJSONが
+         * 選ばれた場合にも対応。
+         */
+
+        if (
+            extension === "json"
+        ) {
+
+            await importDataJSON(file);
+
+            return;
+
+        }
+
+
+        /*
+         * TXT / CSV
+         */
+
+        const text =
+            await readFileAsText(file);
+
+
+        if (
+            !text ||
+            !text.trim()
+        ) {
+
+            showStatus(
+                `${file.name} は空のファイルです。`,
+                "error"
+            );
+
+            return;
+
+        }
+
+
+        const cards =
+            parseTextToCards(
+                text,
+                extension
+            );
+
+
+        if (
+            cards.length === 0
+        ) {
+
+            showStatus(
+                `${file.name} からカードを作成できませんでした。`,
+                "error"
+            );
+
+            return;
+
+        }
+
+
+        addImportedCards(
+            cards,
+            file.name
         );
 
-    if (!deck) {
-        return;
+
+    } catch (error) {
+
+        console.error(
+            "教材インポートエラー:",
+            error
+        );
+
+
+        showStatus(
+            `${file.name} の読み込みに失敗しました。`,
+            "error"
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   TEXT PARSER
+   ========================================================= */
+
+function parseTextToCards(
+    text,
+    extension
+) {
+
+    const cards = [];
+
+
+    /*
+     * CSV
+     */
+
+    if (
+        extension === "csv"
+    ) {
+
+        const rows =
+            parseCSV(text);
+
+
+        rows.forEach(
+            function (row) {
+
+                if (
+                    row.length >= 2
+                ) {
+
+                    const front =
+                        String(
+                            row[0] || ""
+                        ).trim();
+
+                    const back =
+                        String(
+                            row[1] || ""
+                        ).trim();
+
+
+                    if (
+                        front ||
+                        back
+                    ) {
+
+                        cards.push(
+                            normalizeCard({
+                                front,
+                                back,
+                                language:
+                                    appData
+                                        .settings
+                                        .learningLanguage
+                            })
+                        );
+
+                    }
+
+                }
+
+            }
+        );
+
+
+        return cards
+            .filter(Boolean);
+
+    }
+
+
+    /*
+     * TXT
+     *
+     * 基本的には
+     *
+     * 表<TAB>裏
+     *
+     * 表,裏
+     *
+     * 表｜裏
+     *
+     * のような形式を扱う。
+     */
+
+    const lines =
+        String(text)
+            .replace(/\r\n/g, "\n")
+            .replace(/\r/g, "\n")
+            .split("\n");
+
+
+    lines.forEach(
+        function (line) {
+
+            const trimmed =
+                line.trim();
+
+
+            if (!trimmed) {
+
+                return;
+
+            }
+
+
+            let parts = null;
+
+
+            if (
+                trimmed.includes("\t")
+            ) {
+
+                parts =
+                    trimmed.split("\t");
+
+            } else if (
+                trimmed.includes("｜")
+            ) {
+
+                parts =
+                    trimmed.split("｜");
+
+            } else if (
+                trimmed.includes("|")
+            ) {
+
+                parts =
+                    trimmed.split("|");
+
+            } else if (
+                trimmed.includes(",")
+            ) {
+
+                parts =
+                    trimmed.split(",");
+
+            }
+
+
+            if (
+                parts &&
+                parts.length >= 2
+            ) {
+
+                const front =
+                    parts.shift()
+                        .trim();
+
+                const back =
+                    parts.join(
+                        extension === "csv"
+                            ? ","
+                            : " "
+                    ).trim();
+
+
+                if (
+                    front ||
+                    back
+                ) {
+
+                    cards.push(
+                        normalizeCard({
+                            front,
+                            back,
+                            language:
+                                appData
+                                    .settings
+                                    .learningLanguage
+                        })
+                    );
+
+                }
+
+
+                return;
+
+            }
+
+
+            /*
+             * 区切りがない場合は、
+             * 1行を表面として扱い、
+             * 裏面を空欄にする。
+             *
+             * データを捨てないための安全策。
+             */
+
+            cards.push(
+                normalizeCard({
+                    front: trimmed,
+                    back: "",
+                    language:
+                        appData
+                            .settings
+                            .learningLanguage
+                })
+            );
+
+        }
+    );
+
+
+    return cards
+        .filter(Boolean);
+
+}
+
+
+/* =========================================================
+   CSV PARSER
+   ========================================================= */
+
+function parseCSV(text) {
+
+    const rows = [];
+
+    let row = [];
+
+    let cell = "";
+
+    let insideQuotes = false;
+
+
+    const source =
+        String(text)
+            .replace(/\r\n/g, "\n")
+            .replace(/\r/g, "\n");
+
+
+    for (
+        let i = 0;
+        i < source.length;
+        i++
+    ) {
+
+        const char =
+            source[i];
+
+
+        const next =
+            source[i + 1];
+
+
+        if (
+            char === '"'
+        ) {
+
+            if (
+                insideQuotes &&
+                next === '"'
+            ) {
+
+                cell += '"';
+
+                i++;
+
+            } else {
+
+                insideQuotes =
+                    !insideQuotes;
+
+            }
+
+
+            continue;
+
+        }
+
+
+        if (
+            char === "," &&
+            !insideQuotes
+        ) {
+
+            row.push(cell);
+
+            cell = "";
+
+            continue;
+
+        }
+
+
+        if (
+            char === "\n" &&
+            !insideQuotes
+        ) {
+
+            row.push(cell);
+
+            rows.push(row);
+
+            row = [];
+
+            cell = "";
+
+            continue;
+
+        }
+
+
+        cell += char;
+
     }
 
 
     if (
-        !window.confirm(
-            t("deleteConfirm")
-        )
+        cell !== "" ||
+        row.length > 0
     ) {
-        return;
+
+        row.push(cell);
+
+        rows.push(row);
+
     }
 
 
-    deck.cards =
-        deck.cards.filter(
-            card =>
-                card.id !== cardId
+    return rows;
+
+}
+
+
+/* =========================================================
+   ADD IMPORTED CARDS
+   ========================================================= */
+
+function addImportedCards(
+    cards,
+    fileName = ""
+) {
+
+    if (
+        !Array.isArray(cards) ||
+        cards.length === 0
+    ) {
+
+        return;
+
+    }
+
+
+    const deckSelect =
+        document.getElementById(
+            "import-deck-select"
         );
 
-    deck.updatedAt =
-        new Date().toISOString();
+
+    const selectedDeckId =
+        deckSelect
+            ? deckSelect.value
+            : "";
+
+
+    let deck =
+        selectedDeckId
+            ? appData.decks.find(
+                item =>
+                    item.id ===
+                    selectedDeckId
+            )
+            : null;
+
+
+    /*
+     * 新しいデッキ
+     */
+
+    if (!deck) {
+
+        const baseName =
+            String(
+                fileName ||
+                "新しいデッキ"
+            )
+                .replace(
+                    /\.[^/.]+$/,
+                    ""
+                )
+                .trim();
+
+
+        deck = {
+
+            id:
+                generateId("deck"),
+
+            name:
+                baseName ||
+                "新しいデッキ",
+
+            language:
+                appData
+                    .settings
+                    .learningLanguage ||
+                "zh",
+
+            createdAt:
+                nowISO(),
+
+            cards: []
+
+        };
+
+
+        appData.decks.push(
+            deck
+        );
+
+    }
+
+
+    /*
+     * 重複を避けながら追加
+     */
+
+    const existing =
+        new Set(
+            deck.cards.map(
+                card =>
+                    (
+                        String(
+                            card.front || ""
+                        ) +
+                        "\n" +
+                        String(
+                            card.back || ""
+                        )
+                    )
+                        .trim()
+                        .toLowerCase()
+            )
+        );
+
+
+    let added = 0;
+
+
+    cards.forEach(
+        function (card) {
+
+            if (!card) {
+
+                return;
+
+            }
+
+
+            const key =
+                (
+                    String(
+                        card.front || ""
+                    ) +
+                    "\n" +
+                    String(
+                        card.back || ""
+                    )
+                )
+                    .trim()
+                    .toLowerCase();
+
+
+            /*
+             * 完全に空のカードは追加しない。
+             */
+
+            if (!key) {
+
+                return;
+
+            }
+
+
+            /*
+             * 同じカードは重複追加しない。
+             */
+
+            if (
+                existing.has(key)
+            ) {
+
+                return;
+
+            }
+
+
+            existing.add(key);
+
+
+            deck.cards.push(
+                normalizeCard({
+                    ...card,
+                    language:
+                        card.language ||
+                        deck.language
+                })
+            );
+
+
+            added++;
+
+        }
+    );
+
 
     saveData();
 
+
     renderDecks();
+
     renderHome();
+
+    renderImportDeckSelect();
+
+
+    showStatus(
+        `${added}枚のカードを「${deck.name}」に追加しました。`,
+        "success"
+    );
+
+
+    /*
+     * 選択ファイル一覧を少し残してから
+     * 状態表示を更新。
+     */
+
+    setTimeout(
+        function () {
+
+            const selectedFiles =
+                document.getElementById(
+                    "selected-files"
+                );
+
+
+            if (selectedFiles) {
+
+                selectedFiles.innerHTML =
+                    `
+                    <div
+                        style="
+                            color:var(--primary);
+                            padding:10px 0;
+                        "
+                    >
+                        ✅ ${added}枚を追加しました
+                    </div>
+                    `;
+
+            }
+
+        },
+        300
+    );
+
+}
+
+
+/* =========================================================
+   PDF IMPORT
+   ========================================================= */
+
+async function importPDF(
+    file
+) {
+
+    /*
+     * PDF.js が読み込まれていない場合
+     */
+
+    if (
+        typeof pdfjsLib ===
+        "undefined"
+    ) {
+
+        showStatus(
+            "PDF読み込み機能を読み込めませんでした。TXTまたはCSVを使用してください。",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    try {
+
+        const buffer =
+            await file.arrayBuffer();
+
+
+        const loadingTask =
+            pdfjsLib.getDocument({
+                data: buffer
+            });
+
+
+        const pdf =
+            await loadingTask.promise;
+
+
+        let fullText = "";
+
+
+        for (
+            let pageNumber = 1;
+            pageNumber <= pdf.numPages;
+            pageNumber++
+        ) {
+
+            const page =
+                await pdf.getPage(
+                    pageNumber
+                );
+
+
+            const content =
+                await page.getTextContent();
+
+
+            const pageText =
+                content.items
+                    .map(
+                        item =>
+                            item.str
+                    )
+                    .join(" ");
+
+
+            fullText +=
+                pageText +
+                "\n";
+
+        }
+
+
+        const cards =
+            parseTextToCards(
+                fullText,
+                "txt"
+            );
+
+
+        if (
+            cards.length === 0
+        ) {
+
+            showStatus(
+                "PDFからカードを作成できませんでした。",
+                "error"
+            );
+
+            return;
+
+        }
+
+
+        addImportedCards(
+            cards,
+            file.name
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "PDF読み込みエラー:",
+            error
+        );
+
+
+        showStatus(
+            "PDFの読み込みに失敗しました。",
+            "error"
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   JSON EXPORT
+   ========================================================= */
+
+function exportDataJSON() {
+
+    try {
+
+        /*
+         * 書き出す前に最新データを保存。
+         */
+
+        saveData();
+
+
+        const json =
+            JSON.stringify(
+                appData,
+                null,
+                2
+            );
+
+
+        const blob =
+            new Blob(
+                [json],
+                {
+                    type:
+                        "application/json"
+                }
+            );
+
+
+        const url =
+            URL.createObjectURL(
+                blob
+            );
+
+
+        const link =
+            document.createElement(
+                "a"
+            );
+
+
+        link.href =
+            url;
+
+
+        const date =
+            new Date()
+                .toISOString()
+                .slice(0, 10);
+
+
+        link.download =
+            `language-gym-backup-${date}.json`;
+
+
+        document.body.appendChild(
+            link
+        );
+
+
+        link.click();
+
+
+        link.remove();
+
+
+        setTimeout(
+            function () {
+
+                URL.revokeObjectURL(
+                    url
+                );
+
+            },
+            1000
+        );
+
+
+        alert(
+            "データを書き出しました。"
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "JSON書き出しエラー:",
+            error
+        );
+
+
+        alert(
+            "データの書き出しに失敗しました。"
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   JSON IMPORT
+   ========================================================= */
+
+/*
+ * JSONファイルを確実に読み込む。
+ *
+ * 重要:
+ * File.text() が動かないスマホ環境でも
+ * FileReader を使って読み込む。
+ */
+
+async function importDataJSON(
+    file
+) {
+
+    if (!file) {
+
+        return;
+
+    }
+
+
+    try {
+
+        const text =
+            await readFileAsText(
+                file
+            );
+
+
+        if (
+            !text ||
+            !text.trim()
+        ) {
+
+            throw new Error(
+                "JSONファイルが空です。"
+            );
+
+        }
+
+
+        let imported;
+
+
+        try {
+
+            imported =
+                JSON.parse(text);
+
+        } catch (parseError) {
+
+            console.error(
+                "JSON parse error:",
+                parseError
+            );
+
+
+            throw new Error(
+                "JSONファイルの形式が正しくありません。"
+            );
+
+        }
+
+
+        /*
+         * データ形式を検証
+         */
+
+        if (
+            !imported ||
+            typeof imported !==
+            "object"
+        ) {
+
+            throw new Error(
+                "読み込んだデータが正しくありません。"
+            );
+
+        }
+
+
+        /*
+         * 現在データをバックアップ
+         * してから置換する。
+         */
+
+        createAutomaticBackup();
+
+
+        const normalized =
+            normalizeData(
+                imported
+            );
+
+
+        /*
+         * データを置換
+         */
+
+        appData =
+            normalized;
+
+
+        /*
+         * 保存
+         */
+
+        const saved =
+            saveData();
+
+
+        if (!saved) {
+
+            throw new Error(
+                "読み込んだデータを保存できませんでした。"
+            );
+
+        }
+
+
+        /*
+         * UIをすべて更新
+         */
+
+        refreshAllUI();
+
+
+        const deckCount =
+            appData.decks.length;
+
+
+        const cardCount =
+            appData.decks.reduce(
+                (
+                    total,
+                    deck
+                ) =>
+                    total +
+                    deck.cards.length,
+                0
+            );
+
+
+        alert(
+            `データを読み込みました。\n\nデッキ: ${deckCount}\nカード: ${cardCount}`
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "JSON読み込みエラー:",
+            error
+        );
+
+
+        alert(
+            "JSONの読み込みに失敗しました。\n\n" +
+            error.message
+        );
+
+    }
+
 }
 
 
@@ -2334,7 +2757,7 @@ function deleteCard(
    STUDY
    ========================================================= */
 
-function startStudyFromDeck(
+function startStudy(
     deckId
 ) {
 
@@ -2344,29 +2767,44 @@ function startStudyFromDeck(
                 item.id === deckId
         );
 
+
     if (!deck) {
-        return;
-    }
 
-    if (!deck.cards.length) {
-
-        showStatus(
-            t("noCards"),
-            "error"
+        alert(
+            "デッキが見つかりません。"
         );
 
-        showPage("decks");
+        return;
+
+    }
+
+
+    if (
+        !deck.cards ||
+        deck.cards.length === 0
+    ) {
+
+        alert(
+            "このデッキにはカードがありません。"
+        );
 
         return;
+
     }
 
 
     let cards =
-        deck.cards.map(
-            card =>
-                normalizeCard(card)
-        );
+        deck.cards
+            .map(
+                card =>
+                    normalizeCard(card)
+            )
+            .filter(Boolean);
 
+
+    /*
+     * ランダム学習
+     */
 
     if (
         appData.settings.randomStudy
@@ -2380,87 +2818,99 @@ function startStudyFromDeck(
 
     studyState = {
 
-        deckId: deck.id,
+        deckId:
+            deck.id,
 
         cards,
 
-        index: 0,
+        currentIndex:
+            0,
 
-        answerShown: false,
+        answered:
+            false,
 
-        startedAt: Date.now(),
+        startTime:
+            Date.now(),
 
-        timerId: null,
-
-        correct: 0,
-
-        answers: 0
+        timerInterval:
+            null
 
     };
 
 
-    showPage("study");
+    const deckName =
+        document.getElementById(
+            "study-deck-name"
+        );
+
+
+    if (deckName) {
+
+        deckName.textContent =
+            deck.name;
+
+    }
+
+
+    showPage(
+        "study"
+    );
+
 
     startStudyTimer();
 
-    renderStudy();
-
-    speakCurrentCard();
+    renderCurrentStudyCard();
 
 }
 
 
-function startStudyTimer() {
+/* =========================================================
+   SHUFFLE
+   ========================================================= */
 
-    stopStudyTimer();
+function shuffleArray(
+    array
+) {
 
-    studyState.timerId =
-        setInterval(
-            function () {
-
-                const timer =
-                    document.getElementById(
-                        "study-timer"
-                    );
-
-                if (!timer) {
-                    return;
-                }
-
-                const elapsed =
-                    Math.floor(
-                        (
-                            Date.now() -
-                            studyState.startedAt
-                        ) / 1000
-                    );
-
-                timer.textContent =
-                    formatTime(elapsed);
-
-            },
-            1000
-        );
-}
+    const result =
+        [...array];
 
 
-function stopStudyTimer() {
-
-    if (
-        studyState.timerId
+    for (
+        let i =
+            result.length - 1;
+        i > 0;
+        i--
     ) {
 
-        clearInterval(
-            studyState.timerId
-        );
+        const j =
+            Math.floor(
+                Math.random() *
+                (i + 1)
+            );
 
-        studyState.timerId = null;
+
+        [
+            result[i],
+            result[j]
+        ] = [
+            result[j],
+            result[i]
+        ];
 
     }
+
+
+    return result;
+
 }
 
 
-function renderStudy() {
+/* =========================================================
+   STUDY CARD
+   ========================================================= */
+
+function renderCurrentStudyCard() {
 
     const front =
         document.getElementById(
@@ -2477,71 +2927,34 @@ function renderStudy() {
             "study-progress"
         );
 
-    const deckName =
-        document.getElementById(
-            "study-deck-name"
-        );
-
-    const showAnswer =
+    const showButton =
         document.getElementById(
             "show-answer-button"
         );
 
-    const wrong =
+    const wrongButton =
         document.getElementById(
             "wrong-button"
         );
 
-    const correct =
+    const correctButton =
         document.getElementById(
             "correct-button"
         );
 
 
-    const deck =
-        appData.decks.find(
-            item =>
-                item.id ===
-                studyState.deckId
-        );
-
-
-    if (deckName) {
-
-        deckName.textContent =
-            deck
-                ? `${deck.name} ・ ${LANGUAGE_NAMES[deck.language] || deck.language}`
-                : t("chooseDeckToStudy");
-
-    }
-
-
-    if (
-        !studyState.cards.length
-    ) {
-
-        if (front) {
-            front.textContent =
-                t("noCards");
-        }
-
-        if (back) {
-            back.hidden = true;
-        }
-
-        return;
-    }
-
-
     const card =
         studyState.cards[
-            studyState.index
+            studyState.currentIndex
         ];
 
 
     if (!card) {
+
         finishStudy();
+
         return;
+
     }
 
 
@@ -2559,7 +2972,35 @@ function renderStudy() {
             card.back;
 
         back.hidden =
-            !studyState.answerShown;
+            true;
+
+    }
+
+
+    studyState.answered =
+        false;
+
+
+    if (showButton) {
+
+        showButton.disabled =
+            false;
+
+    }
+
+
+    if (wrongButton) {
+
+        wrongButton.disabled =
+            true;
+
+    }
+
+
+    if (correctButton) {
+
+        correctButton.disabled =
+            true;
 
     }
 
@@ -2567,107 +3008,159 @@ function renderStudy() {
     if (progress) {
 
         progress.textContent =
-            `${studyState.index + 1} / ${studyState.cards.length}`;
+            (
+                studyState.currentIndex +
+                1
+            ) +
+            " / " +
+            studyState.cards.length;
 
     }
 
 
-    if (showAnswer) {
+    if (
+        appData.settings.autoVoice
+    ) {
 
-        showAnswer.disabled =
-            studyState.answerShown;
-
-    }
-
-
-    if (wrong) {
-
-        wrong.disabled =
-            !studyState.answerShown;
-
-    }
-
-
-    if (correct) {
-
-        correct.disabled =
-            !studyState.answerShown;
-
-    }
-
-
-    const timer =
-        document.getElementById(
-            "study-timer"
+        speakCard(
+            card
         );
 
-    if (timer) {
-
-        const elapsed =
-            Math.floor(
-                (
-                    Date.now() -
-                    studyState.startedAt
-                ) / 1000
-            );
-
-        timer.textContent =
-            formatTime(elapsed);
-
     }
+
 }
 
+
+/* =========================================================
+   SHOW ANSWER
+   ========================================================= */
 
 function showStudyAnswer() {
 
-    if (
-        !studyState.cards.length
-    ) {
+    const card =
+        studyState.cards[
+            studyState.currentIndex
+        ];
+
+
+    if (!card) {
+
         return;
+
     }
 
-    studyState.answerShown =
+
+    const back =
+        document.getElementById(
+            "study-back"
+        );
+
+
+    const showButton =
+        document.getElementById(
+            "show-answer-button"
+        );
+
+    const wrongButton =
+        document.getElementById(
+            "wrong-button"
+        );
+
+    const correctButton =
+        document.getElementById(
+            "correct-button"
+        );
+
+
+    if (back) {
+
+        back.hidden =
+            false;
+
+    }
+
+
+    studyState.answered =
         true;
 
-    renderStudy();
 
-    speakCurrentCard();
+    if (showButton) {
+
+        showButton.disabled =
+            true;
+
+    }
+
+
+    if (wrongButton) {
+
+        wrongButton.disabled =
+            false;
+
+    }
+
+
+    if (correctButton) {
+
+        correctButton.disabled =
+            false;
+
+    }
+
 }
 
 
+/* =========================================================
+   STUDY ANSWER
+   ========================================================= */
+
 function handleStudyCorrect() {
 
-    handleStudyAnswer(true);
+    handleStudyAnswer(
+        true
+    );
+
 }
 
 
 function handleStudyWrong() {
 
-    handleStudyAnswer(false);
+    handleStudyAnswer(
+        false
+    );
+
 }
 
 
 function handleStudyAnswer(
-    isCorrect
+    correct
 ) {
 
     if (
-        !studyState.answerShown
+        !studyState.answered
     ) {
+
         return;
+
     }
 
 
     const card =
         studyState.cards[
-            studyState.index
+            studyState.currentIndex
         ];
 
 
     if (!card) {
+
         return;
+
     }
 
+
+    /*
+     * 元デッキのカードを探す
+     */
 
     const deck =
         appData.decks.find(
@@ -2686,189 +3179,245 @@ function handleStudyAnswer(
                     card.id
             );
 
+
         if (original) {
 
-            original.stats =
-                original.stats || {
-                    answers: 0,
-                    correct: 0
-                };
+            if (correct) {
 
-            original.stats.answers++;
+                original.correct =
+                    Number(
+                        original.correct ||
+                        0
+                    ) + 1;
 
-            if (isCorrect) {
-                original.stats.correct++;
+            } else {
+
+                original.wrong =
+                    Number(
+                        original.wrong ||
+                        0
+                    ) + 1;
+
             }
+
+
+            original.lastStudied =
+                nowISO();
 
         }
 
     }
 
 
-    studyState.answers++;
+    appData.totalAnswers =
+        Number(
+            appData.totalAnswers || 0
+        ) + 1;
 
-    if (isCorrect) {
-        studyState.correct++;
+
+    if (correct) {
+
+        appData.totalCorrect =
+            Number(
+                appData.totalCorrect || 0
+            ) + 1;
+
     }
 
 
-    appData.progress.totalAnswers++;
+    appData.studyHistory.push({
 
-    if (isCorrect) {
-        appData.progress.totalCorrect++;
-    }
+        id:
+            generateId("history"),
+
+        deckId:
+            studyState.deckId,
+
+        cardId:
+            card.id,
+
+        correct:
+            Boolean(correct),
+
+        timestamp:
+            nowISO()
+
+    });
 
 
-    studyState.index++;
+    saveData();
 
-    studyState.answerShown =
-        false;
+
+    studyState.currentIndex++;
 
 
     if (
-        studyState.index >=
+        studyState.currentIndex >=
         studyState.cards.length
     ) {
 
         finishStudy();
 
         return;
+
     }
 
 
-    saveData();
+    renderCurrentStudyCard();
 
-    renderStudy();
-
-    speakCurrentCard();
 }
 
 
-function finishStudy() {
+/* =========================================================
+   STUDY TIMER
+   ========================================================= */
+
+function startStudyTimer() {
 
     stopStudyTimer();
 
 
-    if (
-        !studyState.startedAt
-    ) {
-
-        showPage("decks");
-
-        return;
-    }
+    studyState.startTime =
+        Date.now();
 
 
-    const elapsed =
-        Math.floor(
-            (
-                Date.now() -
-                studyState.startedAt
-            ) / 1000
+    const timer =
+        document.getElementById(
+            "study-timer"
         );
 
 
-    appData.progress.totalStudyTime +=
-        Math.max(0, elapsed);
+    if (timer) {
 
+        timer.textContent =
+            "0秒";
+
+    }
+
+
+    studyState.timerInterval =
+        setInterval(
+            function () {
+
+                if (!studyState.startTime) {
+
+                    return;
+
+                }
+
+
+                const elapsed =
+                    Math.floor(
+                        (
+                            Date.now() -
+                            studyState.startTime
+                        ) /
+                        1000
+                    );
+
+
+                if (timer) {
+
+                    timer.textContent =
+                        formatTime(
+                            elapsed
+                        );
+
+                }
+
+            },
+            1000
+        );
+
+}
+
+
+function stopStudyTimer() {
 
     if (
-        studyState.answers > 0
+        studyState.timerInterval
     ) {
 
-        appData.progress.history.unshift({
+        clearInterval(
+            studyState.timerInterval
+        );
 
-            id:
-                createId("history"),
+        studyState.timerInterval =
+            null;
 
-            date:
-                new Date().toISOString(),
+    }
 
-            deckId:
-                studyState.deckId,
+}
 
-            deckName:
-                getDeckName(
-                    studyState.deckId
-                ),
 
-            answers:
-                studyState.answers,
+/* =========================================================
+   FINISH STUDY
+   ========================================================= */
 
-            correct:
-                studyState.correct,
+function finishStudy() {
 
-            accuracy:
-                Math.round(
+    const started =
+        studyState.startTime;
+
+
+    stopStudyTimer();
+
+
+    if (started) {
+
+        const elapsed =
+            Math.max(
+                0,
+                Math.floor(
                     (
-                        studyState.correct /
-                        studyState.answers
-                    ) * 100
-                ),
+                        Date.now() -
+                        started
+                    ) /
+                    1000
+                )
+            );
 
-            duration:
-                elapsed
 
-        });
+        if (
+            elapsed > 0
+        ) {
 
-        appData.progress.history =
-            appData.progress.history
-                .slice(0, 100);
+            appData.totalStudyTime =
+                Number(
+                    appData.totalStudyTime ||
+                    0
+                ) +
+                elapsed;
+
+        }
 
     }
 
 
     saveData();
-
-    const finishedAnswers =
-        studyState.answers;
-
-    const finishedCorrect =
-        studyState.correct;
 
 
     studyState = {
 
         deckId: null,
+
         cards: [],
-        index: 0,
-        answerShown: false,
-        startedAt: null,
-        timerId: null,
-        correct: 0,
-        answers: 0
+
+        currentIndex: 0,
+
+        answered: false,
+
+        startTime: null,
+
+        timerInterval: null
 
     };
 
 
-    renderHome();
-    renderProgress();
+    showPage(
+        "decks"
+    );
 
-    showPage("progress");
-
-    if (finishedAnswers > 0) {
-
-        showStatus(
-            `${t("studyFinished")} ` +
-            `${finishedCorrect}/${finishedAnswers}`,
-            "success"
-        );
-
-    }
-}
-
-
-function getDeckName(deckId) {
-
-    const deck =
-        appData.decks.find(
-            item =>
-                item.id === deckId
-        );
-
-    return deck
-        ? deck.name
-        : "";
 }
 
 
@@ -2876,62 +3425,140 @@ function getDeckName(deckId) {
    VOICE
    ========================================================= */
 
-function speakCurrentCard() {
+function speakCard(
+    card
+) {
 
     if (
-        !appData.settings.autoVoice
+        typeof speechSynthesis ===
+        "undefined"
     ) {
+
         return;
+
     }
 
-    speakText(
-        studyState.answerShown
-            ? studyState.cards[
-                studyState.index
-            ]?.back
-            : studyState.cards[
-                studyState.index
-            ]?.front
-    );
+
+    if (!card) {
+
+        return;
+
+    }
+
+
+    const text =
+        String(
+            card.front || ""
+        )
+            .trim();
+
+
+    if (!text) {
+
+        return;
+
+    }
+
+
+    try {
+
+        speechSynthesis.cancel();
+
+
+        const utterance =
+            new SpeechSynthesisUtterance(
+                text
+            );
+
+
+        utterance.rate =
+            clamp(
+                Number(
+                    appData
+                        .settings
+                        .voiceRate ||
+                    1
+                ),
+                0.5,
+                2
+            );
+
+
+        utterance.pitch =
+            clamp(
+                Number(
+                    appData
+                        .settings
+                        .voicePitch ||
+                    1
+                ),
+                0,
+                2
+            );
+
+
+        const language =
+            card.language ||
+            appData
+                .settings
+                .learningLanguage ||
+            "zh";
+
+
+        utterance.lang =
+            getSpeechLanguage(
+                language
+            );
+
+
+        speechSynthesis.speak(
+            utterance
+        );
+
+    } catch (error) {
+
+        console.warn(
+            "音声再生エラー:",
+            error
+        );
+
+    }
+
 }
 
 
-function speakText(text) {
+function getSpeechLanguage(
+    language
+) {
 
-    if (
-        !text ||
-        !("speechSynthesis" in window)
-    ) {
-        return;
-    }
+    const map = {
 
+        zh: "zh-CN",
 
-    window.speechSynthesis.cancel();
+        ja: "ja-JP",
 
+        ko: "ko-KR",
 
-    const utterance =
-        new SpeechSynthesisUtterance(
-            String(text)
-        );
+        de: "de-DE",
 
+        fr: "fr-FR",
 
-    utterance.lang =
-        getLearningLocale();
+        es: "es-ES",
 
-    utterance.rate =
-        Number(
-            appData.settings.voiceRate
-        ) || 1;
+        it: "it-IT",
 
-    utterance.pitch =
-        Number(
-            appData.settings.voicePitch
-        ) || 1;
+        fi: "fi-FI",
+
+        en: "en-US"
+
+    };
 
 
-    window.speechSynthesis.speak(
-        utterance
+    return (
+        map[language] ||
+        "en-US"
     );
+
 }
 
 
@@ -2939,1623 +3566,821 @@ function speakText(text) {
    PROGRESS
    ========================================================= */
 
-function calculateAccuracy() {
-
-    const total =
-        Number(
-            appData.progress.totalAnswers
-        ) || 0;
-
-    const correct =
-        Number(
-            appData.progress.totalCorrect
-        ) || 0;
-
-    if (!total) {
-        return 0;
-    }
-
-    return Math.round(
-        (correct / total) * 100
-    );
-}
-
-
 function renderProgress() {
 
-    const totalTime =
-        document.getElementById(
-            "progress-total-time"
-        );
+    setText(
+        "progress-total-time",
+        formatTime(
+            appData.totalStudyTime
+        )
+    );
 
-    const totalAnswers =
-        document.getElementById(
-            "progress-total-answers"
-        );
 
-    const totalCorrect =
-        document.getElementById(
-            "progress-total-correct"
-        );
+    setText(
+        "progress-total-answers",
+        appData.totalAnswers
+    );
+
+
+    setText(
+        "progress-total-correct",
+        appData.totalCorrect
+    );
+
 
     const accuracy =
-        document.getElementById(
-            "progress-accuracy"
-        );
+        appData.totalAnswers > 0
+            ? Math.round(
+                (
+                    appData.totalCorrect /
+                    appData.totalAnswers
+                ) *
+                100
+            )
+            : 0;
 
 
-    if (totalTime) {
-
-        totalTime.textContent =
-            formatTime(
-                appData.progress.totalStudyTime
-            );
-
-    }
-
-    if (totalAnswers) {
-
-        totalAnswers.textContent =
-            appData.progress.totalAnswers;
-
-    }
-
-    if (totalCorrect) {
-
-        totalCorrect.textContent =
-            appData.progress.totalCorrect;
-
-    }
-
-    if (accuracy) {
-
-        accuracy.textContent =
-            calculateAccuracy() + "%";
-
-    }
+    setText(
+        "progress-accuracy",
+        accuracy + "%"
+    );
 
 
-    const table =
+    const container =
         document.getElementById(
             "progress-table"
         );
 
-    if (!table) {
+
+    if (!container) {
+
         return;
+
+    }
+
+
+    if (
+        !appData.studyHistory ||
+        appData.studyHistory.length === 0
+    ) {
+
+        container.innerHTML =
+            `
+            <div class="empty-state">
+                まだ学習記録がありません。
+            </div>
+            `;
+
+        return;
+
     }
 
 
     const history =
-        appData.progress.history || [];
+        [
+            ...appData.studyHistory
+        ]
+            .reverse()
+            .slice(0, 100);
 
 
-    if (!history.length) {
+    container.innerHTML =
+        `
+        <table>
 
-        table.innerHTML = `
-            <div class="empty-state">
-                ${escapeHTML(t("noHistory"))}
-            </div>
-        `;
+            <thead>
 
-        return;
-    }
+                <tr>
 
+                    <th>
+                        日時
+                    </th>
 
-    table.innerHTML = `
+                    <th>
+                        デッキ
+                    </th>
 
-        <div class="table-wrapper">
+                    <th>
+                        結果
+                    </th>
 
-            <table>
+                </tr>
 
-                <thead>
+            </thead>
 
-                    <tr>
+            <tbody>
 
-                        <th>
-                            ${escapeHTML(t("date"))}
-                        </th>
-
-                        <th>
-                            ${escapeHTML(t("deckName"))}
-                        </th>
-
-                        <th>
-                            ${escapeHTML(t("answers"))}
-                        </th>
-
-                        <th>
-                            ${escapeHTML(t("correctColumn"))}
-                        </th>
-
-                        <th>
-                            ${escapeHTML(t("correctRate"))}
-                        </th>
-
-                        <th>
-                            ${escapeHTML(t("totalStudyTime"))}
-                        </th>
-
-                    </tr>
-
-                </thead>
-
-                <tbody>
-
-                    ${history
+                ${
+                    history
                         .map(
-                            item => `
+                            item => {
 
+                                const deck =
+                                    appData.decks.find(
+                                        d =>
+                                            d.id ===
+                                            item.deckId
+                                    );
+
+
+                                const date =
+                                    item.timestamp
+                                        ? new Date(
+                                            item.timestamp
+                                        )
+                                            .toLocaleString(
+                                                "ja-JP"
+                                            )
+                                        : "";
+
+
+                                return `
                                 <tr>
 
                                     <td>
                                         ${escapeHTML(
-                                            new Date(
-                                                item.date
-                                            ).toLocaleString(
-                                                appData.settings.uiLanguage
-                                            )
+                                            date
                                         )}
                                     </td>
 
                                     <td>
                                         ${escapeHTML(
-                                            item.deckName
+                                            deck?.name ||
+                                            "削除されたデッキ"
                                         )}
                                     </td>
 
                                     <td>
-                                        ${item.answers}
-                                    </td>
-
-                                    <td>
-                                        ${item.correct}
-                                    </td>
-
-                                    <td>
-                                        ${item.accuracy}%
-                                    </td>
-
-                                    <td>
-                                        ${formatTime(
-                                            item.duration
-                                        )}
+                                        ${
+                                            item.correct
+                                                ? "⭕ 正解"
+                                                : "❌ 不正解"
+                                        }
                                     </td>
 
                                 </tr>
+                                `;
 
-                            `
+                            }
                         )
-                        .join("")}
+                        .join("")
+                }
 
-                </tbody>
+            </tbody>
 
-            </table>
-
-        </div>
-
-    `;
-}
-
-
-/* =========================================================
-   IMPORT DECK SELECT
-   ========================================================= */
-
-function renderImportDeckSelect() {
-
-    const select =
-        document.getElementById(
-            "import-deck-select"
-        );
-
-    if (!select) {
-        return;
-    }
-
-
-    const current =
-        select.value;
-
-
-    select.innerHTML = `
-
-        <option value="">
-            ${escapeHTML(t("newDeck"))}
-        </option>
-
-    `;
-
-
-    appData.decks.forEach(
-        deck => {
-
-            const option =
-                document.createElement(
-                    "option"
-                );
-
-            option.value =
-                deck.id;
-
-            option.textContent =
-                `${deck.name} ・ ${LANGUAGE_NAMES[deck.language] || deck.language}`;
-
-            select.appendChild(
-                option
-            );
-
-        }
-    );
-
-
-    if (
-        appData.decks.some(
-            deck =>
-                deck.id === current
-        )
-    ) {
-
-        select.value =
-            current;
-
-    }
-}
-
-
-function syncImportLanguage() {
-
-    const select =
-        document.getElementById(
-            "import-language-select"
-        );
-
-    if (!select) {
-        return;
-    }
-
-
-    const learning =
-        getLearningLanguage();
-
-
-    /*
-     * index.htmlに存在しない言語でも
-     * 自動的にoptionを追加する。
-     */
-
-    ensureLanguageOption(
-        select,
-        learning
-    );
-
-
-    select.value =
-        learning;
-}
-
-
-function ensureLanguageOption(
-    select,
-    code
-) {
-
-    if (
-        select.querySelector(
-            `option[value="${code}"]`
-        )
-    ) {
-        return;
-    }
-
-
-    const option =
-        document.createElement(
-            "option"
-        );
-
-    option.value =
-        code;
-
-    option.textContent =
-        LANGUAGE_NAMES[code] ||
-        code;
-
-    select.appendChild(
-        option
-    );
-}
-
-
-/* =========================================================
-   FILE IMPORT
-   ========================================================= */
-
-async function handleFileImport(
-    file
-) {
-
-    if (!file) {
-        return;
-    }
-
-
-    const status =
-        document.getElementById(
-            "import-status"
-        );
-
-
-    if (status) {
-
-        status.innerHTML = `
-            <div
-                style="
-                    padding:14px;
-                    border-radius:12px;
-                    background:var(--primary-light);
-                    color:var(--primary);
-                "
-            >
-                ${escapeHTML(t("importing"))}
-                <br>
-                ${escapeHTML(file.name)}
-            </div>
+        </table>
         `;
 
-    }
+}
 
+
+/* =========================================
+   Language Gym
+   app.js
+   データ管理
+   ========================================= */
+
+const STORAGE_KEY = "languageGymData";
+const BACKUP_KEY = "languageGymBackup";
+
+let appData = loadData();
+
+let currentPage = "home";
+
+let studyState = {
+    deckId: null,
+    cards: [],
+    currentIndex: 0,
+    showingAnswer: false,
+    startedAt: null,
+    elapsedBeforeStart: 0
+};
+
+
+/* =========================================
+   DEFAULT DATA
+   ========================================= */
+
+function createDefaultData() {
+
+    return {
+        decks: [],
+
+        settings: {
+            customColor: "#8B7CF6",
+            autoVoice: false,
+            voiceRate: 1,
+            voicePitch: 1,
+            uiLanguage: "ja",
+            learningLanguage: "zh",
+            randomStudy: true
+        },
+
+        statistics: {
+            totalStudyTime: 0,
+            totalAnswers: 0,
+            totalCorrect: 0
+        },
+
+        studyHistory: [],
+
+        version: 1
+    };
+}
+
+
+/* =========================================
+   SAFE DEEP COPY
+   ========================================= */
+
+function cloneData(data) {
 
     try {
 
-        const extension =
-            getFileExtension(
-                file.name
-            );
-
-
-        let cards = [];
-
-
-        if (
-            extension === "txt"
-        ) {
-
-            const text =
-                await file.text();
-
-            cards =
-                parseTextToCards(
-                    text
-                );
-
-        } else if (
-            extension === "csv"
-        ) {
-
-            const text =
-                await file.text();
-
-            cards =
-                parseCSVToCards(
-                    text
-                );
-
-        } else if (
-            extension === "pdf"
-        ) {
-
-            cards =
-                await parsePDFToCards(
-                    file
-                );
-
-        } else {
-
-            throw new Error(
-                "Unsupported file type"
-            );
-
-        }
-
-
-        if (!cards.length) {
-
-            throw new Error(
-                t("noCardsDetected")
-            );
-
-        }
-
-
-        const deckSelect =
-            document.getElementById(
-                "import-deck-select"
-            );
-
-        const languageSelect =
-            document.getElementById(
-                "import-language-select"
-            );
-
-
-        const selectedDeckId =
-            deckSelect?.value || "";
-
-
-        const language =
-            languageSelect?.value ||
-            getLearningLanguage();
-
-
-        let deck;
-
-
-        if (selectedDeckId) {
-
-            deck =
-                appData.decks.find(
-                    item =>
-                        item.id ===
-                        selectedDeckId
-                );
-
-        }
-
-
-        if (!deck) {
-
-            const baseName =
-                file.name
-                    .replace(
-                        /\.[^/.]+$/,
-                        ""
-                    )
-                    .trim() ||
-                "Imported Deck";
-
-
-            deck = {
-
-                id:
-                    createId("deck"),
-
-                name:
-                    baseName,
-
-                language,
-
-                createdAt:
-                    new Date().toISOString(),
-
-                updatedAt:
-                    new Date().toISOString(),
-
-                cards: []
-
-            };
-
-
-            appData.decks.push(
-                deck
-            );
-
-        }
-
-
-        const normalizedCards =
-            cards.map(
-                card => ({
-
-                    ...normalizeCard(
-                        card
-                    ),
-
-                    language
-
-                })
-            );
-
-
-        deck.cards.push(
-            ...normalizedCards
+        return JSON.parse(
+            JSON.stringify(data)
         );
-
-
-        deck.language =
-            language;
-
-        deck.updatedAt =
-            new Date().toISOString();
-
-
-        saveData();
-
-        renderHome();
-        renderDecks();
-        renderImportDeckSelect();
-
-
-        if (status) {
-
-            status.innerHTML = `
-
-                <div
-                    style="
-                        padding:14px;
-                        border-radius:12px;
-                        background:#edf9f0;
-                        color:#287a3e;
-                    "
-                >
-                    ✅
-                    ${escapeHTML(t("imported"))}
-                    <strong>
-                        ${escapeHTML(file.name)}
-                    </strong>
-                    <br>
-                    ${normalizedCards.length}
-                    ${escapeHTML(t("cardsCount"))}
-                    ・
-                    ${escapeHTML(
-                        LANGUAGE_NAMES[language] ||
-                        language
-                    )}
-                </div>
-
-            `;
-
-        }
-
 
     } catch (error) {
 
         console.error(
-            "Import error:",
+            "データコピーに失敗しました",
             error
         );
 
-
-        if (status) {
-
-            status.innerHTML = `
-
-                <div
-                    style="
-                        padding:14px;
-                        border-radius:12px;
-                        background:#fff0f2;
-                        color:#c43e59;
-                    "
-                >
-                    ❌
-                    ${escapeHTML(t("importError"))}
-                    <br>
-                    ${escapeHTML(
-                        error.message ||
-                        String(error)
-                    )}
-                </div>
-
-            `;
-
-        }
-
+        return null;
     }
 }
 
 
-function getFileExtension(
-    fileName
-) {
+/* =========================================
+   DATA NORMALIZE
+   ========================================= */
 
-    const parts =
-        String(fileName)
-            .toLowerCase()
-            .split(".");
+function normalizeData(data) {
 
-    return parts.length > 1
-        ? parts.pop()
-        : "";
-}
+    const defaultData =
+        createDefaultData();
 
-
-/* =========================================================
-   TXT PARSER
-   ========================================================= */
-
-function parseTextToCards(
-    text
-) {
-
-    const normalized =
-        String(text || "")
-            .replace(/\r\n/g, "\n")
-            .replace(/\r/g, "\n");
-
-
-    const lines =
-        normalized
-            .split("\n")
-            .map(
-                line =>
-                    line.trim()
-            )
-            .filter(Boolean);
-
-
-    const cards = [];
-
-
-    lines.forEach(
-        line => {
-
-            let front = "";
-            let back = "";
-
-
-            /*
-             * タブ
-             */
-
-            if (
-                line.includes("\t")
-            ) {
-
-                const parts =
-                    line.split("\t");
-
-                front =
-                    parts.shift().trim();
-
-                back =
-                    parts.join("\t").trim();
-
-            }
-
-
-            /*
-             * |||
-             */
-
-            else if (
-                line.includes("|||")
-            ) {
-
-                const parts =
-                    line.split("|||");
-
-                front =
-                    parts.shift().trim();
-
-                back =
-                    parts.join("|||").trim();
-
-            }
-
-
-            /*
-             * =>
-             */
-
-            else if (
-                line.includes("=>")
-            ) {
-
-                const parts =
-                    line.split("=>");
-
-                front =
-                    parts.shift().trim();
-
-                back =
-                    parts.join("=>").trim();
-
-            }
-
-
-            /*
-             * →
-             */
-
-            else if (
-                line.includes("→")
-            ) {
-
-                const parts =
-                    line.split("→");
-
-                front =
-                    parts.shift().trim();
-
-                back =
-                    parts.join("→").trim();
-
-            }
-
-
-            /*
-             * ｜ 
-             */
-
-            else if (
-                line.includes("｜")
-            ) {
-
-                const parts =
-                    line.split("｜");
-
-                front =
-                    parts.shift().trim();
-
-                back =
-                    parts.join("｜").trim();
-
-            }
-
-
-            /*
-             * 通常の | 
-             */
-
-            else if (
-                line.includes("|")
-            ) {
-
-                const parts =
-                    line.split("|");
-
-                front =
-                    parts.shift().trim();
-
-                back =
-                    parts.join("|").trim();
-
-            }
-
-
-            /*
-             * セミコロン
-             */
-
-            else if (
-                line.includes(";")
-            ) {
-
-                const parts =
-                    line.split(";");
-
-                if (parts.length >= 2) {
-
-                    front =
-                        parts.shift().trim();
-
-                    back =
-                        parts.join(";").trim();
-
-                }
-
-            }
-
-
-            /*
-             * それ以外は
-             * 1行を表面として扱い、
-             * 次の行を裏面にする処理は
-             * 後段で行う。
-             */
-
-            if (front && back) {
-
-                cards.push({
-                    front,
-                    back
-                });
-
-            }
-
-        }
-    );
-
-
-    /*
-     * 区切り記号がない教材用。
-     * 2行1組としてカード化。
-     */
-
-    if (!cards.length) {
-
-        for (
-            let i = 0;
-            i < lines.length - 1;
-            i += 2
-        ) {
-
-            const front =
-                lines[i];
-
-            const back =
-                lines[i + 1];
-
-            if (front && back) {
-
-                cards.push({
-                    front,
-                    back
-                });
-
-            }
-
-        }
-
-    }
-
-
-    return removeDuplicateCards(
-        cards
-    );
-}
-
-
-/* =========================================================
-   CSV PARSER
-   ========================================================= */
-
-function parseCSVToCards(
-    text
-) {
-
-    const rows =
-        parseCSVRows(
-            String(text || "")
-        );
-
-
-    if (!rows.length) {
-        return [];
-    }
-
-
-    let startIndex = 0;
-
-
-    /*
-     * 先頭行が
-     * front/back/question/answer
-     * ならヘッダーとして扱う。
-     */
-
-    const first =
-        rows[0]
-            .map(
-                cell =>
-                    cell
-                        .trim()
-                        .toLowerCase()
-            );
-
-
-    const looksLikeHeader =
-        first.some(
-            value =>
-                [
-                    "front",
-                    "back",
-                    "question",
-                    "answer",
-                    "表",
-                    "裏",
-                    "問題",
-                    "答え"
-                ].includes(value)
-        );
-
-
-    if (looksLikeHeader) {
-        startIndex = 1;
-    }
-
-
-    const cards = [];
-
-
-    for (
-        let i = startIndex;
-        i < rows.length;
-        i++
+    if (
+        !data ||
+        typeof data !== "object"
     ) {
 
-        const row =
-            rows[i];
-
-        if (
-            !row ||
-            row.length < 2
-        ) {
-            continue;
-        }
-
-
-        const front =
-            String(
-                row[0] || ""
-            ).trim();
-
-        const back =
-            row
-                .slice(1)
-                .join(",")
-                .trim();
-
-
-        if (
-            front &&
-            back
-        ) {
-
-            cards.push({
-                front,
-                back
-            });
-
-        }
-
+        return defaultData;
     }
 
 
-    return removeDuplicateCards(
-        cards
-    );
-}
-
-
-function parseCSVRows(
-    text
-) {
-
-    const rows = [];
-
-    let row = [];
-    let cell = "";
-    let insideQuotes = false;
-
-
-    for (
-        let i = 0;
-        i < text.length;
-        i++
-    ) {
-
-        const char =
-            text[i];
-
-        const next =
-            text[i + 1];
-
-
-        if (char === '"') {
-
-            if (
-                insideQuotes &&
-                next === '"'
-            ) {
-
-                cell += '"';
-
-                i++;
-
-            } else {
-
-                insideQuotes =
-                    !insideQuotes;
-
-            }
-
-            continue;
-        }
-
-
-        if (
-            char === "," &&
-            !insideQuotes
-        ) {
-
-            row.push(cell);
-            cell = "";
-
-            continue;
-        }
-
-
-        if (
-            (char === "\n" ||
-                char === "\r") &&
-            !insideQuotes
-        ) {
-
-            if (
-                char === "\r" &&
-                next === "\n"
-            ) {
-
-                i++;
-
-            }
-
-            row.push(cell);
-            cell = "";
-
-            if (
-                row.some(
-                    value =>
-                        value.trim() !== ""
-                )
-            ) {
-
-                rows.push(row);
-
-            }
-
-            row = [];
-
-            continue;
-        }
-
-
-        cell += char;
-
+    if (!Array.isArray(data.decks)) {
+        data.decks = [];
     }
 
 
     if (
-        cell !== "" ||
-        row.length
+        !data.settings ||
+        typeof data.settings !== "object"
     ) {
 
-        row.push(cell);
-
-        if (
-            row.some(
-                value =>
-                    value.trim() !== ""
-            )
-        ) {
-
-            rows.push(row);
-
-        }
-
+        data.settings =
+            defaultData.settings;
     }
 
 
-    return rows;
-}
+    if (
+        !data.statistics ||
+        typeof data.statistics !== "object"
+    ) {
 
-
-/* =========================================================
-   PDF PARSER
-   ========================================================= */
-
-let pdfjsPromise = null;
-
-
-async function loadPDFJS() {
-
-    if (pdfjsPromise) {
-        return pdfjsPromise;
+        data.statistics =
+            defaultData.statistics;
     }
 
 
-    pdfjsPromise =
-        new Promise(
-            (resolve, reject) => {
+    if (
+        !Array.isArray(data.studyHistory)
+    ) {
 
-                if (
-                    window.pdfjsLib
-                ) {
-
-                    resolve(
-                        window.pdfjsLib
-                    );
-
-                    return;
-                }
+        data.studyHistory = [];
+    }
 
 
-                const script =
-                    document.createElement(
-                        "script"
-                    );
-
-                script.src =
-                    "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.min.mjs";
-
-                script.type =
-                    "module";
+    data.settings.customColor =
+        typeof data.settings.customColor ===
+        "string"
+            ? data.settings.customColor
+            : "#8B7CF6";
 
 
-                /*
-                 * PDF.jsのES moduleを
-                 * dynamic importで読み込む。
-                 */
-
-                import(
-                    "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.min.mjs"
-                )
-                    .then(
-                        pdfjs => {
-
-                            window.pdfjsLib =
-                                pdfjs;
-
-                            resolve(pdfjs);
-
-                        }
-                    )
-                    .catch(
-                        error => {
-
-                            pdfjsPromise =
-                                null;
-
-                            reject(error);
-
-                        }
-                    );
-
-            }
+    data.settings.autoVoice =
+        Boolean(
+            data.settings.autoVoice
         );
 
 
-    return pdfjsPromise;
+    data.settings.voiceRate =
+        Number.isFinite(
+            Number(data.settings.voiceRate)
+        )
+            ? Number(data.settings.voiceRate)
+            : 1;
+
+
+    data.settings.voicePitch =
+        Number.isFinite(
+            Number(data.settings.voicePitch)
+        )
+            ? Number(data.settings.voicePitch)
+            : 1;
+
+
+    data.settings.uiLanguage =
+        data.settings.uiLanguage ||
+        "ja";
+
+
+    data.settings.learningLanguage =
+        data.settings.learningLanguage ||
+        "zh";
+
+
+    data.settings.randomStudy =
+        data.settings.randomStudy !== false;
+
+
+    data.statistics.totalStudyTime =
+        Number(
+            data.statistics.totalStudyTime
+        ) || 0;
+
+
+    data.statistics.totalAnswers =
+        Number(
+            data.statistics.totalAnswers
+        ) || 0;
+
+
+    data.statistics.totalCorrect =
+        Number(
+            data.statistics.totalCorrect
+        ) || 0;
+
+
+    data.version =
+        Number(data.version) || 1;
+
+
+    return data;
 }
 
 
-async function parsePDFToCards(
-    file
-) {
+/* =========================================
+   LOAD DATA
+   ========================================= */
 
-    const pdfjsLib =
-        await loadPDFJS();
-
-
-    const buffer =
-        await file.arrayBuffer();
-
-
-    const pdf =
-        await pdfjsLib.getDocument({
-            data: buffer
-        }).promise;
-
-
-    const pageTexts = [];
-
-
-    for (
-        let pageNumber = 1;
-        pageNumber <= pdf.numPages;
-        pageNumber++
-    ) {
-
-        const page =
-            await pdf.getPage(
-                pageNumber
-            );
-
-
-        const content =
-            await page.getTextContent();
-
-
-        const text =
-            content.items
-                .map(
-                    item =>
-                        item.str || ""
-                )
-                .join(" ");
-
-
-        pageTexts.push(
-            text
-        );
-
-    }
-
-
-    const fullText =
-        pageTexts.join("\n");
-
-
-    return parseTextToCards(
-        fullText
-    );
-}
-
-
-/* =========================================================
-   CARD HELPERS
-   ========================================================= */
-
-function removeDuplicateCards(
-    cards
-) {
-
-    const seen =
-        new Set();
-
-    return cards.filter(
-        card => {
-
-            const key =
-                (
-                    card.front +
-                    "\n" +
-                    card.back
-                )
-                    .trim()
-                    .toLowerCase();
-
-            if (!key) {
-                return false;
-            }
-
-            if (seen.has(key)) {
-                return false;
-            }
-
-            seen.add(key);
-
-            return true;
-
-        }
-    );
-}
-
-
-function shuffleArray(
-    array
-) {
-
-    const result =
-        [...array];
-
-    for (
-        let i =
-            result.length - 1;
-        i > 0;
-        i--
-    ) {
-
-        const j =
-            Math.floor(
-                Math.random() *
-                (i + 1)
-            );
-
-        [
-            result[i],
-            result[j]
-        ] = [
-            result[j],
-            result[i]
-        ];
-
-    }
-
-    return result;
-}
-
-
-/* =========================================================
-   DATA EXPORT
-   ========================================================= */
-
-function exportDataJSON() {
+function loadData() {
 
     try {
 
-        const data =
-            JSON.stringify(
-                appData,
-                null,
-                2
+        const saved =
+            localStorage.getItem(
+                STORAGE_KEY
             );
 
 
-        const blob =
-            new Blob(
-                [data],
-                {
-                    type:
-                        "application/json"
-                }
-            );
+        if (!saved) {
+
+            return createDefaultData();
+        }
 
 
-        const url =
-            URL.createObjectURL(
-                blob
-            );
+        const parsed =
+            JSON.parse(saved);
 
 
-        const a =
-            document.createElement(
-                "a"
-            );
-
-        a.href =
-            url;
-
-        a.download =
-            `language-gym-backup-${getDateStamp()}.json`;
-
-        document.body.appendChild(a);
-
-        a.click();
-
-        a.remove();
-
-        URL.revokeObjectURL(
-            url
-        );
-
-
-        showStatus(
-            t("dataExported"),
-            "success"
-        );
+        return normalizeData(parsed);
 
     } catch (error) {
 
-        console.error(error);
-
-        showStatus(
-            "JSON export failed.",
-            "error"
+        console.error(
+            "Language Gymデータ読み込みエラー:",
+            error
         );
 
+
+        /*
+         * 壊れたデータを上書きしない。
+         * 新規データとして動作させるだけ。
+         */
+
+        return createDefaultData();
     }
 }
 
 
-function importDataJSON(
-    file
-) {
+/* =========================================
+   SAVE DATA
+   ========================================= */
 
-    if (!file) {
-        return;
+function saveData() {
+
+    try {
+
+        const backup =
+            localStorage.getItem(
+                STORAGE_KEY
+            );
+
+
+        /*
+         * 現在保存されている正常なデータを
+         * バックアップとして保持。
+         */
+
+        if (backup) {
+
+            localStorage.setItem(
+                BACKUP_KEY,
+                backup
+            );
+
+        }
+
+
+        const dataToSave =
+            cloneData(appData);
+
+
+        if (!dataToSave) {
+            return false;
+        }
+
+
+        localStorage.setItem(
+            STORAGE_KEY,
+            JSON.stringify(
+                dataToSave
+            )
+        );
+
+
+        return true;
+
+    } catch (error) {
+
+        console.error(
+            "Language Gymデータ保存エラー:",
+            error
+        );
+
+        return false;
     }
-
-
-    const reader =
-        new FileReader();
-
-
-    reader.onload =
-        function () {
-
-            try {
-
-                const imported =
-                    JSON.parse(
-                        reader.result
-                    );
-
-
-                if (
-                    !imported ||
-                    !Array.isArray(
-                        imported.decks
-                    )
-                ) {
-
-                    throw new Error(
-                        "Invalid Language Gym data."
-                    );
-
-                }
-
-
-                const defaults =
-                    createDefaultData();
-
-
-                appData = {
-
-                    ...defaults,
-
-                    ...imported,
-
-                    settings: {
-                        ...defaults.settings,
-                        ...(imported.settings || {})
-                    },
-
-                    progress: {
-                        ...defaults.progress,
-                        ...(imported.progress || {})
-                    }
-
-                };
-
-
-                appData.decks =
-                    appData.decks.map(
-                        normalizeDeck
-                    );
-
-
-                saveData();
-
-                applyTheme(
-                    appData.settings.themeColor ||
-                    DEFAULT_COLOR
-                );
-
-                applyUILanguage();
-
-                renderHome();
-                renderDecks();
-                renderProgress();
-                renderImportDeckSelect();
-                renderSettings();
-
-
-                showStatus(
-                    t("dataImported"),
-                    "success"
-                );
-
-
-            } catch (error) {
-
-                console.error(
-                    "JSON import error:",
-                    error
-                );
-
-
-                showStatus(
-                    "JSONデータを読み込めませんでした。",
-                    "error"
-                );
-
-            }
-
-        };
-
-
-    reader.readAsText(
-        file,
-        "utf-8"
-    );
 }
 
 
-/* =========================================================
-   BACKUP
-   ========================================================= */
+/* =========================================
+   AUTOMATIC BACKUP
+   ========================================= */
 
 function restoreAutomaticBackup() {
 
     try {
 
-        const raw =
+        const backup =
             localStorage.getItem(
                 BACKUP_KEY
             );
 
 
-        if (!raw) {
+        if (!backup) {
 
-            showStatus(
-                "自動バックアップがありません。",
-                "error"
+            alert(
+                "復元できるバックアップがありません。"
             );
 
             return;
         }
 
 
-        if (
-            !window.confirm(
-                "最新の自動バックアップから復元しますか？"
-            )
-        ) {
+        const parsed =
+            JSON.parse(backup);
+
+
+        const normalized =
+            normalizeData(parsed);
+
+
+        const confirmed =
+            confirm(
+                "バックアップからデータを復元します。\n\n" +
+                "現在のデータはバックアップの内容に置き換わります。\n" +
+                "復元しますか？"
+            );
+
+
+        if (!confirmed) {
             return;
         }
 
 
         appData =
-            JSON.parse(raw);
+            normalized;
 
 
-        appData =
-            {
-                ...createDefaultData(),
-                ...appData,
-
-                settings: {
-                    ...createDefaultData().settings,
-                    ...(appData.settings || {})
-                },
-
-                progress: {
-                    ...createDefaultData().progress,
-                    ...(appData.progress || {})
-                }
-            };
-
-
-        appData.decks =
-            Array.isArray(appData.decks)
-                ? appData.decks.map(
-                    normalizeDeck
-                )
-                : [];
-
-
-        saveData();
-
-
-        applyTheme(
-            appData.settings.themeColor ||
-            DEFAULT_COLOR
+        localStorage.setItem(
+            STORAGE_KEY,
+            JSON.stringify(appData)
         );
 
-        applyUILanguage();
 
-        renderHome();
-        renderDecks();
-        renderProgress();
-        renderImportDeckSelect();
-        renderSettings();
-
-
-        showStatus(
-            t("backupRestored"),
-            "success"
+        alert(
+            "バックアップから復元しました。"
         );
 
+
+        refreshAll();
 
     } catch (error) {
 
         console.error(
-            "Backup restore error:",
+            "バックアップ復元エラー:",
             error
         );
 
 
-        showStatus(
-            "バックアップを復元できませんでした。",
-            "error"
+        alert(
+            "バックアップの復元に失敗しました。"
         );
-
     }
 }
 
 
-/* =========================================================
-   SETTINGS
-   ========================================================= */
+/* =========================================
+   ID
+   ========================================= */
 
-function saveSetting(
-    key,
-    value
-) {
+function createId(prefix) {
 
-    appData.settings[key] =
-        value;
-
-    saveData();
+    return (
+        prefix +
+        "_" +
+        Date.now().toString(36) +
+        "_" +
+        Math.random()
+            .toString(36)
+            .slice(2, 10)
+    );
 }
 
 
+/* =========================================
+   ESCAPE HTML
+   ========================================= */
+
+function escapeHTML(value) {
+
+    if (
+        value === null ||
+        value === undefined
+    ) {
+
+        return "";
+    }
+
+
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+
+/* =========================================
+   PAGE NAVIGATION
+   ========================================= */
+
+function showPage(pageName) {
+
+    const page =
+        document.getElementById(
+            "page-" + pageName
+        );
+
+
+    if (!page) {
+        return;
+    }
+
+
+    document
+        .querySelectorAll(".page")
+        .forEach(
+            function (element) {
+
+                element.classList.remove(
+                    "active-page"
+                );
+
+            }
+        );
+
+
+    page.classList.add(
+        "active-page"
+    );
+
+
+    document
+        .querySelectorAll(".nav-item")
+        .forEach(
+            function (button) {
+
+                button.classList.toggle(
+                    "active",
+                    button.dataset.page ===
+                    pageName
+                );
+
+            }
+        );
+
+
+    currentPage =
+        pageName;
+
+
+    updateHeader();
+
+
+    if (pageName === "home") {
+        renderHome();
+    }
+
+    if (pageName === "decks") {
+        renderDecks();
+        renderCardSearchResults("");
+    }
+
+    if (pageName === "progress") {
+        renderProgress();
+    }
+
+    if (pageName === "import") {
+        renderImportDeckSelect();
+    }
+
+
+    if (pageName === "settings") {
+        renderSettings();
+    }
+
+
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
+}
+
+
+/* =========================================
+   HEADER
+   ========================================= */
+
+function updateHeader() {
+
+    const header =
+        document.getElementById(
+            "header-language"
+        );
+
+
+    if (!header) {
+        return;
+    }
+
+
+    const languageNames = {
+
+        zh: "中国語",
+
+        ja: "日本語",
+
+        ko: "韓国語",
+
+        de: "ドイツ語",
+
+        fr: "フランス語",
+
+        es: "スペイン語",
+
+        it: "イタリア語",
+
+        fi: "フィンランド語"
+
+    };
+
+
+    const language =
+        appData.settings &&
+        appData.settings.learningLanguage;
+
+
+    header.textContent =
+        languageNames[language] ||
+        "Language Gym";
+}
+
+
+/* =========================================
+   THEME
+   ========================================= */
+
+function applyTheme(color) {
+
+    if (
+        !color ||
+        !/^#[0-9A-Fa-f]{6}$/.test(color)
+    ) {
+
+        color = "#8B7CF6";
+    }
+
+
+    document.documentElement.style
+        .setProperty(
+            "--primary",
+            color
+        );
+
+
+    /*
+     * primary-lightを自動生成
+     */
+
+    const hex =
+        color.replace("#", "");
+
+
+    const r =
+        parseInt(
+            hex.substring(0, 2),
+            16
+        );
+
+    const g =
+        parseInt(
+            hex.substring(2, 4),
+            16
+        );
+
+    const b =
+        parseInt(
+            hex.substring(4, 6),
+            16
+        );
+
+
+    const mix =
+        function (value) {
+
+            return Math.round(
+                value +
+                (255 - value) * 0.88
+            );
+
+        };
+
+
+    const lightColor =
+        "rgb(" +
+        mix(r) +
+        ", " +
+        mix(g) +
+        ", " +
+        mix(b) +
+        ")";
+
+
+    document.documentElement.style
+        .setProperty(
+            "--primary-light",
+            lightColor
+        );
+}
+
+
+/* =========================================
+   SETTINGS RENDER
+   ========================================= */
+
 function renderSettings() {
 
-    const settings =
-        appData.settings;
+    if (
+        !appData.settings
+    ) {
+        return;
+    }
 
 
     const autoVoice =
@@ -4588,12 +4413,22 @@ function renderSettings() {
             "learning-language"
         );
 
+    const customColor =
+        document.getElementById(
+            "custom-color"
+        );
+
+    const customColorValue =
+        document.getElementById(
+            "custom-color-value"
+        );
+
 
     if (autoVoice) {
 
         autoVoice.checked =
             Boolean(
-                settings.autoVoice
+                appData.settings.autoVoice
             );
 
     }
@@ -4602,7 +4437,7 @@ function renderSettings() {
     if (randomStudy) {
 
         randomStudy.checked =
-            settings.randomStudy !== false;
+            appData.settings.randomStudy !== false;
 
     }
 
@@ -4610,7 +4445,7 @@ function renderSettings() {
     if (voiceRate) {
 
         voiceRate.value =
-            settings.voiceRate || 1;
+            appData.settings.voiceRate || 1;
 
     }
 
@@ -4618,73 +4453,955 @@ function renderSettings() {
     if (voicePitch) {
 
         voicePitch.value =
-            settings.voicePitch || 1;
+            appData.settings.voicePitch || 1;
 
     }
 
 
     if (uiLanguage) {
 
-        ensureUILanguageOptions(
-            uiLanguage
-        );
-
         uiLanguage.value =
-            settings.uiLanguage || "ja";
+            appData.settings.uiLanguage || "ja";
 
     }
 
 
     if (learningLanguage) {
 
-        ensureLearningLanguageOptions(
-            learningLanguage
-        );
-
         learningLanguage.value =
-            settings.learningLanguage ||
+            appData.settings.learningLanguage ||
             "zh";
 
     }
 
 
+    if (customColor) {
+
+        customColor.value =
+            appData.settings.customColor ||
+            "#8B7CF6";
+
+    }
+
+
+    if (customColorValue) {
+
+        customColorValue.textContent =
+            (
+                appData.settings.customColor ||
+                "#8B7CF6"
+            ).toUpperCase();
+
+    }
+
+
     applyTheme(
-        settings.themeColor ||
-        DEFAULT_COLOR
+        appData.settings.customColor ||
+        "#8B7CF6"
+    );
+
+
+    document
+        .querySelectorAll(
+            ".color-option"
+        )
+        .forEach(
+            function (button) {
+
+                const selected =
+                    button.dataset.color &&
+                    button.dataset.color
+                        .toUpperCase() ===
+                    (
+                        appData.settings.customColor ||
+                        "#8B7CF6"
+                    ).toUpperCase();
+
+
+                button.classList.toggle(
+                    "selected",
+                    selected
+                );
+
+            }
+        );
+}
+
+
+
+
+/* =========================================
+   DECK FUNCTIONS
+   ========================================= */
+
+/*
+ * デッキを取得
+ */
+function getDeck(deckId) {
+
+    return appData.decks.find(
+        function (deck) {
+            return deck.id === deckId;
+        }
+    ) || null;
+}
+
+
+/*
+ * デッキ名の重複を避ける
+ */
+function createUniqueDeckName(baseName) {
+
+    const name =
+        String(baseName || "新しいデッキ")
+            .trim() ||
+        "新しいデッキ";
+
+
+    const existingNames =
+        appData.decks.map(
+            function (deck) {
+                return String(deck.name || "");
+            }
+        );
+
+
+    if (!existingNames.includes(name)) {
+        return name;
+    }
+
+
+    let number = 2;
+
+    while (
+        existingNames.includes(
+            name + " (" + number + ")"
+        )
+    ) {
+
+        number++;
+    }
+
+
+    return name + " (" + number + ")";
+}
+
+
+/*
+ * デッキ作成
+ */
+function createDeck(
+    name,
+    language
+) {
+
+    const deck = {
+
+        id: createId("deck"),
+
+        name:
+            createUniqueDeckName(name),
+
+        language:
+            language ||
+            appData.settings.learningLanguage ||
+            "zh",
+
+        cards: [],
+
+        createdAt:
+            new Date().toISOString(),
+
+        updatedAt:
+            new Date().toISOString()
+
+    };
+
+
+    appData.decks.push(deck);
+
+    saveData();
+
+    return deck;
+}
+
+
+/*
+ * デッキ削除
+ */
+function deleteDeck(deckId) {
+
+    const deck =
+        getDeck(deckId);
+
+
+    if (!deck) {
+        return;
+    }
+
+
+    const confirmed =
+        confirm(
+            "「" +
+            (deck.name || "このデッキ") +
+            "」を削除しますか？\n\n" +
+            "このデッキに入っているカードも削除されます。"
+        );
+
+
+    if (!confirmed) {
+        return;
+    }
+
+
+    appData.decks =
+        appData.decks.filter(
+            function (item) {
+                return item.id !== deckId;
+            }
+        );
+
+
+    saveData();
+
+    renderDecks();
+    renderImportDeckSelect();
+    renderHome();
+
+    alert("デッキを削除しました。");
+}
+
+
+/*
+ * デッキ表示
+ */
+function renderDecks() {
+
+    const container =
+        document.getElementById(
+            "deck-list"
+        );
+
+
+    if (!container) {
+        return;
+    }
+
+
+    if (
+        !Array.isArray(
+            appData.decks
+        ) ||
+        appData.decks.length === 0
+    ) {
+
+        container.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-icon">📚</div>
+
+                <p>
+                    まだデッキがありません。
+                </p>
+
+                <button
+                    type="button"
+                    class="btn btn-primary"
+                    data-go-page="import"
+                >
+                    教材をインポート
+                </button>
+            </div>
+        `;
+
+
+        const button =
+            container.querySelector(
+                "[data-go-page='import']"
+            );
+
+
+        if (button) {
+
+            button.addEventListener(
+                "click",
+                function () {
+
+                    showPage("import");
+
+                }
+            );
+
+        }
+
+
+        return;
+    }
+
+
+    container.innerHTML =
+        appData.decks
+            .map(
+                function (deck) {
+
+                    const cards =
+                        Array.isArray(
+                            deck.cards
+                        )
+                            ? deck.cards
+                            : [];
+
+
+                    return `
+                        <div class="deck-card">
+
+                            <div class="deck-name">
+                                ${escapeHTML(
+                                    deck.name ||
+                                    "名称未設定"
+                                )}
+                            </div>
+
+                            <div class="deck-meta">
+                                🌐
+                                ${escapeHTML(
+                                    getLanguageName(
+                                        deck.language
+                                    )
+                                )}
+                            </div>
+
+                            <div class="deck-meta">
+                                🃏
+                                ${cards.length}
+                                カード
+                            </div>
+
+                            <div
+                                class="button-row"
+                                style="margin-top:16px;"
+                            >
+
+                                <button
+                                    type="button"
+                                    class="btn btn-primary"
+                                    data-study-deck="${escapeHTML(
+                                        deck.id
+                                    )}"
+                                >
+                                    🏋️ 学習
+                                </button>
+
+                                <button
+                                    type="button"
+                                    class="btn btn-outline"
+                                    data-search-deck="${escapeHTML(
+                                        deck.id
+                                    )}"
+                                >
+                                    🔎 カードを見る
+                                </button>
+
+                                <button
+                                    type="button"
+                                    class="btn btn-danger"
+                                    data-delete-deck="${escapeHTML(
+                                        deck.id
+                                    )}"
+                                >
+                                    🗑️ 削除
+                                </button>
+
+                            </div>
+
+                        </div>
+                    `;
+
+                }
+            )
+            .join("");
+
+
+    /*
+     * 学習ボタン
+     */
+
+    container
+        .querySelectorAll(
+            "[data-study-deck]"
+        )
+        .forEach(
+            function (button) {
+
+                button.addEventListener(
+                    "click",
+                    function () {
+
+                        startStudy(
+                            this.dataset.studyDeck
+                        );
+
+                    }
+                );
+
+            }
+        );
+
+
+    /*
+     * カード検索
+     */
+
+    container
+        .querySelectorAll(
+            "[data-search-deck]"
+        )
+        .forEach(
+            function (button) {
+
+                button.addEventListener(
+                    "click",
+                    function () {
+
+                        const deckId =
+                            this.dataset.searchDeck;
+
+
+                        showPage("decks");
+
+
+                        const input =
+                            document.getElementById(
+                                "card-search-input"
+                            );
+
+
+                        if (input) {
+
+                            input.value = "";
+
+
+                            input.focus();
+
+                        }
+
+
+                        renderCardSearchResults(
+                            "",
+                            deckId
+                        );
+
+                    }
+                );
+
+            }
+        );
+
+
+    /*
+     * 削除ボタン
+     */
+
+    container
+        .querySelectorAll(
+            "[data-delete-deck]"
+        )
+        .forEach(
+            function (button) {
+
+                button.addEventListener(
+                    "click",
+                    function () {
+
+                        deleteDeck(
+                            this.dataset.deleteDeck
+                        );
+
+                    }
+                );
+
+            }
+        );
+}
+
+
+/* =========================================
+   LANGUAGE
+   ========================================= */
+
+function getLanguageName(
+    language
+) {
+
+    const names = {
+
+        zh: "中国語",
+
+        ja: "日本語",
+
+        ko: "韓国語",
+
+        de: "ドイツ語",
+
+        fr: "フランス語",
+
+        es: "スペイン語",
+
+        it: "イタリア語",
+
+        fi: "フィンランド語"
+
+    };
+
+
+    return (
+        names[language] ||
+        language ||
+        "不明"
     );
 }
 
 
-/* =========================================================
-   UI LANGUAGE OPTIONS
-   ========================================================= */
+/* =========================================
+   CARD NORMALIZATION
+   ========================================= */
 
-function ensureUILanguageOptions(
-    select
+function normalizeCard(card) {
+
+    if (
+        !card ||
+        typeof card !== "object"
+    ) {
+
+        return null;
+    }
+
+
+    /*
+     * 以前のデータ形式にも
+     * できるだけ対応する。
+     */
+
+    const front =
+        card.front !== undefined
+            ? card.front
+            : (
+                card.question !== undefined
+                    ? card.question
+                    : ""
+            );
+
+
+    const back =
+        card.back !== undefined
+            ? card.back
+            : (
+                card.answer !== undefined
+                    ? card.answer
+                    : ""
+            );
+
+
+    return {
+
+        id:
+            card.id ||
+            createId("card"),
+
+        front:
+            String(front ?? ""),
+
+        back:
+            String(back ?? ""),
+
+        language:
+            card.language ||
+            null,
+
+        createdAt:
+            card.createdAt ||
+            new Date().toISOString(),
+
+        updatedAt:
+            card.updatedAt ||
+            new Date().toISOString(),
+
+        correctCount:
+            Number(
+                card.correctCount
+            ) || 0,
+
+        wrongCount:
+            Number(
+                card.wrongCount
+            ) || 0,
+
+        lastReviewedAt:
+            card.lastReviewedAt ||
+            null
+
+    };
+}
+
+
+/* =========================================
+   ADD CARD
+   ========================================= */
+
+function addCard(
+    deck,
+    front,
+    back,
+    language
 ) {
 
-    const current =
+    if (!deck) {
+        return null;
+    }
+
+
+    const normalizedFront =
+        String(front ?? "").trim();
+
+
+    const normalizedBack =
+        String(back ?? "").trim();
+
+
+    if (
+        !normalizedFront &&
+        !normalizedBack
+    ) {
+
+        return null;
+    }
+
+
+    if (
+        !Array.isArray(deck.cards)
+    ) {
+
+        deck.cards = [];
+    }
+
+
+    const card = {
+
+        id: createId("card"),
+
+        front:
+            normalizedFront,
+
+        back:
+            normalizedBack,
+
+        language:
+            language ||
+            deck.language ||
+            appData.settings.learningLanguage,
+
+        createdAt:
+            new Date().toISOString(),
+
+        updatedAt:
+            new Date().toISOString(),
+
+        correctCount: 0,
+
+        wrongCount: 0,
+
+        lastReviewedAt: null
+
+    };
+
+
+    deck.cards.push(card);
+
+    deck.updatedAt =
+        new Date().toISOString();
+
+
+    return card;
+}
+
+
+/* =========================================
+   HOME
+   ========================================= */
+
+function renderHome() {
+
+    const deckCount =
+        appData.decks.length;
+
+
+    let cardCount = 0;
+
+
+    appData.decks.forEach(
+        function (deck) {
+
+            if (
+                Array.isArray(deck.cards)
+            ) {
+
+                cardCount +=
+                    deck.cards.length;
+
+            }
+
+        }
+    );
+
+
+    const totalTime =
+        Number(
+            appData.statistics.totalStudyTime
+        ) || 0;
+
+
+    const totalAnswers =
+        Number(
+            appData.statistics.totalAnswers
+        ) || 0;
+
+
+    const totalCorrect =
+        Number(
+            appData.statistics.totalCorrect
+        ) || 0;
+
+
+    const accuracy =
+        totalAnswers > 0
+            ? Math.round(
+                totalCorrect /
+                totalAnswers *
+                100
+            )
+            : 0;
+
+
+    const deckElement =
+        document.getElementById(
+            "home-deck-count"
+        );
+
+
+    const cardElement =
+        document.getElementById(
+            "home-card-count"
+        );
+
+
+    const timeElement =
+        document.getElementById(
+            "home-study-time"
+        );
+
+
+    const accuracyElement =
+        document.getElementById(
+            "home-accuracy"
+        );
+
+
+    if (deckElement) {
+
+        deckElement.textContent =
+            deckCount;
+
+    }
+
+
+    if (cardElement) {
+
+        cardElement.textContent =
+            cardCount;
+
+    }
+
+
+    if (timeElement) {
+
+        timeElement.textContent =
+            formatStudyTime(
+                totalTime
+            );
+
+    }
+
+
+    if (accuracyElement) {
+
+        accuracyElement.textContent =
+            accuracy + "%";
+
+    }
+
+
+    renderDailyMessage();
+
+    updateHeader();
+}
+
+
+/* =========================================
+   DAILY MESSAGE
+   ========================================= */
+
+function renderDailyMessage() {
+
+    const element =
+        document.getElementById(
+            "daily-message"
+        );
+
+
+    if (!element) {
+        return;
+    }
+
+
+    const messages = [
+
+        "今日も一歩前進！",
+
+        "完璧じゃなくて大丈夫。1枚でも進めよう。",
+
+        "昨日の自分より、ほんの少し強くなろう。",
+
+        "5分だけでも立派な学習です。",
+
+        "間違いは、次に覚えるためのヒントです。",
+
+        "今日の1枚が、未来の語学力を作ります。",
+
+        "少しずつでも、続けば大きな力になります。",
+
+        "Language Gymで今日もトレーニング！"
+
+    ];
+
+
+    const day =
+        new Date().getDate();
+
+
+    element.textContent =
+        messages[
+            day % messages.length
+        ];
+}
+
+
+/* =========================================
+   TIME FORMAT
+   ========================================= */
+
+function formatStudyTime(
+    seconds
+) {
+
+    seconds =
+        Math.max(
+            0,
+            Math.floor(
+                Number(seconds) || 0
+            )
+        );
+
+
+    if (seconds < 60) {
+
+        return seconds + "秒";
+    }
+
+
+    const minutes =
+        Math.floor(
+            seconds / 60
+        );
+
+
+    if (minutes < 60) {
+
+        return minutes + "分";
+    }
+
+
+    const hours =
+        Math.floor(
+            minutes / 60
+        );
+
+
+    const remainingMinutes =
+        minutes % 60;
+
+
+    return (
+        hours +
+        "時間 " +
+        remainingMinutes +
+        "分"
+    );
+}
+
+
+/* =========================================
+   IMPORT DECK SELECT
+   ========================================= */
+
+function renderImportDeckSelect() {
+
+    const select =
+        document.getElementById(
+            "import-deck-select"
+        );
+
+
+    if (!select) {
+        return;
+    }
+
+
+    const currentValue =
         select.value;
 
 
-    select.innerHTML = "";
+    select.innerHTML = `
+        <option value="">
+            新しいデッキを作成
+        </option>
+    `;
 
 
-    Object.entries(
-        LANGUAGE_NAMES
-    ).forEach(
-        ([code, name]) => {
+    appData.decks.forEach(
+        function (deck) {
 
             const option =
                 document.createElement(
                     "option"
                 );
 
+
             option.value =
-                code;
+                deck.id;
+
 
             option.textContent =
-                name;
+                (
+                    deck.name ||
+                    "名称未設定"
+                ) +
+                " (" +
+                (
+                    Array.isArray(deck.cards)
+                        ? deck.cards.length
+                        : 0
+                ) +
+                "カード)";
+
 
             select.appendChild(
                 option
@@ -4694,1890 +5411,5258 @@ function ensureUILanguageOptions(
     );
 
 
-    select.value =
-        current ||
-        appData.settings.uiLanguage ||
-        "ja";
+    if (
+        currentValue &&
+        appData.decks.some(
+            function (deck) {
+                return deck.id === currentValue;
+            }
+        )
+    ) {
+
+        select.value =
+            currentValue;
+
+    }
 }
 
 
-function ensureLearningLanguageOptions(
-    select
+/* =========================================
+   FILE IMPORT
+   TXT / CSV / PDF
+   ========================================= */
+
+/*
+ * ファイル名からデッキ名を作る
+ */
+function getDeckNameFromFile(
+    fileName
 ) {
 
-    const current =
-        select.value;
-
-
-    select.innerHTML = "";
-
-
-    Object.entries(
-        LANGUAGE_NAMES
+    return String(
+        fileName || "インポート教材"
     )
-        .filter(
-            ([code]) =>
-                code !== "en" ||
-                true
+        .replace(
+            /\.[^/.]+$/,
+            ""
         )
-        .forEach(
-            ([code, name]) => {
-
-                const option =
-                    document.createElement(
-                        "option"
-                    );
-
-                option.value =
-                    code;
-
-                option.textContent =
-                    name;
-
-                select.appendChild(
-                    option
-                );
-
-            }
-        );
-
-
-    select.value =
-        current ||
-        appData.settings.learningLanguage ||
-        "zh";
+        .trim() ||
+        "インポート教材";
 }
 
 
-/* =========================================================
-   UI TRANSLATION
-   ========================================================= */
-
-function applyUILanguage() {
-
-    const lang =
-        appData.settings.uiLanguage ||
-        "ja";
-
-
-    document.documentElement.lang =
-        lang;
-
-
-    /*
-     * Sidebar
-     */
-
-    setText(
-        '[data-page="home"]',
-        `🏠 ${t("home")}`
-    );
-
-    setText(
-        '[data-page="decks"]',
-        `📚 ${t("decks")}`
-    );
-
-    setText(
-        '[data-page="study"]',
-        `🏋️ ${t("study")}`
-    );
-
-    setText(
-        '[data-page="progress"]',
-        `📊 ${t("progress")}`
-    );
-
-    setText(
-        '[data-page="import"]',
-        `📥 ${t("import")}`
-    );
-
-    setText(
-        '[data-page="data-share"]',
-        `🔄 ${t("dataShare")}`
-    );
-
-    setText(
-        '[data-page="settings"]',
-        `⚙️ ${t("settings")}`
-    );
-
-
-    /*
-     * Logo
-     */
-
-    const subtitle =
-        document.querySelector(
-            ".logo-subtitle"
-        );
-
-    if (subtitle) {
-
-        subtitle.textContent =
-            t("subtitle");
-
-    }
-
-
-    /*
-     * Home
-     */
-
-    setText(
-        "#page-home .page-title",
-        t("homeTitle")
-    );
-
-    setText(
-        "#page-home .page-description",
-        t("homeDescription")
-    );
-
-
-    setText(
-        "#page-home .stat-label:nth-of-type(1)",
-        t("deck")
-    );
-
-
-    /*
-     * より安全にstat-labelを順番で処理
-     */
-
-    const homeLabels =
-        document.querySelectorAll(
-            "#page-home .stat-label"
-        );
-
-    if (homeLabels[0]) {
-        homeLabels[0].textContent =
-            t("deck");
-    }
-
-    if (homeLabels[1]) {
-        homeLabels[1].textContent =
-            t("cards");
-    }
-
-    if (homeLabels[2]) {
-        homeLabels[2].textContent =
-            t("totalStudyTime");
-    }
-
-    if (homeLabels[3]) {
-        homeLabels[3].textContent =
-            t("accuracy");
-    }
-
-
-    const homeStart =
-        document.querySelector(
-            "#page-home .card h2"
-        );
-
-    /*
-     * 固定文言は以下で直接指定
-     */
-
-    const homeCards =
-        document.querySelectorAll(
-            "#page-home .card"
-        );
-
-
-    if (homeCards[4]) {
-
-        const h2 =
-            homeCards[4]
-                .querySelector("h2");
-
-        const p =
-            homeCards[4]
-                .querySelector("p");
-
-        if (h2) {
-            h2.textContent =
-                t("startLearning");
-        }
-
-        if (p) {
-            p.textContent =
-                t("chooseDeck");
-        }
-
-        const buttons =
-            homeCards[4]
-                .querySelectorAll(
-                    "[data-go-page]"
-                );
-
-        if (buttons[0]) {
-            buttons[0].textContent =
-                t("viewDecks");
-        }
-
-        if (buttons[1]) {
-            buttons[1].textContent =
-                t("importMaterial");
-        }
-
-    }
-
-
-    if (homeCards[5]) {
-
-        const h2 =
-            homeCards[5]
-                .querySelector("h2");
-
-        if (h2) {
-            h2.textContent =
-                t("todayMessage");
-        }
-
-    }
-
-
-    const daily =
-        document.getElementById(
-            "daily-message"
-        );
-
-    if (daily) {
-        daily.textContent =
-            t("todayForward");
-    }
-
-
-    /*
-     * Deck
-     */
-
-    setText(
-        "#page-decks .page-title",
-        t("deckTitle")
-    );
-
-    setText(
-        "#page-decks .page-description",
-        t("deckDescription")
-    );
-
-
-    const searchTitle =
-        document.querySelector(
-            "#page-decks .card h2"
-        );
-
-    if (searchTitle) {
-        searchTitle.textContent =
-            t("cardSearch");
-    }
-
-
-    const searchInput =
-        document.getElementById(
-            "card-search-input"
-        );
-
-    if (searchInput) {
-
-        searchInput.placeholder =
-            t("searchPlaceholder");
-
-    }
-
-
-    /*
-     * Study
-     */
-
-    setText(
-        "#page-study .page-title",
-        t("studyTitle")
-    );
-
-    setText(
-        "#show-answer-button",
-        t("showAnswer")
-    );
-
-    setText(
-        "#wrong-button",
-        t("dontKnow")
-    );
-
-    setText(
-        "#correct-button",
-        t("correct")
-    );
-
-    setText(
-        "#finish-study-button",
-        t("finishStudy")
-    );
-
-
-    /*
-     * Progress
-     */
-
-    setText(
-        "#page-progress .page-title",
-        t("progressTitle")
-    );
-
-    setText(
-        "#page-progress .page-description",
-        t("progressDescription")
-    );
-
-
-    const progressLabels =
-        document.querySelectorAll(
-            "#page-progress .stat-label"
-        );
-
-    if (progressLabels[0]) {
-        progressLabels[0].textContent =
-            t("totalStudyTime");
-    }
-
-    if (progressLabels[1]) {
-        progressLabels[1].textContent =
-            t("totalAnswers");
-    }
-
-    if (progressLabels[2]) {
-        progressLabels[2].textContent =
-            t("correctAnswers");
-    }
-
-    if (progressLabels[3]) {
-        progressLabels[3].textContent =
-            t("accuracy");
-    }
-
-
-    const progressH2 =
-        document.querySelector(
-            "#page-progress .card h2"
-        );
-
-    if (progressH2) {
-        progressH2.textContent =
-            t("history");
-    }
-
-
-    /*
-     * Import
-     */
-
-    setText(
-        "#page-import .page-title",
-        t("importTitle")
-    );
-
-    setText(
-        "#page-import .page-description",
-        t("importDescription")
-    );
-
-
-    const importLabels =
-        document.querySelectorAll(
-            "#page-import .form-label"
-        );
-
-    if (importLabels[0]) {
-        importLabels[0].textContent =
-            t("targetDeck");
-    }
-
-    if (importLabels[1]) {
-        importLabels[1].textContent =
-            t("learningLanguage");
-    }
-
-
-    const selectFileButton =
-        document.getElementById(
-            "select-file-button"
-        );
-
-    if (selectFileButton) {
-
-        selectFileButton.textContent =
-            t("selectFile");
-
-    }
-
-
-    /*
-     * Data Share
-     */
-
-    setText(
-        "#page-data-share .page-title",
-        t("dataShareTitle")
-    );
-
-    setText(
-        "#page-data-share .page-description",
-        t("dataShareDescription")
-    );
-
-
-    const shareCards =
-        document.querySelectorAll(
-            "#page-data-share .card"
-        );
-
-    if (shareCards[0]) {
-
-        const h2 =
-            shareCards[0]
-                .querySelector("h2");
-
-        const p =
-            shareCards[0]
-                .querySelector("p");
-
-        const button =
-            shareCards[0]
-                .querySelector("button");
-
-        if (h2) {
-            h2.textContent =
-                t("exportTitle");
-        }
-
-        if (p) {
-            p.textContent =
-                t("exportDescription");
-        }
-
-        if (button) {
-            button.textContent =
-                t("exportData");
-        }
-
-    }
-
-
-    if (shareCards[1]) {
-
-        const h2 =
-            shareCards[1]
-                .querySelector("h2");
-
-        const p =
-            shareCards[1]
-                .querySelector("p");
-
-        const button =
-            shareCards[1]
-                .querySelector("button");
-
-        if (h2) {
-            h2.textContent =
-                t("importData");
-        }
-
-        if (p) {
-            p.textContent =
-                t("importDataDescription");
-        }
-
-        if (button) {
-            button.textContent =
-                t("readJSON");
-        }
-
-    }
-
-
-    if (shareCards[2]) {
-
-        const h2 =
-            shareCards[2]
-                .querySelector("h2");
-
-        const p =
-            shareCards[2]
-                .querySelector("p");
-
-        const button =
-            shareCards[2]
-                .querySelector("button");
-
-        if (h2) {
-            h2.textContent =
-                t("backupTitle");
-        }
-
-        if (p) {
-            p.textContent =
-                t("backupDescription");
-        }
-
-        if (button) {
-            button.textContent =
-                t("restoreBackup");
-        }
-
-    }
-
-
-    /*
-     * Settings
-     */
-
-    setText(
-        "#page-settings .page-title",
-        t("settingsTitle")
-    );
-
-    setText(
-        "#page-settings .page-description",
-        t("settingsDescription")
-    );
-
-
-    const settingsCards =
-        document.querySelectorAll(
-            "#page-settings .card"
-        );
-
-
-    if (settingsCards[0]) {
-
-        const h2 =
-            settingsCards[0]
-                .querySelector("h2");
-
-        const p =
-            settingsCards[0]
-                .querySelector("p");
-
-        if (h2) {
-            h2.textContent =
-                t("themeColor");
-        }
-
-        if (p) {
-            p.textContent =
-                t("themeDescription");
-        }
-
-    }
-
-
-    if (settingsCards[1]) {
-
-        const h2 =
-            settingsCards[1]
-                .querySelector("h2");
-
-        if (h2) {
-            h2.textContent =
-                t("voice");
-        }
-
-        const labels =
-            settingsCards[1]
-                .querySelectorAll(
-                    ".form-label"
-                );
-
-        if (labels[0]) {
-            labels[0].textContent =
-                t("autoVoice");
-        }
-
-        if (labels[1]) {
-            labels[1].textContent =
-                t("voiceRate");
-        }
-
-        if (labels[2]) {
-            labels[2].textContent =
-                t("voicePitch");
-        }
-
-        const autoLabel =
-            settingsCards[1]
-                .querySelector(
-                    'label[style*="display:flex"]'
-                );
-
-        if (autoLabel) {
-
-            const span =
-                autoLabel.querySelector(
-                    "span"
-                );
-
-            if (span) {
-                span.textContent =
-                    t("randomStudy");
-            }
-
-        }
-
-    }
-
-
-    if (settingsCards[2]) {
-
-        const h2 =
-            settingsCards[2]
-                .querySelector("h2");
-
-        if (h2) {
-            h2.textContent =
-                t("languageSettings");
-        }
-
-        const labels =
-            settingsCards[2]
-                .querySelectorAll(
-                    ".form-label"
-                );
-
-        if (labels[0]) {
-            labels[0].textContent =
-                t("uiLanguage");
-        }
-
-        if (labels[1]) {
-            labels[1].textContent =
-                t("learningLanguageSetting");
-        }
-
-    }
-
-
-    /*
-     * UI language options
-     */
-
-    const uiSelect =
-        document.getElementById(
-            "ui-language"
-        );
-
-    if (uiSelect) {
-        ensureUILanguageOptions(
-            uiSelect
-        );
-    }
-
-
-    /*
-     * Learning language options
-     */
-
-    const learningSelect =
-        document.getElementById(
-            "learning-language"
-        );
-
-    if (learningSelect) {
-        ensureLearningLanguageOptions(
-            learningSelect
-        );
-    }
-
-
-    /*
-     * Import language options
-     */
-
-    const importLanguage =
+/*
+ * 現在選択されている
+ * 学習言語を取得
+ */
+function getSelectedImportLanguage() {
+
+    const select =
         document.getElementById(
             "import-language-select"
         );
 
-    if (importLanguage) {
 
-        Object.entries(
-            LANGUAGE_NAMES
-        ).forEach(
-            ([code, name]) =>
-                ensureLanguageOption(
-                    importLanguage,
-                    code
-                )
-        );
+    if (select && select.value) {
+
+        return select.value;
 
     }
 
 
-    /*
-     * Header language
-     */
+    if (
+        appData &&
+        appData.settings &&
+        appData.settings.learningLanguage
+    ) {
 
-    const header =
-        document.getElementById(
-            "header-language"
-        );
-
-    if (header) {
-
-        header.textContent =
-            getLearningLanguageName();
+        return appData.settings.learningLanguage;
 
     }
 
 
-    /*
-     * Buttons
-     */
-
-    const back =
-        document.querySelector(
-            ".btn-back"
-        );
-
-    const forward =
-        document.querySelector(
-            ".btn-forward"
-        );
-
-    if (back) {
-        back.title = t("back");
-        back.setAttribute(
-            "aria-label",
-            t("back")
-        );
-    }
-
-    if (forward) {
-        forward.title = t("forward");
-        forward.setAttribute(
-            "aria-label",
-            t("forward")
-        );
-    }
-
-
-    /*
-     * 再描画
-     */
-
-    renderHome();
-    renderDecks();
-    renderProgress();
-    renderImportDeckSelect();
-    syncImportLanguage();
-
+    return "zh";
 }
 
 
-function setText(
-    selector,
-    text
+/*
+ * 現在選択されている
+ * 追加先デッキを取得
+ */
+function getSelectedImportDeck() {
+
+    const select =
+        document.getElementById(
+            "import-deck-select"
+        );
+
+
+    if (!select || !select.value) {
+
+        return null;
+
+    }
+
+
+    return getDeck(
+        select.value
+    );
+}
+
+
+/*
+ * インポート状況を表示
+ */
+function setImportStatus(
+    message,
+    type
 ) {
 
     const element =
-        document.querySelector(
-            selector
+        document.getElementById(
+            "import-status"
         );
 
-    if (element) {
-        element.textContent =
-            text;
+
+    if (!element) {
+        return;
     }
+
+
+    let background =
+        "var(--primary-light)";
+
+    let color =
+        "var(--primary)";
+
+
+    if (type === "success") {
+
+        background = "#edf9f0";
+        color = "#278a46";
+
+    }
+
+
+    if (type === "error") {
+
+        background = "#fff0f2";
+        color = "var(--danger)";
+
+    }
+
+
+    if (type === "warning") {
+
+        background = "#fff8e6";
+        color = "#a06a00";
+
+    }
+
+
+    element.innerHTML = `
+        <div
+            style="
+                padding:14px 16px;
+                border-radius:12px;
+                background:${background};
+                color:${color};
+                line-height:1.6;
+            "
+        >
+            ${escapeHTML(message)}
+        </div>
+    `;
 }
 
 
-/* =========================================================
-   STATUS
-   ========================================================= */
-
-function showStatus(
-    message,
-    type = "success"
+/*
+ * 選択ファイル一覧を表示
+ */
+function renderSelectedFiles(
+    files
 ) {
 
     const container =
         document.getElementById(
-            "import-status"
+            "selected-files"
         );
+
 
     if (!container) {
         return;
     }
 
 
-    const isError =
-        type === "error";
+    if (
+        !files ||
+        files.length === 0
+    ) {
+
+        container.innerHTML = "";
+
+        return;
+    }
 
 
-    container.innerHTML = `
+    container.innerHTML =
+        Array.from(files)
+            .map(
+                function (file) {
 
-        <div
-            style="
-                margin-top:15px;
-                padding:14px;
-                border-radius:12px;
-                background:
-                    ${isError
-                        ? "#fff0f2"
-                        : "#edf9f0"};
-                color:
-                    ${isError
-                        ? "#c43e59"
-                        : "#287a3e"};
-            "
-        >
-            ${isError ? "❌" : "✅"}
-            ${escapeHTML(message)}
-        </div>
+                    return `
+                        <div class="selected-file">
 
-    `;
+                            <span>
+                                📄
+                                ${escapeHTML(
+                                    file.name
+                                )}
+                            </span>
+
+                            <span
+                                style="
+                                    color:var(--muted);
+                                    font-size:13px;
+                                "
+                            >
+                                ${formatFileSize(
+                                    file.size
+                                )}
+                            </span>
+
+                        </div>
+                    `;
+
+                }
+            )
+            .join("");
+}
 
 
-    setTimeout(
-        function () {
+/*
+ * ファイルサイズ
+ */
+function formatFileSize(
+    bytes
+) {
+
+    const size =
+        Number(bytes) || 0;
+
+
+    if (size < 1024) {
+
+        return size + " B";
+
+    }
+
+
+    if (size < 1024 * 1024) {
+
+        return (
+            Math.round(
+                size / 1024
+            ) +
+            " KB"
+        );
+
+    }
+
+
+    return (
+        (
+            size /
+            1024 /
+            1024
+        ).toFixed(1) +
+        " MB"
+    );
+}
+
+
+/*
+ * TXTを読み込む
+ */
+async function readTextFile(
+    file
+) {
+
+    return await file.text();
+
+}
+
+
+/*
+ * CSVを読み込む
+ *
+ * シンプルなCSVに対応。
+ * 1列目 = 表
+ * 2列目 = 裏
+ */
+function parseCSV(
+    text
+) {
+
+    const rows = [];
+
+    let row = [];
+
+    let cell = "";
+
+    let insideQuotes = false;
+
+
+    for (
+        let i = 0;
+        i < text.length;
+        i++
+    ) {
+
+        const char =
+            text[i];
+
+
+        const next =
+            text[i + 1];
+
+
+        if (
+            char === '"' &&
+            insideQuotes &&
+            next === '"'
+        ) {
+
+            cell += '"';
+
+            i++;
+
+            continue;
+        }
+
+
+        if (
+            char === '"'
+        ) {
+
+            insideQuotes =
+                !insideQuotes;
+
+            continue;
+        }
+
+
+        if (
+            char === "," &&
+            !insideQuotes
+        ) {
+
+            row.push(cell);
+
+            cell = "";
+
+            continue;
+        }
+
+
+        if (
+            (
+                char === "\n" ||
+                char === "\r"
+            ) &&
+            !insideQuotes
+        ) {
 
             if (
-                container.textContent
+                char === "\r" &&
+                next === "\n"
             ) {
 
-                container.innerHTML =
-                    "";
+                i++;
 
             }
 
-        },
-        3500
-    );
-}
 
+            row.push(cell);
 
-/* =========================================================
-   MOBILE MENU
-   ========================================================= */
+            rows.push(row);
 
-function closeMobileMenu() {
+            row = [];
 
-    const sidebar =
-        document.getElementById(
-            "sidebar"
-        );
+            cell = "";
 
-    const overlay =
-        document.getElementById(
-            "mobile-menu-overlay"
-        );
-
-    const button =
-        document.getElementById(
-            "mobile-menu-button"
-        );
-
-
-    if (sidebar) {
-
-        sidebar.classList.remove(
-            "open"
-        );
-
-    }
-
-    if (overlay) {
-
-        overlay.classList.remove(
-            "open"
-        );
-
-    }
-
-    document.body.classList.remove(
-        "mobile-menu-open"
-    );
-
-
-    if (button) {
-
-        button.setAttribute(
-            "aria-expanded",
-            "false"
-        );
-
-        button.setAttribute(
-            "aria-label",
-            "メニューを開く"
-        );
-
-    }
-}
-
-
-/* =========================================================
-   DATE
-   ========================================================= */
-
-function getDateStamp() {
-
-    const date =
-        new Date();
-
-    return [
-        date.getFullYear(),
-        String(
-            date.getMonth() + 1
-        ).padStart(2, "0"),
-        String(
-            date.getDate()
-        ).padStart(2, "0")
-    ].join("-");
-}
-
-
-/* =========================================================
-   GLOBAL EXPORTS
-   ========================================================= */
-
-window.appData = appData;
-
-window.showPage =
-    showPage;
-
-window.goBack =
-    goBack;
-
-window.goForward =
-    goForward;
-
-window.saveData =
-    saveData;
-
-window.applyTheme =
-    applyTheme;
-
-window.escapeHTML =
-    escapeHTML;
-
-window.handleFileImport =
-    handleFileImport;
-
-window.importDataJSON =
-    importDataJSON;
-
-window.exportDataJSON =
-    exportDataJSON;
-
-window.restoreAutomaticBackup =
-    restoreAutomaticBackup;
-
-window.renderImportDeckSelect =
-    renderImportDeckSelect;
-
-window.renderCardSearchResults =
-    renderCardSearchResults;
-
-window.showStudyAnswer =
-    showStudyAnswer;
-
-window.handleStudyWrong =
-    handleStudyWrong;
-
-window.handleStudyCorrect =
-    handleStudyCorrect;
-
-window.finishStudy =
-    finishStudy;
-
-window.startStudyFromDeck =
-    startStudyFromDeck;
-
-window.editCard =
-    editCard;
-
-window.deleteCard =
-    deleteCard;
-
-window.deleteDeck =
-    deleteDeck;
-
-window.renameDeck =
-    renameDeck;
-
-
-/* =========================================================
-   DOM READY
-   ========================================================= */
-
-document.addEventListener(
-    "DOMContentLoaded",
-    function () {
-
-        /*
-         * 初期テーマ
-         */
-
-        applyTheme(
-            appData.settings.themeColor ||
-            DEFAULT_COLOR
-        );
-
-
-        /*
-         * 初期UI言語
-         */
-
-        applyUILanguage();
-
-
-        /*
-         * 初期ページ
-         */
-
-        pageHistory = ["home"];
-        historyIndex = 0;
-
-        showPage(
-            "home",
-            false
-        );
-
-
-        /* =================================================
-           BACK / FORWARD
-           ================================================= */
-
-        document
-            .querySelector(
-                ".btn-back"
-            )
-            ?.addEventListener(
-                "click",
-                goBack
-            );
-
-
-        document
-            .querySelector(
-                ".btn-forward"
-            )
-            ?.addEventListener(
-                "click",
-                goForward
-            );
-
-
-        /* =================================================
-           NAVIGATION
-           ================================================= */
-
-        document
-            .querySelectorAll(
-                ".nav-item"
-            )
-            .forEach(
-                button => {
-
-                    button.addEventListener(
-                        "click",
-                        function () {
-
-                            const page =
-                                this.dataset.page;
-
-                            if (page) {
-
-                                showPage(
-                                    page
-                                );
-
-                            }
-
-                        }
-                    );
-
-                }
-            );
-
-
-        document
-            .querySelectorAll(
-                "[data-go-page]"
-            )
-            .forEach(
-                button => {
-
-                    button.addEventListener(
-                        "click",
-                        function () {
-
-                            const page =
-                                this.dataset.goPage;
-
-                            if (page) {
-
-                                showPage(
-                                    page
-                                );
-
-                            }
-
-                        }
-                    );
-
-                }
-            );
-
-
-        /* =================================================
-           MOBILE MENU
-           ================================================= */
-
-        const menuButton =
-            document.getElementById(
-                "mobile-menu-button"
-            );
-
-        const sidebar =
-            document.getElementById(
-                "sidebar"
-            );
-
-
-        let overlay =
-            document.getElementById(
-                "mobile-menu-overlay"
-            );
-
-
-        if (!overlay) {
-
-            overlay =
-                document.createElement(
-                    "div"
-                );
-
-            overlay.id =
-                "mobile-menu-overlay";
-
-            overlay.className =
-                "mobile-menu-overlay";
-
-            document.body.appendChild(
-                overlay
-            );
-
+            continue;
         }
 
 
-        function toggleMenu() {
+        cell += char;
+    }
 
-            if (!sidebar) {
+
+    if (
+        cell !== "" ||
+        row.length > 0
+    ) {
+
+        row.push(cell);
+
+        rows.push(row);
+
+    }
+
+
+    return rows
+        .map(
+            function (items) {
+
+                return items.map(
+                    function (item) {
+
+                        return String(
+                            item
+                        ).trim();
+
+                    }
+                );
+
+            }
+        )
+        .filter(
+            function (items) {
+
+                return items.some(
+                    function (item) {
+
+                        return item !== "";
+
+                    }
+                );
+
+            }
+        );
+}
+
+
+/*
+ * CSVからカードを作る
+ */
+function cardsFromCSV(
+    text
+) {
+
+    const rows =
+        parseCSV(text);
+
+
+    const cards = [];
+
+
+    rows.forEach(
+        function (row) {
+
+            if (
+                row.length < 2
+            ) {
+
                 return;
-            }
-
-            const open =
-                !sidebar.classList.contains(
-                    "open"
-                );
-
-
-            if (open) {
-
-                sidebar.classList.add(
-                    "open"
-                );
-
-                overlay.classList.add(
-                    "open"
-                );
-
-                document.body.classList.add(
-                    "mobile-menu-open"
-                );
-
-                menuButton?.setAttribute(
-                    "aria-expanded",
-                    "true"
-                );
-
-            } else {
-
-                closeMobileMenu();
 
             }
+
+
+            const front =
+                String(
+                    row[0] || ""
+                ).trim();
+
+
+            const back =
+                String(
+                    row[1] || ""
+                ).trim();
+
+
+            if (
+                !front &&
+                !back
+            ) {
+
+                return;
+
+            }
+
+
+            cards.push({
+
+                front: front,
+
+                back: back
+
+            });
 
         }
+    );
 
 
-        menuButton?.addEventListener(
-            "click",
-            toggleMenu
-        );
+    return cards;
+}
 
 
-        overlay?.addEventListener(
-            "click",
-            closeMobileMenu
-        );
+/*
+ * TXTからカードを作る
+ *
+ * 対応形式：
+ *
+ * 表<TAB>裏
+ *
+ * 表 | 裏
+ *
+ * 表 / 裏
+ *
+ * 表
+ * 裏
+ *
+ * 空行でカードを区切る形式
+ */
+function cardsFromTXT(
+    text
+) {
+
+    const normalized =
+        String(
+            text || ""
+        )
+            .replace(
+                /\r\n/g,
+                "\n"
+            )
+            .replace(
+                /\r/g,
+                "\n"
+            );
 
 
-        window.addEventListener(
-            "resize",
-            function () {
+    /*
+     * まず空行区切りを確認
+     */
 
-                if (
-                    window.innerWidth > 800
-                ) {
-
-                    closeMobileMenu();
-
+    const blocks =
+        normalized
+            .split(/\n\s*\n/)
+            .map(
+                function (block) {
+                    return block.trim();
                 }
-
-            }
-        );
-
-
-        document.addEventListener(
-            "keydown",
-            function (event) {
-
-                if (
-                    event.key === "Escape"
-                ) {
-
-                    closeMobileMenu();
-
-                }
-
-            }
-        );
-
-
-        /* =================================================
-           STUDY BUTTONS
-           ================================================= */
-
-        document
-            .getElementById(
-                "show-answer-button"
             )
-            ?.addEventListener(
-                "click",
-                showStudyAnswer
-            );
-
-
-        document
-            .getElementById(
-                "wrong-button"
-            )
-            ?.addEventListener(
-                "click",
-                handleStudyWrong
-            );
-
-
-        document
-            .getElementById(
-                "correct-button"
-            )
-            ?.addEventListener(
-                "click",
-                handleStudyCorrect
-            );
-
-
-        document
-            .getElementById(
-                "finish-study-button"
-            )
-            ?.addEventListener(
-                "click",
-                finishStudy
-            );
-
-
-        /* =================================================
-           SEARCH
-           ================================================= */
-
-        document
-            .getElementById(
-                "card-search-input"
-            )
-            ?.addEventListener(
-                "input",
-                function () {
-
-                    renderCardSearchResults(
-                        this.value
-                    );
-
+            .filter(
+                function (block) {
+                    return block !== "";
                 }
             );
 
 
-        /* =================================================
-           FILE IMPORT
-           ================================================= */
-
-        const fileInput =
-            document.getElementById(
-                "file-input"
-            );
-
-        const selectFileButton =
-            document.getElementById(
-                "select-file-button"
-            );
-
-
-        selectFileButton?.addEventListener(
-            "click",
-            function () {
-
-                fileInput?.click();
-
-            }
-        );
-
-
-        fileInput?.addEventListener(
-            "change",
-            async function () {
-
-                const files =
-                    Array.from(
-                        this.files || []
-                    );
-
-
-                renderSelectedFiles(
-                    files
-                );
-
-
-                for (
-                    const file of files
-                ) {
-
-                    await handleFileImport(
-                        file
-                    );
-
-                }
-
-
-                this.value = "";
-
-            }
-        );
-
-
-        /* =================================================
-           DROP ZONE
-           ================================================= */
-
-        const dropZone =
-            document.getElementById(
-                "drop-zone"
-            );
-
-
-        dropZone?.addEventListener(
-            "dragover",
-            function (event) {
-
-                event.preventDefault();
-
-                this.classList.add(
-                    "dragover"
-                );
-
-            }
-        );
-
-
-        dropZone?.addEventListener(
-            "dragleave",
-            function () {
-
-                this.classList.remove(
-                    "dragover"
-                );
-
-            }
-        );
-
-
-        dropZone?.addEventListener(
-            "drop",
-            async function (event) {
-
-                event.preventDefault();
-
-                this.classList.remove(
-                    "dragover"
-                );
-
-
-                const files =
-                    Array.from(
-                        event.dataTransfer
-                            ?.files || []
-                    );
-
-
-                renderSelectedFiles(
-                    files
-                );
-
-
-                for (
-                    const file of files
-                ) {
-
-                    await handleFileImport(
-                        file
-                    );
-
-                }
-
-            }
-        );
-
-
-        /* =================================================
-           JSON IMPORT / EXPORT
-           ================================================= */
-
-        const dataImportButton =
-            document.getElementById(
-                "data-import-button"
-            );
-
-        const dataImportInput =
-            document.getElementById(
-                "data-import-input"
-            );
-
-
-        dataImportButton?.addEventListener(
-            "click",
-            function () {
-
-                dataImportInput?.click();
-
-            }
-        );
-
-
-        dataImportInput?.addEventListener(
-            "change",
-            function () {
-
-                const file =
-                    this.files?.[0];
-
-                if (file) {
-
-                    importDataJSON(
-                        file
-                    );
-
-                }
-
-                this.value = "";
-
-            }
-        );
-
-
-        document
-            .getElementById(
-                "export-data-button"
-            )
-            ?.addEventListener(
-                "click",
-                exportDataJSON
-            );
-
-
-        document
-            .getElementById(
-                "restore-backup-button"
-            )
-            ?.addEventListener(
-                "click",
-                restoreAutomaticBackup
-            );
-
-
-        /* =================================================
-           COLORS
-           ================================================= */
-
-        document
-            .querySelectorAll(
-                ".color-option"
-            )
-            .forEach(
-                button => {
-
-                    button.addEventListener(
-                        "click",
-                        function () {
-
-                            const color =
-                                this.dataset.color;
-
-                            if (!color) {
-                                return;
-                            }
-
-                            applyTheme(
-                                color
-                            );
-
-                            saveSetting(
-                                "themeColor",
-                                color
-                            );
-
+    const cards = [];
+
+
+    /*
+     * 1ブロックずつ処理
+     */
+
+    blocks.forEach(
+        function (block) {
+
+            const lines =
+                block
+                    .split("\n")
+                    .map(
+                        function (line) {
+                            return line.trim();
+                        }
+                    )
+                    .filter(
+                        function (line) {
+                            return line !== "";
                         }
                     );
 
-                }
-            );
+
+            if (
+                lines.length >= 2 &&
+                !findSeparator(
+                    lines[0]
+                )
+            ) {
+
+                cards.push({
+
+                    front: lines[0],
+
+                    back:
+                        lines
+                            .slice(1)
+                            .join("\n")
+
+                });
+
+                return;
+
+            }
 
 
-        document
-            .getElementById(
-                "custom-color"
-            )
-            ?.addEventListener(
-                "input",
-                function () {
+            lines.forEach(
+                function (line) {
 
-                    applyTheme(
-                        this.value
-                    );
-
-                    saveSetting(
-                        "themeColor",
-                        this.value
-                    );
-
-                }
-            );
-
-
-        /* =================================================
-           SETTINGS
-           ================================================= */
-
-        document
-            .getElementById(
-                "auto-voice"
-            )
-            ?.addEventListener(
-                "change",
-                function () {
-
-                    saveSetting(
-                        "autoVoice",
-                        this.checked
-                    );
-
-                }
-            );
-
-
-        document
-            .getElementById(
-                "random-study"
-            )
-            ?.addEventListener(
-                "change",
-                function () {
-
-                    saveSetting(
-                        "randomStudy",
-                        this.checked
-                    );
-
-                }
-            );
-
-
-        document
-            .getElementById(
-                "voice-rate"
-            )
-            ?.addEventListener(
-                "change",
-                function () {
-
-                    let value =
-                        Number(
-                            this.value
+                    const pair =
+                        splitCardLine(
+                            line
                         );
 
-                    value =
-                        Math.min(
-                            2,
-                            Math.max(
-                                0.5,
-                                value || 1
-                            )
-                        );
 
-                    this.value =
-                        value;
+                    if (pair) {
 
-                    saveSetting(
-                        "voiceRate",
-                        value
-                    );
+                        cards.push({
 
-                }
-            );
+                            front:
+                                pair.front,
 
+                            back:
+                                pair.back
 
-        document
-            .getElementById(
-                "voice-pitch"
-            )
-            ?.addEventListener(
-                "change",
-                function () {
+                        });
 
-                    let value =
-                        Number(
-                            this.value
-                        );
-
-                    value =
-                        Math.min(
-                            2,
-                            Math.max(
-                                0,
-                                value || 1
-                            )
-                        );
-
-                    this.value =
-                        value;
-
-                    saveSetting(
-                        "voicePitch",
-                        value
-                    );
-
-                }
-            );
-
-
-        /* =================================================
-           UI LANGUAGE
-           ================================================= */
-
-        const uiLanguage =
-            document.getElementById(
-                "ui-language"
-            );
-
-
-        if (uiLanguage) {
-
-            ensureUILanguageOptions(
-                uiLanguage
-            );
-
-
-            uiLanguage.value =
-                appData.settings.uiLanguage ||
-                "ja";
-
-
-            uiLanguage.addEventListener(
-                "change",
-                function () {
-
-                    saveSetting(
-                        "uiLanguage",
-                        this.value
-                    );
-
-
-                    applyUILanguage();
-
-
-                    showStatus(
-                        t("languageChanged"),
-                        "success"
-                    );
+                    }
 
                 }
             );
 
         }
+    );
 
 
-        /* =================================================
-           LEARNING LANGUAGE
-           ================================================= */
+    /*
+     * 空行がなかった場合
+     */
 
-        const learningLanguage =
-            document.getElementById(
-                "learning-language"
+    if (
+        cards.length === 0
+    ) {
+
+        normalized
+            .split("\n")
+            .map(
+                function (line) {
+                    return line.trim();
+                }
+            )
+            .filter(
+                function (line) {
+                    return line !== "";
+                }
+            )
+            .forEach(
+                function (line) {
+
+                    const pair =
+                        splitCardLine(
+                            line
+                        );
+
+
+                    if (pair) {
+
+                        cards.push(pair);
+
+                    }
+
+                }
+            );
+
+    }
+
+
+    return cards;
+}
+
+
+/*
+ * 区切り文字を探す
+ */
+function findSeparator(
+    line
+) {
+
+    const separators = [
+        "\t",
+        "｜",
+        "|",
+        "／",
+        "/",
+        "⇒",
+        "→"
+    ];
+
+
+    return separators.find(
+        function (separator) {
+
+            return line.includes(
+                separator
+            );
+
+        }
+    ) || null;
+}
+
+
+/*
+ * 1行から表・裏を分ける
+ */
+function splitCardLine(
+    line
+) {
+
+    const text =
+        String(
+            line || ""
+        ).trim();
+
+
+    if (!text) {
+        return null;
+    }
+
+
+    const separator =
+        findSeparator(text);
+
+
+    if (!separator) {
+        return null;
+    }
+
+
+    const parts =
+        text.split(separator);
+
+
+    if (
+        parts.length < 2
+    ) {
+
+        return null;
+
+    }
+
+
+    const front =
+        String(
+            parts.shift() || ""
+        ).trim();
+
+
+    const back =
+        parts
+            .join(separator)
+            .trim();
+
+
+    if (
+        !front &&
+        !back
+    ) {
+
+        return null;
+
+    }
+
+
+    return {
+
+        front: front,
+
+        back: back
+
+    };
+}
+
+
+/*
+ * PDF読み込み
+ *
+ * PDF.jsがページに存在する場合は
+ * それを使用する。
+ *
+ * 存在しない場合は
+ * エラーを表示して安全に終了する。
+ */
+async function readPDFFile(
+    file
+) {
+
+    if (
+        typeof pdfjsLib ===
+            "undefined"
+    ) {
+
+        throw new Error(
+            "PDF読み込みにはPDF.jsが必要です。"
+        );
+
+    }
+
+
+    const buffer =
+        await file.arrayBuffer();
+
+
+    const pdf =
+        await pdfjsLib
+            .getDocument({
+                data: buffer
+            })
+            .promise;
+
+
+    let text = "";
+
+
+    for (
+        let pageNumber = 1;
+        pageNumber <= pdf.numPages;
+        pageNumber++
+    ) {
+
+        const page =
+            await pdf.getPage(
+                pageNumber
             );
 
 
-        if (learningLanguage) {
+        const content =
+            await page.getTextContent();
 
-            ensureLearningLanguageOptions(
-                learningLanguage
+
+        const pageText =
+            content.items
+                .map(
+                    function (item) {
+
+                        return item.str || "";
+
+                    }
+                )
+                .join(" ");
+
+
+        text +=
+            pageText +
+            "\n\n";
+    }
+
+
+    return text;
+}
+
+
+/*
+ * ファイルからカード候補を作る
+ */
+async function parseImportFile(
+    file
+) {
+
+    const name =
+        String(
+            file.name || ""
+        ).toLowerCase();
+
+
+    if (
+        name.endsWith(".csv")
+    ) {
+
+        const text =
+            await readTextFile(file);
+
+
+        return cardsFromCSV(text);
+
+    }
+
+
+    if (
+        name.endsWith(".txt")
+    ) {
+
+        const text =
+            await readTextFile(file);
+
+
+        return cardsFromTXT(text);
+
+    }
+
+
+    if (
+        name.endsWith(".pdf")
+    ) {
+
+        const text =
+            await readPDFFile(file);
+
+
+        /*
+         * PDFはまずTXTと同じルールで
+         * カード化を試みる。
+         */
+
+        return cardsFromTXT(text);
+
+    }
+
+
+    throw new Error(
+        "対応していないファイル形式です。"
+    );
+}
+
+
+/*
+ * ファイルをインポート
+ */
+async function handleFileImport(
+    file
+) {
+
+    if (!file) {
+        return;
+    }
+
+
+    try {
+
+        setImportStatus(
+            "「" +
+            file.name +
+            "」を読み込んでいます…",
+            "warning"
+        );
+
+
+        const cards =
+            await parseImportFile(
+                file
             );
 
 
-            learningLanguage.value =
-                appData.settings.learningLanguage ||
-                "zh";
+        if (
+            !Array.isArray(cards) ||
+            cards.length === 0
+        ) {
+
+            setImportStatus(
+                "カードを作成できませんでした。「表<TAB>裏」などの形式を確認してください。",
+                "error"
+            );
+
+            return;
+        }
 
 
-            learningLanguage.addEventListener(
-                "change",
-                function () {
-
-                    const language =
-                        this.value;
+        const language =
+            getSelectedImportLanguage();
 
 
-                    saveSetting(
-                        "learningLanguage",
+        let deck =
+            getSelectedImportDeck();
+
+
+        /*
+         * 追加先が指定されていない場合
+         * 新しいデッキを作る。
+         */
+
+        if (!deck) {
+
+            deck =
+                createDeck(
+                    getDeckNameFromFile(
+                        file.name
+                    ),
+                    language
+                );
+
+        }
+
+
+        let addedCount = 0;
+
+
+        cards.forEach(
+            function (cardData) {
+
+                const card =
+                    addCard(
+                        deck,
+                        cardData.front,
+                        cardData.back,
                         language
                     );
 
 
-                    /*
-                     * インポート画面にも即反映
-                     */
+                if (card) {
 
-                    const importLanguage =
-                        document.getElementById(
-                            "import-language-select"
-                        );
-
-
-                    if (importLanguage) {
-
-                        ensureLanguageOption(
-                            importLanguage,
-                            language
-                        );
-
-                        importLanguage.value =
-                            language;
-
-                    }
-
-
-                    /*
-                     * ヘッダーにも反映
-                     */
-
-                    const header =
-                        document.getElementById(
-                            "header-language"
-                        );
-
-                    if (header) {
-
-                        header.textContent =
-                            LANGUAGE_NAMES[
-                                language
-                            ] ||
-                            language;
-
-                    }
-
-
-                    /*
-                     * 既存デッキは勝手に変更しない。
-                     * 「現在これから学ぶ言語」
-                     * として反映する。
-                     */
-
-                    renderHome();
-                    renderDecks();
-
-
-                    showStatus(
-                        `${t("learningLanguageChanged")} ` +
-                        `${LANGUAGE_NAMES[language] || language}`,
-                        "success"
-                    );
+                    addedCount++;
 
                 }
+
+            }
+        );
+
+
+        if (addedCount === 0) {
+
+            setImportStatus(
+                "追加できるカードがありませんでした。",
+                "error"
             );
 
+            return;
         }
 
 
-        /* =================================================
-           IMPORT LANGUAGE
-           ================================================= */
-
-        const importLanguage =
-            document.getElementById(
-                "import-language-select"
-            );
+        saveData();
 
 
-        if (importLanguage) {
-
-            Object.entries(
-                LANGUAGE_NAMES
-            ).forEach(
-                ([code]) => {
-
-                    ensureLanguageOption(
-                        importLanguage,
-                        code
-                    );
-
-                }
-            );
-
-
-            importLanguage.value =
-                getLearningLanguage();
-
-        }
-
-
-        /* =================================================
-           IMPORT DECK SELECT
-           ================================================= */
+        renderDecks();
 
         renderImportDeckSelect();
 
+        renderHome();
 
-        /* =================================================
-           INITIAL RENDER
-           ================================================= */
+
+        /*
+         * 作成したデッキを
+         * 追加先として選択状態にする
+         */
+
+        const deckSelect =
+            document.getElementById(
+                "import-deck-select"
+            );
+
+
+        if (deckSelect) {
+
+            deckSelect.value =
+                deck.id;
+
+        }
+
+
+        setImportStatus(
+            "「" +
+            file.name +
+            "」から " +
+            addedCount +
+            " 枚のカードを追加しました。",
+            "success"
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "Import error:",
+            error
+        );
+
+
+        setImportStatus(
+            "「" +
+            file.name +
+            "」の読み込みに失敗しました。\n" +
+            (
+                error &&
+                error.message
+                    ? error.message
+                    : "不明なエラー"
+            ),
+            "error"
+        );
+
+    }
+
+}
+
+
+/* =========================================
+   DRAG & DROP SUPPORT
+   ========================================= */
+
+function handleDroppedFiles(
+    files
+) {
+
+    const fileArray =
+        Array.from(
+            files || []
+        );
+
+
+    if (
+        fileArray.length === 0
+    ) {
+
+        return;
+
+    }
+
+
+    renderSelectedFiles(
+        fileArray
+    );
+
+
+    processImportFiles(
+        fileArray
+    );
+}
+
+
+async function processImportFiles(
+    files
+) {
+
+    for (
+        const file of files
+    ) {
+
+        await handleFileImport(
+            file
+        );
+
+    }
+
+
+    /*
+     * 最新状態を再描画
+     */
+
+    renderDecks();
+
+    renderImportDeckSelect();
+
+    renderHome();
+}
+
+
+
+/* =========================================
+   DATA EXPORT / IMPORT
+   JSON
+   ========================================= */
+
+/*
+ * エクスポート用データを作成
+ *
+ * 元データを直接変更しないように
+ * JSON化してコピーする。
+ */
+function createExportData() {
+
+    try {
+
+        return JSON.parse(
+            JSON.stringify(appData)
+        );
+
+    } catch (error) {
+
+        console.error(
+            "Export data creation error:",
+            error
+        );
+
+        return null;
+    }
+}
+
+
+/*
+ * JSONを書き出す
+ */
+function exportDataJSON() {
+
+    try {
+
+        const exportData =
+            createExportData();
+
+
+        if (!exportData) {
+
+            alert(
+                "データを書き出せませんでした。"
+            );
+
+            return;
+        }
+
+
+        /*
+         * バージョン情報
+         */
+
+        exportData.exportVersion =
+            1;
+
+
+        exportData.exportedAt =
+            new Date().toISOString();
+
+
+        const json =
+            JSON.stringify(
+                exportData,
+                null,
+                2
+            );
+
+
+        const blob =
+            new Blob(
+                [json],
+                {
+                    type:
+                        "application/json"
+                }
+            );
+
+
+        const url =
+            URL.createObjectURL(
+                blob
+            );
+
+
+        const link =
+            document.createElement(
+                "a"
+            );
+
+
+        link.href =
+            url;
+
+
+        const date =
+            new Date();
+
+
+        const dateText =
+            date
+                .toISOString()
+                .slice(
+                    0,
+                    10
+                );
+
+
+        link.download =
+            "language-gym-backup-" +
+            dateText +
+            ".json";
+
+
+        document.body.appendChild(
+            link
+        );
+
+
+        link.click();
+
+
+        link.remove();
+
+
+        /*
+         * URLをすぐに解放しないように
+         * 少し待ってから解放する。
+         */
+        setTimeout(
+            function () {
+
+                URL.revokeObjectURL(
+                    url
+                );
+
+            },
+            1000
+        );
+
+
+        alert(
+            "Language Gymのデータを書き出しました。"
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "Export error:",
+            error
+        );
+
+
+        alert(
+            "データの書き出しに失敗しました。"
+        );
+
+    }
+
+}
+
+
+/* =========================================
+   JSON VALIDATION
+   ========================================= */
+
+/*
+ * 読み込んだJSONが
+ * Language Gymのデータとして使えるか確認
+ */
+function validateImportedData(
+    data
+) {
+
+    if (
+        !data ||
+        typeof data !== "object"
+    ) {
+
+        return {
+
+            valid: false,
+
+            message:
+                "JSONデータが正しくありません。"
+
+        };
+
+    }
+
+
+    /*
+     * decksがない場合
+     *
+     * 古い形式の可能性もあるので、
+     * ここでは完全拒否しない。
+     */
+
+    if (
+        data.decks !== undefined &&
+        !Array.isArray(data.decks)
+    ) {
+
+        return {
+
+            valid: false,
+
+            message:
+                "デッキデータの形式が正しくありません。"
+
+        };
+
+    }
+
+
+    if (
+        data.settings !== undefined &&
+        typeof data.settings !== "object"
+    ) {
+
+        return {
+
+            valid: false,
+
+            message:
+                "設定データの形式が正しくありません。"
+
+        };
+
+    }
+
+
+    if (
+        data.statistics !== undefined &&
+        typeof data.statistics !== "object"
+    ) {
+
+        return {
+
+            valid: false,
+
+            message:
+                "学習記録データの形式が正しくありません。"
+
+        };
+
+    }
+
+
+    return {
+
+        valid: true,
+
+        message: "OK"
+
+    };
+}
+
+
+/* =========================================
+   NORMALIZE IMPORTED DATA
+   ========================================= */
+
+/*
+ * 読み込んだデータを
+ * 現在のLanguage Gym形式に合わせる。
+ */
+function normalizeImportedData(
+    imported
+) {
+
+    const normalized = {
+
+        version:
+            imported.version ||
+            1,
+
+        decks: [],
+
+        settings: {},
+
+        statistics: {},
+
+        studyHistory: []
+
+    };
+
+
+    /*
+     * デッキ
+     */
+
+    if (
+        Array.isArray(
+            imported.decks
+        )
+    ) {
+
+        normalized.decks =
+            imported.decks
+                .map(
+                    function (oldDeck) {
+
+                        if (
+                            !oldDeck ||
+                            typeof oldDeck !== "object"
+                        ) {
+
+                            return null;
+
+                        }
+
+
+                        const deck = {
+
+                            id:
+                                oldDeck.id ||
+                                createId("deck"),
+
+                            name:
+                                String(
+                                    oldDeck.name ||
+                                    "名称未設定"
+                                ),
+
+                            language:
+                                oldDeck.language ||
+                                "zh",
+
+                            cards: [],
+
+                            createdAt:
+                                oldDeck.createdAt ||
+                                new Date().toISOString(),
+
+                            updatedAt:
+                                oldDeck.updatedAt ||
+                                new Date().toISOString()
+
+                        };
+
+
+                        /*
+                         * カード
+                         */
+
+                        if (
+                            Array.isArray(
+                                oldDeck.cards
+                            )
+                        ) {
+
+                            deck.cards =
+                                oldDeck.cards
+                                    .map(
+                                        normalizeCard
+                                    )
+                                    .filter(
+                                        Boolean
+                                    );
+
+                        }
+
+
+                        return deck;
+
+                    }
+                )
+                .filter(
+                    Boolean
+                );
+
+    }
+
+
+    /*
+     * 設定
+     */
+
+    if (
+        imported.settings &&
+        typeof imported.settings === "object"
+    ) {
+
+        normalized.settings =
+            {
+                ...imported.settings
+            };
+
+    }
+
+
+    /*
+     * 統計
+     */
+
+    if (
+        imported.statistics &&
+        typeof imported.statistics === "object"
+    ) {
+
+        normalized.statistics =
+            {
+                ...imported.statistics
+            };
+
+    }
+
+
+    /*
+     * 学習履歴
+     */
+
+    if (
+        Array.isArray(
+            imported.studyHistory
+        )
+    ) {
+
+        normalized.studyHistory =
+            imported.studyHistory
+                .filter(
+                    function (item) {
+
+                        return (
+                            item &&
+                            typeof item === "object"
+                        );
+
+                    }
+                )
+                .map(
+                    function (item) {
+
+                        return {
+                            ...item
+                        };
+
+                    }
+                );
+
+    }
+
+
+    return normalized;
+}
+
+
+/* =========================================
+   MERGE OR REPLACE
+   ========================================= */
+
+/*
+ * JSONデータを現在のデータに
+ * 安全に反映する。
+ *
+ * デフォルトでは「置き換え」ではなく
+ * 既存データを残して追加・統合する。
+ */
+function mergeImportedData(
+    imported
+) {
+
+    const normalized =
+        normalizeImportedData(
+            imported
+        );
+
+
+    /*
+     * デッキIDの重複を避ける
+     */
+
+    const existingDeckIds =
+        new Set(
+            appData.decks.map(
+                function (deck) {
+                    return deck.id;
+                }
+            )
+        );
+
+
+    normalized.decks.forEach(
+        function (importedDeck) {
+
+            let deck =
+                appData.decks.find(
+                    function (existingDeck) {
+
+                        return (
+                            existingDeck.id ===
+                            importedDeck.id
+                        );
+
+                    }
+                );
+
+
+            /*
+             * 同じIDのデッキがある場合
+             * カードだけ統合する。
+             */
+
+            if (deck) {
+
+                if (
+                    !Array.isArray(
+                        deck.cards
+                    )
+                ) {
+
+                    deck.cards = [];
+
+                }
+
+
+                const existingCardIds =
+                    new Set(
+                        deck.cards.map(
+                            function (card) {
+                                return card.id;
+                            }
+                        )
+                    );
+
+
+                importedDeck.cards.forEach(
+                    function (card) {
+
+                        if (
+                            !existingCardIds.has(
+                                card.id
+                            )
+                        ) {
+
+                            deck.cards.push(
+                                card
+                            );
+
+                        }
+
+                    }
+                );
+
+
+                deck.updatedAt =
+                    new Date().toISOString();
+
+
+                return;
+            }
+
+
+            /*
+             * IDが重複する可能性がある場合
+             */
+
+            if (
+                existingDeckIds.has(
+                    importedDeck.id
+                )
+            ) {
+
+                importedDeck.id =
+                    createId("deck");
+
+            }
+
+
+            /*
+             * 新しいデッキとして追加
+             */
+
+            appData.decks.push(
+                importedDeck
+            );
+
+
+            existingDeckIds.add(
+                importedDeck.id
+            );
+
+        }
+    );
+
+
+    /*
+     * 設定は、
+     * 読み込んだ値がある項目だけ反映。
+     */
+
+    if (
+        normalized.settings &&
+        typeof normalized.settings === "object"
+    ) {
+
+        appData.settings = {
+
+            ...appData.settings,
+
+            ...normalized.settings
+
+        };
+
+    }
+
+
+    /*
+     * 統計を統合
+     *
+     * 現在の統計と読み込んだ統計を
+     * 単純に足し合わせる。
+     */
+
+    const importedStats =
+        normalized.statistics;
+
+
+    if (importedStats) {
+
+        appData.statistics.totalStudyTime =
+            Math.max(
+                Number(
+                    appData.statistics.totalStudyTime
+                ) || 0,
+                Number(
+                    importedStats.totalStudyTime
+                ) || 0
+            );
+
+
+        appData.statistics.totalAnswers =
+            Math.max(
+                Number(
+                    appData.statistics.totalAnswers
+                ) || 0,
+                Number(
+                    importedStats.totalAnswers
+                ) || 0
+            );
+
+
+        appData.statistics.totalCorrect =
+            Math.max(
+                Number(
+                    appData.statistics.totalCorrect
+                ) || 0,
+                Number(
+                    importedStats.totalCorrect
+                ) || 0
+            );
+
+    }
+
+
+    /*
+     * 学習履歴
+     */
+
+    if (
+        Array.isArray(
+            normalized.studyHistory
+        )
+    ) {
+
+        if (
+            !Array.isArray(
+                appData.studyHistory
+            )
+        ) {
+
+            appData.studyHistory = [];
+
+        }
+
+
+        const existingHistoryIds =
+            new Set(
+                appData.studyHistory
+                    .map(
+                        function (item) {
+                            return item.id;
+                        }
+                    )
+                    .filter(Boolean)
+            );
+
+
+        normalized.studyHistory.forEach(
+            function (item) {
+
+                if (
+                    item.id &&
+                    existingHistoryIds.has(
+                        item.id
+                    )
+                ) {
+
+                    return;
+
+                }
+
+
+                appData.studyHistory.push(
+                    {
+                        ...item,
+
+                        id:
+                            item.id ||
+                            createId("history")
+
+                    }
+                );
+
+            }
+        );
+
+    }
+
+}
+
+
+/* =========================================
+   JSON IMPORT
+   ========================================= */
+
+async function importDataJSON(
+    file
+) {
+
+    if (!file) {
+        return;
+    }
+
+
+    try {
+
+        /*
+         * まず現在データをバックアップ
+         */
+
+        createAutomaticBackup();
+
+
+        const text =
+            await file.text();
+
+
+        let imported;
+
+
+        try {
+
+            imported =
+                JSON.parse(text);
+
+        } catch (jsonError) {
+
+            alert(
+                "JSONファイルを読み込めませんでした。\n\n" +
+                "正しいLanguage GymのJSONファイルか確認してください。"
+            );
+
+            return;
+        }
+
+
+        const validation =
+            validateImportedData(
+                imported
+            );
+
+
+        if (!validation.valid) {
+
+            alert(
+                validation.message
+            );
+
+            return;
+        }
+
+
+        const deckCountBefore =
+            appData.decks.length;
+
+
+        const cardCountBefore =
+            appData.decks.reduce(
+                function (total, deck) {
+
+                    return total +
+                        (
+                            Array.isArray(deck.cards)
+                                ? deck.cards.length
+                                : 0
+                        );
+
+                },
+                0
+            );
+
+
+        /*
+         * 既存データを残したまま統合
+         */
+
+        mergeImportedData(
+            imported
+        );
+
+
+        saveData();
+
+
+        /*
+         * 画面更新
+         */
+
+        renderDecks();
+
+        renderImportDeckSelect();
 
         renderHome();
-        renderDecks();
+
         renderProgress();
-        renderSettings();
+
+
+        const deckCountAfter =
+            appData.decks.length;
+
+
+        const cardCountAfter =
+            appData.decks.reduce(
+                function (total, deck) {
+
+                    return total +
+                        (
+                            Array.isArray(deck.cards)
+                                ? deck.cards.length
+                                : 0
+                        );
+
+                },
+                0
+            );
+
+
+        const addedDecks =
+            Math.max(
+                0,
+                deckCountAfter -
+                deckCountBefore
+            );
+
+
+        const addedCards =
+            Math.max(
+                0,
+                cardCountAfter -
+                cardCountBefore
+            );
+
+
+        alert(
+            "データを読み込みました。\n\n" +
+            "追加されたデッキ：" +
+            addedDecks +
+            "\n" +
+            "追加されたカード：" +
+            addedCards
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "JSON import error:",
+            error
+        );
+
+
+        alert(
+            "データの読み込み中にエラーが発生しました。\n\n" +
+            (
+                error &&
+                error.message
+                    ? error.message
+                    : "不明なエラー"
+            )
+        );
+
+    }
+
+}
+
+
+/* =========================================
+   AUTOMATIC BACKUP
+   ========================================= */
+
+/*
+ * 自動バックアップを保存
+ *
+ * localStorageとは別キーに保存する。
+ */
+function createAutomaticBackup() {
+
+    try {
+
+        const backup =
+            JSON.stringify(
+                appData
+            );
+
+
+        localStorage.setItem(
+            "languageGymAutomaticBackup",
+            backup
+        );
+
+
+        localStorage.setItem(
+            "languageGymAutomaticBackupAt",
+            new Date().toISOString()
+        );
+
+
+        return true;
+
+
+    } catch (error) {
+
+        console.error(
+            "Backup error:",
+            error
+        );
+
+
+        return false;
+    }
+}
+
+
+/*
+ * 自動バックアップから復元
+ */
+function restoreAutomaticBackup() {
+
+    try {
+
+        const backupText =
+            localStorage.getItem(
+                "languageGymAutomaticBackup"
+            );
+
+
+        if (!backupText) {
+
+            alert(
+                "自動バックアップがありません。"
+            );
+
+            return;
+        }
+
+
+        let backupData;
+
+
+        try {
+
+            backupData =
+                JSON.parse(
+                    backupText
+                );
+
+        } catch (error) {
+
+            alert(
+                "自動バックアップが壊れているため、復元できません。"
+            );
+
+            return;
+        }
+
+
+        const validation =
+            validateImportedData(
+                backupData
+            );
+
+
+        if (!validation.valid) {
+
+            alert(
+                "バックアップの形式が正しくありません。"
+            );
+
+            return;
+        }
+
+
+        const backupAt =
+            localStorage.getItem(
+                "languageGymAutomaticBackupAt"
+            );
+
+
+        let backupDateText =
+            "";
+
+
+        if (backupAt) {
+
+            const date =
+                new Date(
+                    backupAt
+                );
+
+
+            if (
+                !Number.isNaN(
+                    date.getTime()
+                )
+            ) {
+
+                backupDateText =
+                    "\nバックアップ日時：" +
+                    date.toLocaleString(
+                        "ja-JP"
+                    );
+
+            }
+
+        }
+
+
+        const confirmed =
+            confirm(
+                "自動バックアップから復元しますか？" +
+                backupDateText +
+                "\n\n" +
+                "現在のデータは上書きされます。"
+            );
+
+
+        if (!confirmed) {
+            return;
+        }
+
+
+        /*
+         * 復元前に現在のデータを
+         * もう一度バックアップする。
+         */
+
+        createAutomaticBackup();
+
+
+        const normalized =
+            normalizeImportedData(
+                backupData
+            );
+
+
+        /*
+         * 現在のデータを完全に置き換える。
+         */
+
+        appData = {
+
+            ...createDefaultAppData(),
+
+            ...normalized,
+
+            settings: {
+
+                ...createDefaultAppData().settings,
+
+                ...(normalized.settings || {})
+
+            },
+
+            statistics: {
+
+                ...createDefaultAppData().statistics,
+
+                ...(normalized.statistics || {})
+
+            }
+
+        };
+
+
+        saveData();
+
+
+        /*
+         * 画面を更新
+         */
+
+        renderDecks();
+
+        renderImportDeckSelect();
+
+        renderHome();
+
+        renderProgress();
+
+        applyTheme(
+            appData.settings.customColor
+        );
+
+
+        alert(
+            "自動バックアップから復元しました。"
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "Restore backup error:",
+            error
+        );
+
+
+        alert(
+            "バックアップの復元に失敗しました。"
+        );
+
+    }
+
+}
+
+
+/* =========================================
+   STUDY SYSTEM
+   ========================================= */
+
+/*
+ * 学習中の状態
+ */
+
+let studyState = {
+
+    active: false,
+
+    deckId: null,
+
+    cards: [],
+
+    currentIndex: 0,
+
+    answerShown: false,
+
+    startedAt: null,
+
+    timerId: null,
+
+    elapsedSeconds: 0,
+
+    answers: 0,
+
+    correct: 0
+
+};
+
+
+/* =========================================
+   STUDY SETTINGS
+   ========================================= */
+
+/*
+ * ランダム学習がONかどうか
+ */
+function isRandomStudyEnabled() {
+
+    if (
+        typeof appData === "undefined" ||
+        !appData.settings
+    ) {
+
+        return true;
+
+    }
+
+
+    /*
+     * 未設定ならランダムON
+     */
+
+    if (
+        appData.settings.randomStudy ===
+        undefined
+    ) {
+
+        return true;
+
+    }
+
+
+    return Boolean(
+        appData.settings.randomStudy
+    );
+
+}
+
+
+/* =========================================
+   SHUFFLE
+   ========================================= */
+
+/*
+ * Fisher-Yates shuffle
+ *
+ * 元の配列を壊さない。
+ */
+function shuffleArray(
+    array
+) {
+
+    const result =
+        Array.isArray(array)
+            ? [...array]
+            : [];
+
+
+    for (
+        let i = result.length - 1;
+        i > 0;
+        i--
+    ) {
+
+        const j =
+            Math.floor(
+                Math.random() *
+                (i + 1)
+            );
+
+
+        const temp =
+            result[i];
+
+
+        result[i] =
+            result[j];
+
+
+        result[j] =
+            temp;
+
+    }
+
+
+    return result;
+}
+
+
+/* =========================================
+   GET DECK
+   ========================================= */
+
+function getDeckById(
+    deckId
+) {
+
+    if (
+        typeof appData === "undefined" ||
+        !Array.isArray(appData.decks)
+    ) {
+
+        return null;
+
+    }
+
+
+    return appData.decks.find(
+        function (deck) {
+
+            return (
+                deck &&
+                deck.id === deckId
+            );
+
+        }
+    ) || null;
+
+}
+
+
+/* =========================================
+   START STUDY
+   ========================================= */
+
+function startStudy(
+    deckId
+) {
+
+    const deck =
+        getDeckById(
+            deckId
+        );
+
+
+    if (!deck) {
+
+        alert(
+            "デッキが見つかりません。"
+        );
+
+        return;
+
+    }
+
+
+    if (
+        !Array.isArray(deck.cards) ||
+        deck.cards.length === 0
+    ) {
+
+        alert(
+            "このデッキにはカードがありません。"
+        );
+
+        return;
+
+    }
+
+
+    /*
+     * 学習前に状態をリセット
+     */
+
+    stopStudyTimer();
+
+
+    studyState = {
+
+        active: true,
+
+        deckId:
+            deck.id,
+
+        cards:
+            isRandomStudyEnabled()
+                ? shuffleArray(
+                    deck.cards
+                )
+                : [...deck.cards],
+
+        currentIndex: 0,
+
+        answerShown: false,
+
+        startedAt:
+            Date.now(),
+
+        timerId: null,
+
+        elapsedSeconds: 0,
+
+        answers: 0,
+
+        correct: 0
+
+    };
+
+
+    /*
+     * デッキ名を表示
+     */
+
+    const studyDeckName =
+        document.getElementById(
+            "study-deck-name"
+        );
+
+
+    if (studyDeckName) {
+
+        studyDeckName.textContent =
+            "📚 " +
+            deck.name;
+
+    }
+
+
+    /*
+     * 学習ページへ
+     */
+
+    showPage(
+        "study"
+    );
+
+
+    /*
+     * タイマー開始
+     */
+
+    startStudyTimer();
+
+
+    /*
+     * 最初のカード
+     */
+
+    renderStudyCard();
+
+}
+
+
+/* =========================================
+   STUDY TIMER
+   ========================================= */
+
+function startStudyTimer() {
+
+    stopStudyTimer();
+
+
+    studyState.startedAt =
+        Date.now();
+
+
+    studyState.timerId =
+        setInterval(
+            function () {
+
+                if (
+                    !studyState.active
+                ) {
+
+                    return;
+
+                }
+
+
+                studyState.elapsedSeconds =
+                    Math.floor(
+                        (
+                            Date.now() -
+                            studyState.startedAt
+                        ) / 1000
+                    );
+
+
+                updateStudyTimer();
+
+            },
+            1000
+        );
+
+
+    updateStudyTimer();
+
+}
+
+
+function stopStudyTimer() {
+
+    if (
+        studyState.timerId
+    ) {
+
+        clearInterval(
+            studyState.timerId
+        );
+
+    }
+
+
+    studyState.timerId =
+        null;
+
+}
+
+
+function updateStudyTimer() {
+
+    const element =
+        document.getElementById(
+            "study-timer"
+        );
+
+
+    if (!element) {
+        return;
+    }
+
+
+    element.textContent =
+        formatStudyTime(
+            studyState.elapsedSeconds
+        );
+
+}
+
+
+/* =========================================
+   FORMAT TIME
+   ========================================= */
+
+function formatStudyTime(
+    seconds
+) {
+
+    const total =
+        Math.max(
+            0,
+            Number(seconds) || 0
+        );
+
+
+    const hours =
+        Math.floor(
+            total / 3600
+        );
+
+
+    const minutes =
+        Math.floor(
+            (total % 3600) / 60
+        );
+
+
+    const secs =
+        total % 60;
+
+
+    if (hours > 0) {
+
+        return (
+            hours +
+            "時間 " +
+            minutes +
+            "分 " +
+            secs +
+            "秒"
+        );
+
+    }
+
+
+    if (minutes > 0) {
+
+        return (
+            minutes +
+            "分 " +
+            secs +
+            "秒"
+        );
+
+    }
+
+
+    return (
+        secs +
+        "秒"
+    );
+
+}
+
+
+/* =========================================
+   CURRENT CARD
+   ========================================= */
+
+function getCurrentStudyCard() {
+
+    if (
+        !studyState.active
+    ) {
+
+        return null;
+
+    }
+
+
+    if (
+        !Array.isArray(
+            studyState.cards
+        )
+    ) {
+
+        return null;
+
+    }
+
+
+    return (
+        studyState.cards[
+            studyState.currentIndex
+        ] || null
+    );
+
+}
+
+
+/* =========================================
+   RENDER STUDY CARD
+   ========================================= */
+
+function renderStudyCard() {
+
+    const front =
+        document.getElementById(
+            "study-front"
+        );
+
+
+    const back =
+        document.getElementById(
+            "study-back"
+        );
+
+
+    const progress =
+        document.getElementById(
+            "study-progress"
+        );
+
+
+    const showAnswerButton =
+        document.getElementById(
+            "show-answer-button"
+        );
+
+
+    const wrongButton =
+        document.getElementById(
+            "wrong-button"
+        );
+
+
+    const correctButton =
+        document.getElementById(
+            "correct-button"
+        );
+
+
+    const card =
+        getCurrentStudyCard();
+
+
+    /*
+     * カードがない場合
+     */
+
+    if (!card) {
+
+        if (front) {
+
+            front.textContent =
+                "学習するカードがありません。";
+
+        }
+
+
+        if (back) {
+
+            back.hidden =
+                true;
+
+        }
+
+
+        if (showAnswerButton) {
+
+            showAnswerButton.disabled =
+                true;
+
+        }
+
+
+        if (wrongButton) {
+
+            wrongButton.disabled =
+                true;
+
+        }
+
+
+        if (correctButton) {
+
+            correctButton.disabled =
+                true;
+
+        }
+
+
+        return;
+
+    }
+
+
+    /*
+     * 表面
+     */
+
+    if (front) {
+
+        front.textContent =
+            String(
+                card.front ||
+                ""
+            );
+
+    }
+
+
+    /*
+     * 裏面
+     */
+
+    if (back) {
+
+        back.textContent =
+            String(
+                card.back ||
+                ""
+            );
+
+
+        back.hidden =
+            !studyState.answerShown;
+
+    }
+
+
+    /*
+     * 進捗
+     */
+
+    if (progress) {
+
+        progress.textContent =
+            (
+                studyState.currentIndex +
+                1
+            ) +
+            " / " +
+            studyState.cards.length;
+
+    }
+
+
+    /*
+     * 答えを見るボタン
+     */
+
+    if (showAnswerButton) {
+
+        showAnswerButton.disabled =
+            studyState.answerShown;
+
+    }
+
+
+    /*
+     * 正解・不正解
+     */
+
+    if (wrongButton) {
+
+        wrongButton.disabled =
+            !studyState.answerShown;
+
+    }
+
+
+    if (correctButton) {
+
+        correctButton.disabled =
+            !studyState.answerShown;
+
+    }
+
+
+    /*
+     * 自動音声
+     */
+
+    if (
+        appData.settings &&
+        appData.settings.autoVoice
+    ) {
+
+        speakStudyCard(
+            card
+        );
+
+    }
+
+}
+
+
+/* =========================================
+   SHOW ANSWER
+   ========================================= */
+
+function showStudyAnswer() {
+
+    if (
+        !studyState.active
+    ) {
+
+        return;
+
+    }
+
+
+    const card =
+        getCurrentStudyCard();
+
+
+    if (!card) {
+        return;
+    }
+
+
+    studyState.answerShown =
+        true;
+
+
+    const back =
+        document.getElementById(
+            "study-back"
+        );
+
+
+    const showAnswerButton =
+        document.getElementById(
+            "show-answer-button"
+        );
+
+
+    const wrongButton =
+        document.getElementById(
+            "wrong-button"
+        );
+
+
+    const correctButton =
+        document.getElementById(
+            "correct-button"
+        );
+
+
+    if (back) {
+
+        back.textContent =
+            String(
+                card.back ||
+                ""
+            );
+
+
+        back.hidden =
+            false;
+
+    }
+
+
+    if (showAnswerButton) {
+
+        showAnswerButton.disabled =
+            true;
+
+    }
+
+
+    if (wrongButton) {
+
+        wrongButton.disabled =
+            false;
+
+    }
+
+
+    if (correctButton) {
+
+        correctButton.disabled =
+            false;
+
+    }
+
+
+    /*
+     * 答えを読み上げる
+     */
+
+    speakStudyCard(
+        card,
+        true
+    );
+
+}
+
+
+/* =========================================
+   STUDY RESULT
+   ========================================= */
+
+function handleStudyCorrect() {
+
+    handleStudyAnswer(
+        true
+    );
+
+}
+
+
+function handleStudyWrong() {
+
+    handleStudyAnswer(
+        false
+    );
+
+}
+
+
+function handleStudyAnswer(
+    isCorrect
+) {
+
+    if (
+        !studyState.active
+    ) {
+
+        return;
+
+    }
+
+
+    if (
+        !studyState.answerShown
+    ) {
+
+        return;
+
+    }
+
+
+    const card =
+        getCurrentStudyCard();
+
+
+    if (!card) {
+        return;
+    }
+
+
+    /*
+     * 回答数
+     */
+
+    studyState.answers +=
+        1;
+
+
+    /*
+     * 正解数
+     */
+
+    if (isCorrect) {
+
+        studyState.correct +=
+            1;
+
+    }
+
+
+    /*
+     * カード側にも学習結果を保存
+     */
+
+    if (
+        typeof card.correctCount !==
+        "number"
+    ) {
+
+        card.correctCount =
+            0;
+
+    }
+
+
+    if (
+        typeof card.wrongCount !==
+        "number"
+    ) {
+
+        card.wrongCount =
+            0;
+
+    }
+
+
+    if (isCorrect) {
+
+        card.correctCount +=
+            1;
+
+    } else {
+
+        card.wrongCount +=
+            1;
+
+    }
+
+
+    card.lastStudiedAt =
+        new Date().toISOString();
+
+
+    /*
+     * 次のカードへ
+     */
+
+    studyState.currentIndex +=
+        1;
+
+
+    /*
+     * 最後のカードだった場合
+     */
+
+    if (
+        studyState.currentIndex >=
+        studyState.cards.length
+    ) {
+
+        finishStudy();
+
+        return;
+
+    }
+
+
+    /*
+     * 次のカード
+     */
+
+    studyState.answerShown =
+        false;
+
+
+    renderStudyCard();
+
+
+    /*
+     * データ保存
+     */
+
+    saveData();
+
+}
+
+
+/* =========================================
+   FINISH STUDY
+   ========================================= */
+
+function finishStudy() {
+
+    if (
+        !studyState.active
+    ) {
+
+        showPage(
+            "decks"
+        );
+
+        return;
+
+    }
+
+
+    /*
+     * 最終学習時間
+     */
+
+    if (
+        studyState.startedAt
+    ) {
+
+        studyState.elapsedSeconds =
+            Math.max(
+                0,
+                Math.floor(
+                    (
+                        Date.now() -
+                        studyState.startedAt
+                    ) / 1000
+                )
+            );
+
+    }
+
+
+    stopStudyTimer();
+
+
+    /*
+     * 統計オブジェクトを確保
+     */
+
+    if (
+        !appData.statistics ||
+        typeof appData.statistics !== "object"
+    ) {
+
+        appData.statistics = {};
+
+    }
+
+
+    /*
+     * デフォルト値
+     */
+
+    if (
+        typeof appData.statistics.totalStudyTime !==
+        "number"
+    ) {
+
+        appData.statistics.totalStudyTime =
+            0;
+
+    }
+
+
+    if (
+        typeof appData.statistics.totalAnswers !==
+        "number"
+    ) {
+
+        appData.statistics.totalAnswers =
+            0;
+
+    }
+
+
+    if (
+        typeof appData.statistics.totalCorrect !==
+        "number"
+    ) {
+
+        appData.statistics.totalCorrect =
+            0;
+
+    }
+
+
+    /*
+     * 今回の学習を加算
+     */
+
+    appData.statistics.totalStudyTime +=
+        studyState.elapsedSeconds;
+
+
+    appData.statistics.totalAnswers +=
+        studyState.answers;
+
+
+    appData.statistics.totalCorrect +=
+        studyState.correct;
+
+
+    /*
+     * 学習履歴
+     */
+
+    if (
+        !Array.isArray(
+            appData.studyHistory
+        )
+    ) {
+
+        appData.studyHistory = [];
+
+    }
+
+
+    appData.studyHistory.push({
+
+        id:
+            createId("history"),
+
+        deckId:
+            studyState.deckId,
+
+        date:
+            new Date().toISOString(),
+
+        duration:
+            studyState.elapsedSeconds,
+
+        answers:
+            studyState.answers,
+
+        correct:
+            studyState.correct
+
+    });
+
+
+    /*
+     * 保存
+     */
+
+    saveData();
+
+
+    /*
+     * バックアップ
+     */
+
+    createAutomaticBackup();
+
+
+    /*
+     * 結果表示
+     */
+
+    const accuracy =
+        studyState.answers > 0
+            ? Math.round(
+                (
+                    studyState.correct /
+                    studyState.answers
+                ) * 100
+            )
+            : 0;
+
+
+    alert(
+        "学習終了！\n\n" +
+
+        "学習時間：" +
+        formatStudyTime(
+            studyState.elapsedSeconds
+        ) +
+        "\n" +
+
+        "回答数：" +
+        studyState.answers +
+        "\n" +
+
+        "正解数：" +
+        studyState.correct +
+        "\n" +
+
+        "正答率：" +
+        accuracy +
+        "%"
+    );
+
+
+    /*
+     * 学習状態を終了
+     */
+
+    studyState.active =
+        false;
+
+
+    studyState.deckId =
+        null;
+
+
+    studyState.cards =
+        [];
+
+
+    studyState.currentIndex =
+        0;
+
+
+    studyState.answerShown =
+        false;
+
+
+    /*
+     * 画面更新
+     */
+
+    renderHome();
+
+    renderProgress();
+
+    renderDecks();
+
+
+    /*
+     * デッキ画面へ
+     */
+
+    showPage(
+        "decks"
+    );
+
+}
+
+
+/* =========================================
+   CANCEL STUDY
+   ========================================= */
+
+function cancelStudy() {
+
+    if (
+        !studyState.active
+    ) {
+
+        return;
+
+    }
+
+
+    const confirmed =
+        confirm(
+            "現在の学習を終了しますか？\n\n" +
+            "今回の学習結果は記録されます。"
+        );
+
+
+    if (!confirmed) {
+        return;
+    }
+
+
+    finishStudy();
+
+}
+
+
+/* =========================================
+   SPEECH
+   ========================================= */
+
+function speakStudyCard(
+    card,
+    speakBack
+) {
+
+    if (
+        !card ||
+        !("speechSynthesis" in window)
+    ) {
+
+        return;
+
+    }
+
+
+    const settings =
+        appData.settings ||
+        {};
+
+
+    const text =
+        speakBack
+            ? String(
+                card.back ||
+                ""
+            )
+            : String(
+                card.front ||
+                ""
+            );
+
+
+    if (!text.trim()) {
+        return;
+    }
+
+
+    /*
+     * 現在の読み上げを停止
+     */
+
+    window.speechSynthesis.cancel();
+
+
+    const utterance =
+        new SpeechSynthesisUtterance(
+            text
+        );
+
+
+    /*
+     * 設定
+     */
+
+    utterance.rate =
+        Number(
+            settings.voiceRate
+        ) || 1;
+
+
+    utterance.pitch =
+        Number(
+            settings.voicePitch
+        ) || 1;
+
+
+    /*
+     * 言語設定
+     */
+
+    const deck =
+        getDeckById(
+            studyState.deckId
+        );
+
+
+    const language =
+        deck &&
+        deck.language
+            ? deck.language
+            : (
+                settings.learningLanguage ||
+                "zh"
+            );
+
+
+    const speechLanguageMap = {
+
+        zh:
+            "zh-CN",
+
+        ja:
+            "ja-JP",
+
+        ko:
+            "ko-KR",
+
+        de:
+            "de-DE",
+
+        fr:
+            "fr-FR",
+
+        es:
+            "es-ES",
+
+        it:
+            "it-IT",
+
+        fi:
+            "fi-FI"
+
+    };
+
+
+    utterance.lang =
+        speechLanguageMap[
+            language
+        ] ||
+        "zh-CN";
+
+
+    window.speechSynthesis.speak(
+        utterance
+    );
+
+}
+
+
+/* =========================================
+   STUDY CARD KEYBOARD
+   ========================================= */
+
+document.addEventListener(
+    "keydown",
+    function (event) {
+
+        /*
+         * 入力欄では反応しない
+         */
+
+        const target =
+            event.target;
+
+
+        if (
+            target &&
+            (
+                target.tagName === "INPUT" ||
+                target.tagName === "TEXTAREA" ||
+                target.tagName === "SELECT"
+            )
+        ) {
+
+            return;
+
+        }
+
+
+        if (
+            !studyState.active
+        ) {
+
+            return;
+
+        }
+
+
+        /*
+         * Space
+         * → 答えを見る
+         */
+
+        if (
+            event.code === "Space"
+        ) {
+
+            event.preventDefault();
+
+
+            if (
+                !studyState.answerShown
+            ) {
+
+                showStudyAnswer();
+
+            }
+
+            return;
+
+        }
+
+
+        /*
+         * 1 = わからない
+         */
+
+        if (
+            event.key === "1" &&
+            studyState.answerShown
+        ) {
+
+            handleStudyWrong();
+
+            return;
+
+        }
+
+
+        /*
+         * 2 = 正解
+         */
+
+        if (
+            event.key === "2" &&
+            studyState.answerShown
+        ) {
+
+            handleStudyCorrect();
+
+            return;
+
+        }
+
+
+        /*
+         * Escape
+         */
+
+        if (
+            event.key === "Escape"
+        ) {
+
+            cancelStudy();
+
+        }
 
     }
 );
+
+
+/* =========================================
+   RANDOM STUDY SETTING
+   ========================================= */
+
+function initializeRandomStudySetting() {
+
+    const randomStudy =
+        document.getElementById(
+            "random-study"
+        );
+
+
+    if (!randomStudy) {
+        return;
+    }
+
+
+    /*
+     * 初期値
+     */
+
+    if (
+        !appData.settings
+    ) {
+
+        appData.settings = {};
+
+    }
+
+
+    if (
+        appData.settings.randomStudy ===
+        undefined
+    ) {
+
+        appData.settings.randomStudy =
+            true;
+
+    }
+
+
+    randomStudy.checked =
+        Boolean(
+            appData.settings.randomStudy
+        );
+
+
+    randomStudy.addEventListener(
+        "change",
+        function () {
+
+            appData.settings.randomStudy =
+                this.checked;
+
+
+            saveData();
+
+        }
+    );
+
+}
+
+
+/* =========================================
+   INITIALIZE STUDY
+   ========================================= */
+
+initializeRandomStudySetting();
+
+
+
+/* =========================================
+   HOME / DECK / PROGRESS / SEARCH
+   ========================================= */
+
+
+/* =========================================
+   HOME
+   ========================================= */
+
+function renderHome() {
+
+    if (
+        typeof appData === "undefined"
+    ) {
+        return;
+    }
+
+
+    const decks =
+        Array.isArray(appData.decks)
+            ? appData.decks
+            : [];
+
+
+    /*
+     * デッキ数
+     */
+
+    const deckCount =
+        decks.length;
+
+
+    /*
+     * カード総数
+     */
+
+    const cardCount =
+        decks.reduce(
+            function (total, deck) {
+
+                if (
+                    !deck ||
+                    !Array.isArray(deck.cards)
+                ) {
+
+                    return total;
+
+                }
+
+                return (
+                    total +
+                    deck.cards.length
+                );
+
+            },
+            0
+        );
+
+
+    /*
+     * 学習時間
+     */
+
+    const statistics =
+        appData.statistics || {};
+
+
+    const totalStudyTime =
+        Number(
+            statistics.totalStudyTime
+        ) || 0;
+
+
+    /*
+     * 正答率
+     */
+
+    const totalAnswers =
+        Number(
+            statistics.totalAnswers
+        ) || 0;
+
+
+    const totalCorrect =
+        Number(
+            statistics.totalCorrect
+        ) || 0;
+
+
+    const accuracy =
+        totalAnswers > 0
+            ? Math.round(
+                (
+                    totalCorrect /
+                    totalAnswers
+                ) * 100
+            )
+            : 0;
+
+
+    /*
+     * DOM
+     */
+
+    const deckElement =
+        document.getElementById(
+            "home-deck-count"
+        );
+
+
+    const cardElement =
+        document.getElementById(
+            "home-card-count"
+        );
+
+
+    const timeElement =
+        document.getElementById(
+            "home-study-time"
+        );
+
+
+    const accuracyElement =
+        document.getElementById(
+            "home-accuracy"
+        );
+
+
+    if (deckElement) {
+
+        deckElement.textContent =
+            deckCount;
+
+    }
+
+
+    if (cardElement) {
+
+        cardElement.textContent =
+            cardCount;
+
+    }
+
+
+    if (timeElement) {
+
+        timeElement.textContent =
+            formatStudyTime(
+                totalStudyTime
+            );
+
+    }
+
+
+    if (accuracyElement) {
+
+        accuracyElement.textContent =
+            accuracy +
+            "%";
+
+    }
+
+
+    /*
+     * 今日のメッセージ
+     */
+
+    renderDailyMessage();
+
+}
+
+
+/* =========================================
+   DAILY MESSAGE
+   ========================================= */
+
+function renderDailyMessage() {
+
+    const element =
+        document.getElementById(
+            "daily-message"
+        );
+
+
+    if (!element) {
+        return;
+    }
+
+
+    const messages = [
+
+        "今日も一歩前進！🌱",
+
+        "少しだけでも続ければ、ちゃんと積み重なります。✨",
+
+        "完璧じゃなくて大丈夫。今日できることを一つ。💪",
+
+        "昨日の自分より、ほんの少し前へ。🌸",
+
+        "外国語は筋トレと同じ。今日もLanguage Gym！🏋️",
+
+        "分からないカードがあっても大丈夫。それは伸びしろです。📚",
+
+        "5分でも立派な学習です。☕",
+
+        "今日の一枚から始めよう。🎯",
+
+        "忘れることも学習の一部です。もう一度出会えばOK。🌱",
+
+        "焦らず、でも着実に。✨"
+
+    ];
+
+
+    /*
+     * 日付によってメッセージを固定
+     */
+
+    const today =
+        new Date();
+
+
+    const dayNumber =
+        Math.floor(
+            today.getTime() /
+            86400000
+        );
+
+
+    const index =
+        Math.abs(
+            dayNumber
+        ) %
+        messages.length;
+
+
+    element.textContent =
+        messages[index];
+
+}
+
+
+/* =========================================
+   DECK LIST
+   ========================================= */
+
+function renderDecks() {
+
+    const container =
+        document.getElementById(
+            "deck-list"
+        );
+
+
+    if (!container) {
+        return;
+    }
+
+
+    const decks =
+        Array.isArray(appData.decks)
+            ? appData.decks
+            : [];
+
+
+    /*
+     * デッキがない
+     */
+
+    if (
+        decks.length === 0
+    ) {
+
+        container.innerHTML = `
+
+            <div class="empty-state">
+
+                <div class="empty-icon">
+                    📚
+                </div>
+
+                <p>
+                    まだデッキがありません。
+                </p>
+
+                <button
+                    type="button"
+                    class="btn btn-primary"
+                    data-go-page="import"
+                >
+                    教材をインポート
+                </button>
+
+            </div>
+
+        `;
+
+
+        const button =
+            container.querySelector(
+                "[data-go-page]"
+            );
+
+
+        if (button) {
+
+            button.addEventListener(
+                "click",
+                function () {
+
+                    showPage(
+                        "import"
+                    );
+
+                }
+            );
+
+        }
+
+
+        return;
+
+    }
+
+
+    /*
+     * デッキ表示
+     */
+
+    container.innerHTML =
+        decks
+            .map(
+                function (deck) {
+
+                    return createDeckCardHTML(
+                        deck
+                    );
+
+                }
+            )
+            .join("");
+
+
+    /*
+     * 学習ボタン
+     */
+
+    container
+        .querySelectorAll(
+            "[data-study-deck]"
+        )
+        .forEach(
+            function (button) {
+
+                button.addEventListener(
+                    "click",
+                    function () {
+
+                        startStudy(
+                            this.dataset.studyDeck
+                        );
+
+                    }
+                );
+
+            }
+        );
+
+
+    /*
+     * 削除ボタン
+     */
+
+    container
+        .querySelectorAll(
+            "[data-delete-deck]"
+        )
+        .forEach(
+            function (button) {
+
+                button.addEventListener(
+                    "click",
+                    function () {
+
+                        deleteDeck(
+                            this.dataset.deleteDeck
+                        );
+
+                    }
+                );
+
+            }
+        );
+
+
+    /*
+     * 名前変更
+     */
+
+    container
+        .querySelectorAll(
+            "[data-rename-deck]"
+        )
+        .forEach(
+            function (button) {
+
+                button.addEventListener(
+                    "click",
+                    function () {
+
+                        renameDeck(
+                            this.dataset.renameDeck
+                        );
+
+                    }
+                );
+
+            }
+        );
+
+}
+
+
+/* =========================================
+   DECK CARD HTML
+   ========================================= */
+
+function createDeckCardHTML(
+    deck
+) {
+
+    const cardCount =
+        Array.isArray(deck.cards)
+            ? deck.cards.length
+            : 0;
+
+
+    const languageNames = {
+
+        zh:
+            "中国語",
+
+        ja:
+            "日本語",
+
+        ko:
+            "韓国語",
+
+        de:
+            "ドイツ語",
+
+        fr:
+            "フランス語",
+
+        es:
+            "スペイン語",
+
+        it:
+            "イタリア語",
+
+        fi:
+            "フィンランド語"
+
+    };
+
+
+    const language =
+        languageNames[
+            deck.language
+        ] ||
+        "その他";
+
+
+    return `
+
+        <div
+            class="deck-card"
+            data-deck-id="${escapeHTML(
+                String(deck.id)
+            )}"
+        >
+
+            <div class="deck-name">
+                📚 ${escapeHTML(
+                    deck.name ||
+                    "名称未設定"
+                )}
+            </div>
+
+
+            <div class="deck-meta">
+
+                🌐 ${escapeHTML(
+                    language
+                )}
+
+                <br>
+
+                🃏 ${cardCount} カード
+
+            </div>
+
+
+            <div
+                class="button-row"
+                style="margin-top:18px;"
+            >
+
+                <button
+                    type="button"
+                    class="btn btn-primary"
+                    data-study-deck="${escapeHTML(
+                        String(deck.id)
+                    )}"
+                    ${
+                        cardCount === 0
+                            ? "disabled"
+                            : ""
+                    }
+                >
+                    🏋️ 学習
+                </button>
+
+
+                <button
+                    type="button"
+                    class="btn btn-outline"
+                    data-rename-deck="${escapeHTML(
+                        String(deck.id)
+                    )}"
+                >
+                    ✏️ 名前変更
+                </button>
+
+
+                <button
+                    type="button"
+                    class="btn btn-danger"
+                    data-delete-deck="${escapeHTML(
+                        String(deck.id)
+                    )}"
+                >
+                    🗑️ 削除
+                </button>
+
+            </div>
+
+        </div>
+
+    `;
+
+}
+
+
+/* =========================================
+   RENAME DECK
+   ========================================= */
+
+function renameDeck(
+    deckId
+) {
+
+    const deck =
+        getDeckById(
+            deckId
+        );
+
+
+    if (!deck) {
+
+        alert(
+            "デッキが見つかりません。"
+        );
+
+        return;
+
+    }
+
+
+    const newName =
+        prompt(
+            "デッキ名を入力してください。",
+            deck.name || ""
+        );
+
+
+    if (
+        newName === null
+    ) {
+
+        return;
+
+    }
+
+
+    const trimmed =
+        newName.trim();
+
+
+    if (!trimmed) {
+
+        alert(
+            "デッキ名を入力してください。"
+        );
+
+        return;
+
+    }
+
+
+    deck.name =
+        trimmed;
+
+
+    deck.updatedAt =
+        new Date().toISOString();
+
+
+    saveData();
+
+
+    renderDecks();
+
+    renderImportDeckSelect();
+
+    renderHome();
+
+}
+
+
+/* =========================================
+   DELETE DECK
+   ========================================= */
+
+function deleteDeck(
+    deckId
+) {
+
+    const deck =
+        getDeckById(
+            deckId
+        );
+
+
+    if (!deck) {
+
+        alert(
+            "デッキが見つかりません。"
+        );
+
+        return;
+
+    }
+
+
+    const cardCount =
+        Array.isArray(deck.cards)
+            ? deck.cards.length
+            : 0;
+
+
+    const confirmed =
+        confirm(
+            "「" +
+            deck.name +
+            "」を削除しますか？\n\n" +
+            cardCount +
+            "枚のカードも削除されます。\n\n" +
+            "この操作は元に戻せません。"
+        );
+
+
+    if (!confirmed) {
+        return;
+    }
+
+
+    /*
+     * 削除前バックアップ
+     */
+
+    createAutomaticBackup();
+
+
+    appData.decks =
+        appData.decks.filter(
+            function (item) {
+
+                return (
+                    item.id !==
+                    deckId
+                );
+
+            }
+        );
+
+
+    saveData();
+
+
+    renderDecks();
+
+    renderImportDeckSelect();
+
+    renderHome();
+
+
+    alert(
+        "デッキを削除しました。"
+    );
+
+}
+
+
+/* =========================================
+   CARD SEARCH
+   ========================================= */
+
+function renderCardSearchResults(
+    query
+) {
+
+    const container =
+        document.getElementById(
+            "card-search-results"
+        );
+
+
+    if (!container) {
+        return;
+    }
+
+
+    const searchText =
+        String(
+            query || ""
+        )
+        .trim()
+        .toLowerCase();
+
+
+    /*
+     * 空欄
+     */
+
+    if (!searchText) {
+
+        container.innerHTML = `
+
+            <div class="empty-state">
+
+                🔎
+
+                <p>
+                    検索したいカードの
+                    表や裏を入力してください。
+                </p>
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    const results = [];
+
+
+    const decks =
+        Array.isArray(appData.decks)
+            ? appData.decks
+            : [];
+
+
+    decks.forEach(
+        function (deck) {
+
+            if (
+                !deck ||
+                !Array.isArray(deck.cards)
+            ) {
+
+                return;
+
+            }
+
+
+            deck.cards.forEach(
+                function (card) {
+
+                    if (!card) {
+                        return;
+                    }
+
+
+                    const front =
+                        String(
+                            card.front || ""
+                        );
+
+
+                    const back =
+                        String(
+                            card.back || ""
+                        );
+
+
+                    const target =
+                        (
+                            front +
+                            "\n" +
+                            back
+                        )
+                        .toLowerCase();
+
+
+                    if (
+                        target.includes(
+                            searchText
+                        )
+                    ) {
+
+                        results.push({
+
+                            deck:
+                                deck,
+
+                            card:
+                                card
+
+                        });
+
+                    }
+
+                }
+            );
+
+        }
+    );
+
+
+    /*
+     * 結果なし
+     */
+
+    if (
+        results.length === 0
+    ) {
+
+        container.innerHTML = `
+
+            <div class="empty-state">
+
+                <div class="empty-icon">
+                    🔎
+                </div>
+
+                <p>
+                    「${escapeHTML(
+                        query
+                    )}」に一致するカードはありません。
+                </p>
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    /*
+     * 最大100件
+     */
+
+    const visibleResults =
+        results.slice(
+            0,
+            100
+        );
+
+
+    container.innerHTML =
+        visibleResults
+            .map(
+                function (item) {
+
+                    const deck =
+                        item.deck;
+
+
+                    const card =
+                        item.card;
+
+
+                    const correct =
+                        Number(
+                            card.correctCount
+                        ) || 0;
+
+
+                    const wrong =
+                        Number(
+                            card.wrongCount
+                        ) || 0;
+
+
+                    return `
+
+                        <div class="card-search-item">
+
+                            <div class="search-card-front">
+                                ${escapeHTML(
+                                    card.front || ""
+                                )}
+                            </div>
+
+
+                            <div class="search-card-back">
+                                ${escapeHTML(
+                                    card.back || ""
+                                )}
+                            </div>
+
+
+                            <div class="search-card-meta">
+
+                                <span>
+                                    📚 ${escapeHTML(
+                                        deck.name || ""
+                                    )}
+                                </span>
+
+
+                                <span>
+                                    ⭕ ${correct}
+                                    /
+                                    ❌ ${wrong}
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    `;
+
+                }
+            )
+            .join("");
+
+
+    if (
+        results.length > 100
+    ) {
+
+        container.innerHTML += `
+
+            <p
+                style="
+                    color:var(--muted);
+                    margin-top:15px;
+                "
+            >
+                最初の100件を表示しています。
+            </p>
+
+        `;
+
+    }
+
+}
+
+
+/* =========================================
+   PROGRESS
+   ========================================= */
+
+function renderProgress() {
+
+    const statistics =
+        appData.statistics ||
+        {};
+
+
+    const totalTime =
+        Number(
+            statistics.totalStudyTime
+        ) || 0;
+
+
+    const totalAnswers =
+        Number(
+            statistics.totalAnswers
+        ) || 0;
+
+
+    const totalCorrect =
+        Number(
+            statistics.totalCorrect
+        ) || 0;
+
+
+    const accuracy =
+        totalAnswers > 0
+            ? Math.round(
+                (
+                    totalCorrect /
+                    totalAnswers
+                ) * 100
+            )
+            : 0;
+
+
+    /*
+     * 上部統計
+     */
+
+    const timeElement =
+        document.getElementById(
+            "progress-total-time"
+        );
+
+
+    const answersElement =
+        document.getElementById(
+            "progress-total-answers"
+        );
+
+
+    const correctElement =
+        document.getElementById(
+            "progress-total-correct"
+        );
+
+
+    const accuracyElement =
+        document.getElementById(
+            "progress-accuracy"
+        );
+
+
+    if (timeElement) {
+
+        timeElement.textContent =
+            formatStudyTime(
+                totalTime
+            );
+
+    }
+
+
+    if (answersElement) {
+
+        answersElement.textContent =
+            totalAnswers;
+
+    }
+
+
+    if (correctElement) {
+
+        correctElement.textContent =
+            totalCorrect;
+
+    }
+
+
+    if (accuracyElement) {
+
+        accuracyElement.textContent =
+            accuracy +
+            "%";
+
+    }
+
+
+    /*
+     * 履歴
+     */
+
+    renderStudyHistory();
+
+}
+
+
+/* =========================================
+   STUDY HISTORY
+   ========================================= */
+
+function renderStudyHistory() {
+
+    const container =
+        document.getElementById(
+            "progress-table"
+        );
+
+
+    if (!container) {
+        return;
+    }
+
+
+    const history =
+        Array.isArray(
+            appData.studyHistory
+        )
+            ? appData.studyHistory
+            : [];
+
+
+    if (
+        history.length === 0
+    ) {
+
+        container.innerHTML = `
+
+            <div class="empty-state">
+
+                <div class="empty-icon">
+                    📊
+                </div>
+
+                まだ学習記録がありません。
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    /*
+     * 新しい順
+     */
+
+    const sorted =
+        [...history]
+            .sort(
+                function (a, b) {
+
+                    return (
+                        new Date(
+                            b.date || 0
+                        ).getTime() -
+                        new Date(
+                            a.date || 0
+                        ).getTime()
+                    );
+
+                }
+            );
+
+
+    container.innerHTML = `
+
+        <div class="table-wrapper">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            日時
+                        </th>
+
+                        <th>
+                            デッキ
+                        </th>
+
+                        <th>
+                            時間
+                        </th>
+
+                        <th>
+                            回答
+                        </th>
+
+                        <th>
+                            正解
+                        </th>
+
+                        <th>
+                            正答率
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    ${
+                        sorted
+                            .map(
+                                function (item) {
+
+                                    const deck =
+                                        getDeckById(
+                                            item.deckId
+                                        );
+
+
+                                    const answers =
+                                        Number(
+                                            item.answers
+                                        ) || 0;
+
+
+                                    const correct =
+                                        Number(
+                                            item.correct
+                                        ) || 0;
+
+
+                                    const itemAccuracy =
+                                        answers > 0
+                                            ? Math.round(
+                                                (
+                                                    correct /
+                                                    answers
+                                                ) * 100
+                                            )
+                                            : 0;
+
+
+                                    const date =
+                                        formatHistoryDate(
+                                            item.date
+                                        );
+
+
+                                    return `
+
+                                        <tr>
+
+                                            <td>
+                                                ${escapeHTML(
+                                                    date
+                                                )}
+                                            </td>
+
+                                            <td>
+                                                ${escapeHTML(
+                                                    deck
+                                                        ? deck.name
+                                                        : "削除されたデッキ"
+                                                )}
+                                            </td>
+
+                                            <td>
+                                                ${escapeHTML(
+                                                    formatStudyTime(
+                                                        item.duration
+                                                    )
+                                                )}
+                                            </td>
+
+                                            <td>
+                                                ${answers}
+                                            </td>
+
+                                            <td>
+                                                ${correct}
+                                            </td>
+
+                                            <td>
+                                                ${itemAccuracy}%
+                                            </td>
+
+                                        </tr>
+
+                                    `;
+
+                                }
+                            )
+                            .join("")
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    `;
+
+}
+
+
+/* =========================================
+   HISTORY DATE
+   ========================================= */
+
+function formatHistoryDate(
+    value
+) {
+
+    if (!value) {
+
+        return "日時不明";
+
+    }
+
+
+    const date =
+        new Date(
+            value
+        );
+
+
+    if (
+        Number.isNaN(
+            date.getTime()
+        )
+    ) {
+
+        return "日時不明";
+
+    }
+
+
+    return date.toLocaleString(
+        "ja-JP",
+        {
+            year:
+                "numeric",
+
+            month:
+                "2-digit",
+
+            day:
+                "2-digit",
+
+            hour:
+                "2-digit",
+
+            minute:
+                "2-digit"
+        }
+    );
+
+}
+
+
+/* =========================================
+   IMPORT DECK SELECT
+   ========================================= */
+
+function renderImportDeckSelect() {
+
+    const select =
+        document.getElementById(
+            "import-deck-select"
+        );
+
+
+    if (!select) {
+        return;
+    }
+
+
+    const currentValue =
+        select.value;
+
+
+    const decks =
+        Array.isArray(
+            appData.decks
+        )
+            ? appData.decks
+            : [];
+
+
+    select.innerHTML = `
+
+        <option value="">
+            新しいデッキを作成
+        </option>
+
+    `;
+
+
+    decks.forEach(
+        function (deck) {
+
+            const option =
+                document.createElement(
+                    "option"
+                );
+
+
+            option.value =
+                deck.id;
+
+
+            option.textContent =
+                "📚 " +
+                (
+                    deck.name ||
+                    "名称未設定"
+                );
+
+
+            select.appendChild(
+                option
+            );
+
+        }
+    );
+
+
+    /*
+     * 以前の選択を復元
+     */
+
+    if (
+        decks.some(
+            function (deck) {
+
+                return (
+                    deck.id ===
+                    currentValue
+                );
+
+            }
+        )
+    ) {
+
+        select.value =
+            currentValue;
+
+    } else {
+
+        select.value =
+            "";
+
+    }
+
+}
