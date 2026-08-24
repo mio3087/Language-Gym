@@ -3742,10 +3742,6 @@ function renderProgress() {
 let appData = loadData();
 
 let currentPage = "home";
-
-
-
-
 /* =========================================
    DEFAULT DATA
    ========================================= */
