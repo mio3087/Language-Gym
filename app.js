@@ -3742,6 +3742,9 @@ function renderProgress() {
 let appData = loadData();
 
 let currentPage = "home";
+
+
+
 /* =========================================
    DEFAULT DATA
    ========================================= */
@@ -7688,33 +7691,6 @@ function restoreAutomaticBackup() {
    STUDY SYSTEM
    ========================================= */
 
-/*
- * 学習中の状態
- */
-
-let studyState = {
-
-    active: false,
-
-    deckId: null,
-
-    cards: [],
-
-    currentIndex: 0,
-
-    answerShown: false,
-
-    startedAt: null,
-
-    timerId: null,
-
-    elapsedSeconds: 0,
-
-    answers: 0,
-
-    correct: 0
-
-};
 
 
 /* =========================================
