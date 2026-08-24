@@ -3743,14 +3743,7 @@ let appData = loadData();
 
 let currentPage = "home";
 
-let studyState = {
-    deckId: null,
-    cards: [],
-    currentIndex: 0,
-    showingAnswer: false,
-    startedAt: null,
-    elapsedBeforeStart: 0
-};
+
 
 
 /* =========================================
