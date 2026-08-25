@@ -10630,6 +10630,8 @@ function renderImportDeckSelect() {
 
 
 
+
+
 /* =========================================================
    CSV PARSER
    ========================================================= */
@@ -12169,11 +12171,7 @@ function getSpeechLanguage(
 
 }
 
-        correctButton.disabled =
-            true;
-
-    }
-
+        correctButton.disabled = true;
 
     if (progress) {
 
@@ -12199,7 +12197,6 @@ function getSpeechLanguage(
 
     }
 
-}
 
 
 /* =========================================================
@@ -13529,7 +13526,6 @@ function refreshAllUI() {
 
             return true;
 
-        } catch (error) {
 
             console.error(
                 "Language Gymデータ保存エラー:",
@@ -13539,7 +13535,6 @@ function refreshAllUI() {
 
             return false;
 
-        }
 
     }
 
