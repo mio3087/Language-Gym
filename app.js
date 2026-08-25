@@ -10628,9 +10628,6 @@ function renderImportDeckSelect() {
 
 }
 
-    return cards
-        .filter(Boolean);
-}
 
 
 /* =========================================================
