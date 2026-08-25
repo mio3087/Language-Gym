@@ -13512,8 +13512,7 @@ function refreshAllUI() {
             if (!dataToSave) {
 
                 return false;
-
-
+            }
     
 
 
