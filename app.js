@@ -1113,63 +1113,25 @@ function updateStudyTimerDisplay() {
    CONSTANTS
    ========================================================= */
 
-const STORAGE_KEY = "languageGymData";
-const BACKUP_KEY = "languageGymAutomaticBackup";
-
 
 /* =========================================================
    DEFAULT DATA
    ========================================================= */
 
-const DEFAULT_SETTINGS = {
-    customColor: "#8B7CF6",
-    autoVoice: false,
-    voiceRate: 1,
-    voicePitch: 1,
-    uiLanguage: "ja",
-    learningLanguage: "zh",
-    randomStudy: true
-};
 
 
-const DEFAULT_DATA = {
     version: 1,
-
-    settings: {
-        ...DEFAULT_SETTINGS
-    },
-
-    decks: [],
-
-    studyHistory: [],
-
-    totalStudyTime: 0,
-
-    totalAnswers: 0,
-
-    totalCorrect: 0
-};
 
 
 /* =========================================================
    GLOBAL DATA
    ========================================================= */
 
-let appData = null;
-
 
 /* =========================================================
    STUDY STATE
    ========================================================= */
 
-let studyState = {
-    deckId: null,
-    cards: [],
-    currentIndex: 0,
-    answered: false,
-    startTime: null,
-    timerInterval: null
-};
 
 
 /* =========================================================
@@ -4200,9 +4162,7 @@ function renderProgress() {
                                                         </span>
 
                                                         <strong>
-                                                            ${deck
-
-                                                                                                                            Accuracy}%
+                                                            ${deckAccuracy}%
                                                         </strong>
 
                                                     </div>
@@ -5596,42 +5556,8 @@ function handleSearchInput(
 
 }
 
-                                                            Accuracy}%
-                                                        </strong>
-
-                                                    </div>
-
-                                                </div>
-
-                                            `;
-
-                                        }
-                                    )
-                                    .join("")
-                            }
-
-                        </div>
-                    `
-            }
-
-        </div>
-
-
-        <div class="progress-section">
-
-            <h3>
-                学習履歴
-            </h3>
-
-            <div id="history-container"></div>
-
-        </div>
-
-    `;
 
     renderHistory();
-
-}
 
 
 /* =========================================================
@@ -5652,148 +5578,6 @@ function renderDataShare() {
     }
 
     container.innerHTML = `
-
-        <div class="data-share-section">
-
-            <div class="data-share-card">
-
-                <div class="data-share-icon">
-                    📤
-                </div>
-
-                <div class="data-share-content">
-
-                    <h3>
-                        データを書き出す
-                    </h3>
-
-                    <p>
-                        Language Gymのデータを
-                        JSONファイルとして保存します。
-                    </p>
-
-                    <button
-                        type="button"
-                        class="primary-button"
-                        data-action="export-data"
-                    >
-                        JSONを書き出す
-                    </button>
-
-                </div>
-
-            </div>
-
-
-            <div class="data-share-card">
-
-                <div class="data-share-icon">
-                    📥
-                </div>
-
-                <div class="data-share-content">
-
-                    <h3>
-                        データを読み込む
-                    </h3>
-
-                    <p>
-                        保存したJSONファイルから
-                        データを復元します。
-                    </p>
-
-                    <input
-                        type="file"
-                        id="data-import-input"
-                        accept=".json,application/json"
-                        hidden
-                    >
-
-                    <button
-                        type="button"
-                        class="secondary-button"
-                        data-action="import-data"
-                    >
-                        JSONを読み込む
-                    </button>
-
-                </div>
-
-            </div>
-
-
-            <div class="data-share-card">
-
-                <div class="data-share-icon">
-                    💾
-                </div>
-
-                <div class="data-share-content">
-
-                    <h3>
-                        自動バックアップ
-                    </h3>
-
-                    <p>
-                        現在のデータをブラウザ内に
-                        バックアップします。
-                    </p>
-
-                    <button
-                        type="button"
-                        class="secondary-button"
-                        data-action="backup-data"
-                    >
-                        バックアップを作成
-                    </button>
-
-                    <button
-                        type="button"
-                        class="secondary-button"
-                        data-action="restore-backup"
-                    >
-                        バックアップから復元
-                    </button>
-
-                </div>
-
-            </div>
-
-
-            <div class="data-share-card danger-card">
-
-                <div class="data-share-icon">
-                    ⚠️
-                </div>
-
-                <div class="data-share-content">
-
-                    <h3>
-                        データをリセット
-                    </h3>
-
-                    <p>
-                        すべてのデッキ・カード・
-                        学習履歴を削除します。
-                    </p>
-
-                    <button
-                        type="button"
-                        class="danger-button"
-                        data-action="reset-data"
-                    >
-                        すべて削除
-                    </button>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    `;
-
-}
 
 
 /* =========================================================
@@ -6133,293 +5917,8 @@ function renderSettings() {
 
     container.innerHTML = `
 
-        <div class="settings-section">
 
-            <h3>
-                学習設定
-            </h3>
 
-
-            <div class="setting-item">
-
-                <div class="setting-info">
-
-                    <strong>
-                        学習言語
-                    </strong>
-
-                    <span>
-                        音声などで使用する言語
-                    </span>
-
-                </div>
-
-                <select
-                    id="learning-language-setting"
-                >
-
-                    <option
-                        value="zh"
-                        ${
-                            settings.learningLanguage ===
-                            "zh"
-                                ? "selected"
-                                : ""
-                        }
-                    >
-                        中国語（簡体字）
-                    </option>
-
-                    <option
-                        value="zh-TW"
-                        ${
-                            settings.learningLanguage ===
-                            "zh-TW"
-                                ? "selected"
-                                : ""
-                        }
-                    >
-                        中国語（繁体字）
-                    </option>
-
-                    <option
-                        value="ko"
-                        ${
-                            settings.learningLanguage ===
-                            "ko"
-                                ? "selected"
-                                : ""
-                        }
-                    >
-                        韓国語
-                    </option>
-
-                    <option
-                        value="de"
-                        ${
-                            settings.learningLanguage ===
-                            "de"
-                                ? "selected"
-                                : ""
-                        }
-                    >
-                        ドイツ語
-                    </option>
-
-                    <option
-                        value="fr"
-                        ${
-                            settings.learningLanguage ===
-                            "fr"
-                                ? "selected"
-                                : ""
-                        }
-                    >
-                        フランス語
-                    </option>
-
-                    <option
-                        value="es"
-                        ${
-                            settings.learningLanguage ===
-                            "es"
-                                ? "selected"
-                                : ""
-                        }
-                    >
-                        スペイン語
-                    </option>
-
-                    <option
-                        value="it"
-                        ${
-                            settings.learningLanguage ===
-                            "it"
-                                ? "selected"
-                                : ""
-                        }
-                    >
-                        イタリア語
-                    </option>
-
-                </select>
-
-            </div>
-
-
-            <div class="setting-item">
-
-                <div class="setting-info">
-
-                    <strong>
-                        ランダム学習
-                    </strong>
-
-                    <span>
-                        学習開始時にカードをシャッフルします
-                    </span>
-
-                </div>
-
-                <label class="switch">
-
-                    <input
-                        type="checkbox"
-                        id="random-study-setting"
-                        ${
-                            settings.randomStudy
-                                ? "checked"
-                                : ""
-                        }
-                    >
-
-                    <span class="slider"></span>
-
-                </label>
-
-            </div>
-
-        </div>
-
-
-        <div class="settings-section">
-
-            <h3>
-                音声設定
-            </h3>
-
-
-            <div class="setting-item">
-
-                <div class="setting-info">
-
-                    <strong>
-                        自動音声
-                    </strong>
-
-                    <span>
-                        答えを表示したときに自動で読み上げます
-                    </span>
-
-                </div>
-
-                <label class="switch">
-
-                    <input
-                        type="checkbox"
-                        id="auto-voice-setting"
-                        ${
-                            settings.autoVoice
-                                ? "checked"
-                                : ""
-                        }
-                    >
-
-                    <span class="slider"></span>
-
-                </label>
-
-            </div>
-
-
-            <div class="setting-item">
-
-                <div class="setting-info">
-
-                    <strong>
-                        音声速度
-                    </strong>
-
-                    <span
-                        id="voice-rate-value"
-                    >
-                        ${Number(
-                            settings.voiceRate
-                        ).toFixed(1)}
-                    </span>
-
-                </div>
-
-                <input
-                    type="range"
-                    id="voice-rate-setting"
-                    min="0.5"
-                    max="2"
-                    step="0.1"
-                    value="${Number(
-                        settings.voiceRate
-                    )}"
-                >
-
-            </div>
-
-
-            <div class="setting-item">
-
-                <div class="setting-info">
-
-                    <strong>
-                        音声ピッチ
-                    </strong>
-
-                    <span
-                        id="voice-pitch-value"
-                    >
-                        ${Number(
-                            settings.voicePitch
-                        ).toFixed(1)}
-                    </span>
-
-                </div>
-
-                <input
-                    type="range"
-                    id="voice-pitch-setting"
-                    min="0"
-                    max="2"
-                    step="0.1"
-                    value="${Number(
-                        settings.voicePitch
-                    )}"
-                >
-
-            </div>
-
-        </div>
-
-
-        <div class="settings-section">
-
-            <h3>
-                外観
-            </h3>
-
-
-            <div class="setting-item">
-
-                <div class="setting-info">
-
-                    <strong>
-                        テーマカラー
-                    </strong>
-
-                    <span>
-                        アプリのメインカラー
-                    </span>
-
-                </div>
-
-                <input
-                    type="color"
-                    id="theme-color-setting"
-                    value="${escapeHTML(
-                        settings.customColor
-                    )}"
-                >
-
-            </div>
-
-        </div>
 
     `;
 
@@ -6911,17 +6410,7 @@ function renderSearchResults(
     ) {
 
         container.innerHTML = `
-            <div class="empty-state">
 
-                <div class="empty-state-icon">
-                    🔍
-                </div>
-
-                <p>
-                    該当するカードがありません。
-                </p>
-
-            </div>
         `;
 
         return;
@@ -6935,42 +6424,9 @@ function renderSearchResults(
 
                     return `
 
-                        <div class="search-result-card">
-
-                            <div class="search-result-deck">
-
-                                📚
-                                ${escapeHTML(
-                                    result.deck.name
-                                )}
-
-                            </div>
-
-                            <div class="search-result-front">
-
-                                ${escapeHTML(
-                                    result.card.front
-                                )}
-
-                            </div>
-
-                            <div class="search-result-back">
-
-                                ${escapeHTML(
-                                    result.card.back
-                                )}
-
-                            </div>
-
-                        </div>
-
-                    `;
 
                 }
-            )
-            .join("");
-
-}
+        
 
 
 /* =========================================================
@@ -7000,63 +6456,21 @@ function handleSearchInput(
      * settings
      */
 
-    if (
-        imported.settings &&
-        typeof imported.settings === "object"
-    ) {
 
-        normalized.settings = {
-            ...imported.settings
-        };
-
-    }
 
 
     /*
      * statistics
      */
 
-    if (
-        imported.statistics &&
-        typeof imported.statistics === "object"
-    ) {
-
-        normalized.statistics = {
-            ...imported.statistics
-        };
-
-    }
-
 
     /*
      * studyHistory
      */
 
-    if (
-        Array.isArray(
-            imported.studyHistory
-        )
-    ) {
+    
+                
 
-        normalized.studyHistory =
-            imported.studyHistory
-                .filter(
-                    function (item) {
-
-                        return (
-                            item &&
-                            typeof item === "object"
-                        );
-
-                    }
-                );
-
-    }
-
-
-    return normalized;
-
-}
 
 
 /* =========================================
@@ -9194,9 +8608,7 @@ function createDefaultData() {
     return {
 
         version:
-            APP_VERSION,
-
-        decks:
+        
             [],
 
         settings:
@@ -14036,16 +13448,15 @@ if (
              * カードとして読み込めるようにする。
              */
 
-            if (
-                trimmed
-            ) {
+    
+    
 
-                cards.push(
+            
                     normalizeCard({
                         front:
-                            trimmed,
+                    
 
-                        back:
+                
                             "",
 
                         language:
@@ -14053,20 +13464,12 @@ if (
                                 .settings
                                 .learningLanguage
                     })
-                );
+            
 
-            }
+        
 
-        }
-    );
-
-
-    return cards
-        .filter(
             Boolean
-        );
 
-}
 
 
 /* =========================================================
