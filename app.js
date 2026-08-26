@@ -6906,8 +6906,6 @@ function showPage(
             }
         );
 
-
-    
         pageName;
 
 
@@ -9604,6 +9602,15 @@ if (
 /* =========================================================
    EVENT BINDING - CONTINUED
    ========================================================= */
+
+function goBack() {
+    window.history.back();
+}
+
+function goForward() {
+    window.history.forward();
+}
+
 
 function bindAppEvents() {
 
