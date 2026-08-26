@@ -13910,9 +13910,9 @@ function setupImportInput() {
             }
 
 
-            await handleFileImport(
-                file
-            );
+            await handleImportFile(
+    file
+);
 
         }
     );

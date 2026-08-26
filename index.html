@@ -1008,7 +1008,7 @@
 
 
                 <div
-                    id="deck-list"
+                    id="decks-container"
                     class="deck-list"
                 >
 
@@ -2496,14 +2496,7 @@ document.addEventListener(
             fileInput
         ) {
 
-            selectFileButton.addEventListener(
-                "click",
-                function () {
-
-                    fileInput.click();
-
-                }
-            );
+            
 
 
             fileInput.addEventListener(
@@ -2558,16 +2551,17 @@ document.addEventListener(
                         const file of files
                     ) {
 
+
                         if (
-                            typeof handleFileImport ===
-                                "function"
-                        ) {
+    typeof handleImportFile ===
+        "function"
+) {
 
-                            await handleFileImport(
-                                file
-                            );
+    await handleImportFile(
+        file
+    );
 
-                        }
+}
 
                     }
 
@@ -3172,16 +3166,16 @@ document.addEventListener(
                         const file of files
                     ) {
 
-                        if (
-                            typeof handleFileImport ===
-                                "function"
-                        ) {
+                    if (
+    typeof handleImportFile ===
+        "function"
+) {
 
-                            await handleFileImport(
-                                file
-                            );
+    await handleImportFile(
+        file
+    );
 
-                        }
+}
 
                     }
 
