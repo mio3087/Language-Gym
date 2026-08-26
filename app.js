@@ -11312,8 +11312,14 @@ function renderStudyEmpty() {
 
 function showStudyAnswer() {
 
+
     const card =
         getCurrentStudyCard();
+
+        
+    
+
+        console.log("CURRENT CARD:", card);
 
 
     if (!card) {
@@ -13910,9 +13916,7 @@ function setupImportInput() {
             }
 
 
-            await handleImportFile(
-    file
-);
+            
 
         }
     );
