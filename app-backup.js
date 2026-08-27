@@ -6906,6 +6906,8 @@ function showPage(
             }
         );
 
+
+    
         pageName;
 
 
@@ -9603,15 +9605,6 @@ if (
    EVENT BINDING - CONTINUED
    ========================================================= */
 
-function goBack() {
-    window.history.back();
-}
-
-function goForward() {
-    window.history.forward();
-}
-
-
 function bindAppEvents() {
 
     document
@@ -11196,20 +11189,18 @@ function renderStudyPage() {
 
     }
 
-if (back) {
 
-    back.textContent =
-        card.back || "";
+    if (back) {
 
-    back.hidden =
-        !studyState.answered;
+        back.textContent =
+            card.back || "";
 
-    back.classList.toggle(
-        "hidden",
-        !studyState.answered
-    );
+        back.classList.toggle(
+            "hidden",
+            !studyState.answered
+        );
 
-}
+    }
 
 
     if (progress) {
@@ -11233,51 +11224,35 @@ if (back) {
     }
 
 
-if (answerButton) {
+    if (answerButton) {
 
-    answerButton.hidden =
-        studyState.answered;
+        answerButton.classList.toggle(
+            "hidden",
+            studyState.answered
+        );
 
-    answerButton.disabled = false;
-
-    answerButton.classList.toggle(
-        "hidden",
-        studyState.answered
-    );
-
-}
+    }
 
 
     if (wrongButton) {
 
-    wrongButton.hidden =
-        !studyState.answered;
+        wrongButton.classList.toggle(
+            "hidden",
+            !studyState.answered
+        );
 
-    wrongButton.disabled =
-        !studyState.answered;
-
-    wrongButton.classList.toggle(
-        "hidden",
-        !studyState.answered
-    );
-
-}
+    }
 
 
     if (correctButton) {
 
-    correctButton.hidden =
-        !studyState.answered;
+        correctButton.classList.toggle(
+            "hidden",
+            !studyState.answered
+        );
 
-    correctButton.disabled =
-        !studyState.answered;
+    }
 
-    correctButton.classList.toggle(
-        "hidden",
-        !studyState.answered
-    );
-
-}
 
     updateStudyTimerDisplay();
 
@@ -11327,54 +11302,61 @@ function renderStudyEmpty() {
 /* =========================================================
    SHOW ANSWER
    ========================================================= */
+
 function showStudyAnswer() {
 
     const card =
         getCurrentStudyCard();
 
-    console.log("CURRENT CARD:", card);
 
     if (!card) {
+
         return;
+
     }
 
-    studyState.answered = true;
+
+    studyState.answered =
+        true;
+
 
     const back =
         document.getElementById(
             "study-back"
         );
 
+
     const answerButton =
         document.getElementById(
             "show-answer-button"
         );
+
 
     const wrongButton =
         document.getElementById(
             "wrong-button"
         );
 
+
     const correctButton =
         document.getElementById(
             "correct-button"
         );
+
 
     if (back) {
 
         back.textContent =
             card.back || "";
 
-        back.hidden = false;
-
         back.classList.remove(
             "hidden"
         );
+
     }
 
-    if (answerButton) {
 
-        answerButton.hidden = true;
+    if (answerButton) {
 
         answerButton.classList.add(
             "hidden"
@@ -11382,11 +11364,8 @@ function showStudyAnswer() {
 
     }
 
+
     if (wrongButton) {
-
-        wrongButton.disabled = false;
-
-        wrongButton.hidden = false;
 
         wrongButton.classList.remove(
             "hidden"
@@ -11394,11 +11373,8 @@ function showStudyAnswer() {
 
     }
 
+
     if (correctButton) {
-
-        correctButton.disabled = false;
-
-        correctButton.hidden = false;
 
         correctButton.classList.remove(
             "hidden"
@@ -13927,7 +13903,9 @@ function setupImportInput() {
             }
 
 
-            
+            await handleFileImport(
+                file
+            );
 
         }
     );
