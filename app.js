@@ -12970,119 +12970,183 @@ function deleteCard(
 
 function renderProgress() {
 
-    const totalCards =
-        appData.decks.reduce(
-            function (
-                total,
-                deck
-            ) {
-
-                return (
-                    total +
-                    (
-                        Array.isArray(
-                            deck.cards
-                        )
-                            ? deck.cards.length
-                            : 0
-                    )
-                );
-
-            },
-            0
+    const container =
+        document.getElementById(
+            "progress-container"
         );
 
+    if (!container) {
+        return;
+    }
 
-    let correct =
-        0;
+    const totalCards =
+        getTotalCardCount();
 
-    let incorrect =
-        0;
+    const totalAnswers =
+        Number(
+            appData.totalAnswers
+        ) || 0;
 
+    const totalCorrect =
+        Number(
+            appData.totalCorrect
+        ) || 0;
 
-    appData.decks.forEach(
-        function (deck) {
-
-            if (
-                !Array.isArray(
-                    deck.cards
-                )
-            ) {
-
-                return;
-
-            }
-
-
-            deck.cards.forEach(
-                function (card) {
-
-                    correct +=
-                        Number(
-                            card.correct
-                        ) || 0;
-
-
-                    incorrect +=
-                        Number(
-                            card.incorrect
-                        ) || 0;
-
-                }
-            );
-
-        }
-    );
-
-
-    const totalAttempts =
-        correct +
-        incorrect;
-
+    const totalIncorrect =
+        Math.max(
+            0,
+            totalAnswers - totalCorrect
+        );
 
     const accuracy =
-        totalAttempts > 0
+        totalAnswers > 0
             ? Math.round(
                 (
-                    correct /
-                    totalAttempts
-                ) *
-                100
+                    totalCorrect /
+                    totalAnswers
+                ) * 100
             )
             : 0;
 
-
-    setText(
-        "progress-total-cards",
-        totalCards
-    );
-
-
-    setText(
-        "progress-correct",
-        correct
-    );
-
-
-    setText(
-        "progress-incorrect",
-        incorrect
-    );
-
-
-    setText(
-        "progress-accuracy",
-        accuracy + "%"
-    );
-
-
-    setText(
-        "progress-study-time",
-        formatStudyTime(
+    const totalStudyTime =
+        Number(
             appData.totalStudyTime
-        )
-    );
+        ) || 0;
 
+    container.innerHTML = `
+
+        <div class="progress-summary">
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    📚
+                </div>
+
+                <div class="stat-content">
+
+                    <span>
+                        デッキ数
+                    </span>
+
+                    <strong>
+                        ${appData.decks.length}
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    🃏
+                </div>
+
+                <div class="stat-content">
+
+                    <span>
+                        総カード数
+                    </span>
+
+                    <strong>
+                        ${totalCards}
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    ⏱️
+                </div>
+
+                <div class="stat-content">
+
+                    <span>
+                        累計学習時間
+                    </span>
+
+                    <strong>
+                        ${formatStudyTime(
+                            totalStudyTime
+                        )}
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    🎯
+                </div>
+
+                <div class="stat-content">
+
+                    <span>
+                        正答率
+                    </span>
+
+                    <strong>
+                        ${accuracy}%
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    ✅
+                </div>
+
+                <div class="stat-content">
+
+                    <span>
+                        正解数
+                    </span>
+
+                    <strong>
+                        ${totalCorrect}
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    ❌
+                </div>
+
+                <div class="stat-content">
+
+                    <span>
+                        不正解数
+                    </span>
+
+                    <strong>
+                        ${totalIncorrect}
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    `;
 
     renderHistory();
 
