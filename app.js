@@ -11974,6 +11974,14 @@ function refreshSettingsUI() {
             ".color-option"
         )
         .forEach(
+
+
+
+
+
+
+
+            
             function (button) {
 
                 const selected =
@@ -12002,47 +12010,23 @@ function refreshSettingsUI() {
    THEME
    ========================================================= */
 
-function applyTheme(
-    color
-) {
+/* ========================================================= THEME COLOR ========================================================= */ const DEFAULT_THEME_COLOR = "#8B7CF6"; function applyTheme(color) { let normalized = String( color || DEFAULT_THEME_COLOR ).toUpperCase();
 
-    const normalized =
-        String(
-            color ||
-            "#8B7CF6"
-        );
+    if ( !/^#[0-9A-F]{6}$/.test( normalized ) ) { normalized = DEFAULT_THEME_COLOR; } const root = document.documentElement; /* * 既存CSSがどの変数を使用していても * 同じテーマカラーが反映されるようにする。 */
 
+    root.style.setProperty( "--primary", normalized ); root.style.setProperty( "--primary-color", normalized ); root.style.setProperty( "--accent-color", normalized ); root.style.setProperty( "--theme-color", normalized );
 
-    document.documentElement.style.setProperty(
-        "--primary-color",
-        normalized
-    );
+    const rgb = hexToRGB( normalized ); if (rgb) { const lighter = mixColors( normalized, "#ffffff", 0.85 ); const darker = mixColors( normalized, "#000000", 0.15 );
+
+        root.style.setProperty( "--primary-light", lighter ); root.style.setProperty( "--primary-dark", darker ); } }
 
 
-    document.documentElement.style.setProperty(
-        "--accent-color",
-        normalized
-    );
+function setThemeColor(color) { if ( typeof color !== "string" ) { return; } const normalized = color.toUpperCase(); if ( !/^#[0-9A-F]{6}$/.test( normalized ) ) { return; }
+
+appData.settings.customColor = normalized; saveData(); applyTheme( normalized ); refreshSettingsUI(); }
 
 
-    document.documentElement.style.setProperty(
-        "--theme-color",
-        normalized
-    );
-
-}
-
-
-function applyThemeColor(
-    color
-) {
-
-    applyTheme(
-        color
-    );
-
-}
-
+        
 
 /* =========================================================
    HOME
