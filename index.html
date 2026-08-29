@@ -1164,13 +1164,7 @@
                                 ⭕ 正解
                             </button>
 
-                            <button
-                                type="button"
-                                class="btn btn-outline"
-                                id="finish-study-button"
-                            >
-                                学習終了
-                            </button>
+            <button type="button" data-action="end-study">学習終了</button>
 
                         </div>
 
@@ -2355,10 +2349,32 @@ document.addEventListener(
                 "correct-button"
             );
 
-        const finishStudyButton =
-            document.getElementById(
-                "finish-study-button"
+                const finishButtons =
+            document.querySelectorAll(
+                '[data-action="end-study"]'
             );
+
+        finishButtons.forEach(
+            function (button) {
+
+                button.addEventListener(
+                    "click",
+                    function () {
+
+                        if (
+                            typeof finishStudy ===
+                                "function"
+                        ) {
+
+                            finishStudy();
+
+                        }
+
+                    }
+                );
+
+            }
+        );
 
 
         if (showAnswerButton) {
@@ -2425,26 +2441,6 @@ document.addEventListener(
 
         }
 
-
-        if (finishStudyButton) {
-
-            finishStudyButton.addEventListener(
-                "click",
-                function () {
-
-                    if (
-                        typeof finishStudy ===
-                            "function"
-                    ) {
-
-                        finishStudy();
-
-                    }
-
-                }
-            );
-
-        }
 
 
         /* =================================
