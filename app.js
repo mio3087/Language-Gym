@@ -2435,21 +2435,82 @@ function getDailyMessage() {
 
     const messages = [
 
-        "今日も少しずつ積み重ねましょう。",
 
-        "完璧じゃなくて大丈夫。1枚でも進めば前進です。",
 
-        "昨日の自分より1つできることを増やしましょう。",
 
-        "短い時間でも、集中した学習は力になります。",
+function getDailyMessage() {
 
-        "Language Gymで今日のトレーニングを始めましょう。",
+    const messages = [
+        "今日も一歩前進！",
+        "小さな一歩が、未来の自分をつくります。",
+        "今日できることを、ひとつだけ。",
+        "完璧じゃなくて大丈夫。進めたらそれで十分です。",
+        "昨日の自分より、ほんの少し前へ。",
+        "5分の努力も、ちゃんと積み重なっています。",
+        "今日のあなたも、ちゃんと頑張っています。",
+        "焦らなくて大丈夫。あなたのペースで進みましょう。",
+        "ひとつ覚えたら、それだけで今日の成果です。",
+        "続けることは、それだけで立派な才能です。",
+        "今日の積み重ねが、いつか大きな力になります。",
+        "できなかったことより、できたことを見てあげましょう。",
+        "少しでも進めた自分を、ちゃんと褒めてあげてください。",
+        "今日も一緒にトレーニングしましょう。",
+        "一問、一単語、一歩ずつ。",
+        "未来の自分へのプレゼントを、今日ひとつ。",
+        "昨日より1つできることが増えたら大成功！",
+        "間違いは失敗ではなく、成長の記録です。",
+        "今日の努力は、明日の自信になります。",
+        "ゆっくりでも、前に進んでいます。",
+        "あなたが積み重ねた時間は、決して無駄になりません。",
+        "今日もLanguage Gymを開いた。それだけでえらい！",
+        "まずはひとつ。そこから始めましょう。",
+        "できるところから、少しずつ。",
+        "今日の自分にできることを、大切に。",
+        "一日一歩でも、40日後には40歩です。",
+        "続けた先に、今は見えない景色があります。",
+        "今日も昨日の自分を少しだけ超えていきましょう。",
+        "頑張りすぎなくても、前進はできます。",
+        "学んだことは、少しずつあなたの中に残っています。",
+        "今日も自分の未来に1ポイント追加！",
+        "一緒に今日の1セットを終わらせましょう。",
+        "小さな達成感を、ひとつ拾っていきましょう。",
+        "今日もあなたの知識がひとつ増えます。",
+        "やる気がなくても大丈夫。始めれば流れが変わるかもしれません。",
+        "今日の一歩は、未来の大きな一歩につながります。",
+        "ここまで来たあなたなら、今日も大丈夫。",
+        "昨日までの努力が、今日のあなたを支えています。",
+        "今日もコツコツ。コツコツは強い。",
+        "さあ、今日のトレーニングを始めましょう。"
 
-        "間違いは成長のデータです。",
 
-        "今日もあなたのペースで大丈夫です。",
+        
 
-        "続けた分だけ、あとで大きな差になります。"
+        
+
+
+    ];
+
+    return messages[
+        Math.floor(
+            Math.random() * messages.length
+        )
+    ];
+
+}
+　
+
+
+
+
+
+
+
+
+
+
+
+        
+        
 
     ];
 
@@ -9441,18 +9502,701 @@ function nowISO() {
 }
 
 
-function clamp(
-    value,
-    min,
-    max
-) {
+/* =========================================================
+   UI TRANSLATION
+   ========================================================= */
 
-    return Math.min(
-        Math.max(
-            Number(value),
-            min
-        ),
-        max
+const UI_TRANSLATIONS = {
+    ja: {
+        appName: "Language Gym",
+        home: "ホーム",
+        decks: "デッキ",
+        progress: "学習記録",
+        import: "インポート",
+        dataShare: "データ共有",
+        settings: "設定",
+
+        learningSettings: "学習設定",
+        learningLanguage: "学習言語",
+        learningLanguageDescription: "音声などで使用する言語",
+        uiLanguage: "UI言語",
+
+        chineseSimplified: "中国語（簡体字）",
+        chineseTraditional: "中国語（繁体字）",
+        korean: "韓国語",
+        german: "ドイツ語",
+        french: "フランス語",
+        spanish: "スペイン語",
+        italian: "イタリア語",
+
+        randomStudy: "ランダム学習",
+        randomStudyDescription: "学習開始時にカードをシャッフルします",
+
+        question: "問題",
+        answer: "答え",
+        example: "例文",
+        memo: "メモ",
+        showAnswer: "答えを見る",
+        wrong: "✕ 間違えた",
+        correct: "✓ 正解",
+        finishStudy: "学習を終了",
+
+        study: "学習する",
+        edit: "編集",
+        delete: "削除",
+        createDeck: "＋ デッキを作成",
+
+        noDecks: "デッキがありません",
+        createDeckDescription: "新しいデッキを作成して学習を始めましょう。",
+
+        save: "保存",
+        cancel: "キャンセル",
+        back: "戻る"
+    },
+
+    en: {
+        appName: "Language Gym",
+        home: "Home",
+        decks: "Decks",
+        progress: "Progress",
+        import: "Import",
+        dataShare: "Data",
+        settings: "Settings",
+
+        learningSettings: "Learning Settings",
+        learningLanguage: "Learning Language",
+        learningLanguageDescription: "Language used for speech and other features",
+        uiLanguage: "UI Language",
+
+        chineseSimplified: "Chinese (Simplified)",
+        chineseTraditional: "Chinese (Traditional)",
+        korean: "Korean",
+        german: "German",
+        french: "French",
+        spanish: "Spanish",
+        italian: "Italian",
+
+        randomStudy: "Random Study",
+        randomStudyDescription: "Shuffle cards when starting a study session",
+
+        question: "Question",
+        answer: "Answer",
+        example: "Example",
+        memo: "Note",
+        showAnswer: "Show Answer",
+        wrong: "✕ Wrong",
+        correct: "✓ Correct",
+        finishStudy: "Finish Study",
+
+        study: "Study",
+        edit: "Edit",
+        delete: "Delete",
+        createDeck: "＋ Create Deck",
+
+        noDecks: "No decks",
+        createDeckDescription: "Create a new deck and start studying.",
+
+        save: "Save",
+        cancel: "Cancel",
+        back: "Back"
+    },
+
+    de: {
+        appName: "Language Gym",
+        home: "Startseite",
+        decks: "Decks",
+        progress: "Lernfortschritt",
+        import: "Importieren",
+        dataShare: "Daten",
+        settings: "Einstellungen",
+
+        learningSettings: "Lerneinstellungen",
+        learningLanguage: "Lernsprache",
+        learningLanguageDescription: "Sprache für Sprachausgabe und andere Funktionen",
+        uiLanguage: "Oberflächensprache",
+
+        chineseSimplified: "Chinesisch (vereinfacht)",
+        chineseTraditional: "Chinesisch (traditionell)",
+        korean: "Koreanisch",
+        german: "Deutsch",
+        french: "Französisch",
+        spanish: "Spanisch",
+        italian: "Italienisch",
+
+        randomStudy: "Zufälliges Lernen",
+        randomStudyDescription: "Karten beim Start einer Lerneinheit mischen",
+
+        question: "Frage",
+        answer: "Antwort",
+        example: "Beispiel",
+        memo: "Notiz",
+        showAnswer: "Antwort anzeigen",
+        wrong: "✕ Falsch",
+        correct: "✓ Richtig",
+        finishStudy: "Lernen beenden",
+
+        study: "Lernen",
+        edit: "Bearbeiten",
+        delete: "Löschen",
+        createDeck: "＋ Deck erstellen",
+
+        noDecks: "Keine Decks vorhanden",
+        createDeckDescription: "Erstelle ein neues Deck und beginne zu lernen.",
+
+        save: "Speichern",
+        cancel: "Abbrechen",
+        back: "Zurück"
+    },
+
+    es: {
+        appName: "Language Gym",
+        home: "Inicio",
+        decks: "Mazos",
+        progress: "Progreso",
+        import: "Importar",
+        dataShare: "Datos",
+        settings: "Configuración",
+
+        learningSettings: "Configuración de aprendizaje",
+        learningLanguage: "Idioma de aprendizaje",
+        learningLanguageDescription: "Idioma utilizado para la voz y otras funciones",
+        uiLanguage: "Idioma de la interfaz",
+
+        chineseSimplified: "Chino (simplificado)",
+        chineseTraditional: "Chino (tradicional)",
+        korean: "Coreano",
+        german: "Alemán",
+        french: "Francés",
+        spanish: "Español",
+        italian: "Italiano",
+
+        randomStudy: "Estudio aleatorio",
+        randomStudyDescription: "Barajar las tarjetas al comenzar a estudiar",
+
+        question: "Pregunta",
+        answer: "Respuesta",
+        example: "Ejemplo",
+        memo: "Nota",
+        showAnswer: "Ver respuesta",
+        wrong: "✕ Incorrecto",
+        correct: "✓ Correcto",
+        finishStudy: "Terminar estudio",
+
+        study: "Estudiar",
+        edit: "Editar",
+        delete: "Eliminar",
+        createDeck: "＋ Crear mazo",
+
+        noDecks: "No hay mazos",
+        createDeckDescription: "Crea un nuevo mazo y empieza a estudiar.",
+
+        save: "Guardar",
+        cancel: "Cancelar",
+        back: "Atrás"
+    },
+
+    it: {
+        appName: "Language Gym",
+        home: "Home",
+        decks: "Mazzi",
+        progress: "Progressi",
+        import: "Importa",
+        dataShare: "Dati",
+        settings: "Impostazioni",
+
+        learningSettings: "Impostazioni di apprendimento",
+        learningLanguage: "Lingua di apprendimento",
+        learningLanguageDescription: "Lingua utilizzata per la voce e altre funzioni",
+        uiLanguage: "Lingua dell'interfaccia",
+
+        chineseSimplified: "Cinese (semplificato)",
+        chineseTraditional: "Cinese (tradizionale)",
+        korean: "Coreano",
+        german: "Tedesco",
+        french: "Francese",
+        spanish: "Spagnolo",
+        italian: "Italiano",
+
+        randomStudy: "Studio casuale",
+        randomStudyDescription: "Mescola le schede quando inizi una sessione",
+
+        question: "Domanda",
+        answer: "Risposta",
+        example: "Esempio",
+        memo: "Nota",
+        showAnswer: "Mostra risposta",
+        wrong: "✕ Sbagliato",
+        correct: "✓ Corretto",
+        finishStudy: "Termina studio",
+
+        study: "Studia",
+        edit: "Modifica",
+        delete: "Elimina",
+        createDeck: "＋ Crea mazzo",
+
+        noDecks: "Nessun mazzo",
+        createDeckDescription: "Crea un nuovo mazzo e inizia a studiare.",
+
+        save: "Salva",
+        cancel: "Annulla",
+        back: "Indietro"
+    }
+};
+
+
+function t(key) {
+    const language =
+        appData &&
+        appData.settings &&
+        appData.settings.uiLanguage
+            ? appData.settings.uiLanguage
+            : "ja";
+
+    return (
+        UI_TRANSLATIONS[language] &&
+        UI_TRANSLATIONS[language][key]
+    ) ||
+    UI_TRANSLATIONS.ja[key] ||
+    key;
+}
+
+function applyUITranslations() {
+
+    const lang =
+        appData?.settings?.uiLanguage || "ja";
+
+    const translations = {
+
+        ja: {
+            subtitle: "多言語学習トレーニング",
+            home: "ホーム",
+            decks: "デッキ",
+            study: "学習",
+            progress: "学習記録",
+            import: "インポート",
+            dataShare: "データ共有",
+            settings: "設定",
+            homeDescription: "今日も少しずつ、外国語を鍛えよう。",
+            deckLabel: "デッキ",
+            cardLabel: "カード",
+            totalStudyTime: "累計学習時間",
+            accuracy: "正答率",
+            startLearning: "🚀 学習を始める",
+            chooseDeck: "デッキを選んで学習を開始しましょう。",
+            viewDecks: "📚 デッキを見る",
+            importMaterial: "📥 教材を取り込む",
+            dailyMessage: "🌱 今日のメッセージ",
+            dailyMessageText: "今日も一歩前進！",
+            deckDescription: "学習する教材を管理します。",
+            noDecks: "まだデッキがありません。",
+            importMaterialButton: "教材をインポート",
+            cardSearch: "🔎 カード検索",
+            searchPlaceholder: "カードの表・裏を検索",
+            studyDescription: "デッキを選択してください。",
+            studyStart: "学習を開始するとここにカードが表示されます。",
+            showAnswer: "👀 答えを見る",
+            dontKnow: "❌ わからない",
+            correct: "⭕ 正解",
+            finishStudy: "学習終了",
+            progressDescription: "学習時間・回答数・正答率を確認できます。",
+            totalAnswers: "累計回答数",
+            correctAnswers: "正解数",
+            studyHistory: "学習履歴",
+            noHistory: "まだ学習記録がありません。",
+            importDescription: "TXT・CSV・PDFなどの教材を取り込みます。",
+            addToDeck: "📚 追加先デッキ",
+            newDeck: "新しいデッキを作成",
+            addToExistingDeck:
+                "既存デッキを選ぶと、そのデッキにカードを追加します。",
+            learningLanguage: "🌐 学習言語",
+            chooseMaterial: "教材を選択",
+            multipleFiles:
+                "複数ファイルをまとめて選択できます",
+            chooseFile: "📂 ファイルを選択",
+            dataShareDescription:
+                "PC・スマホ間でLanguage Gymのデータを共有します。",
+            exportData: "📤 データを書き出す",
+            exportDescription:
+                "学習記録・デッキ・設定などをJSONファイルとして保存します。",
+            exportButton: "データを書き出す",
+            importData: "📥 データを読み込む",
+            importDataDescription:
+                "別の端末で書き出したJSONファイルを読み込みます。",
+            importJSON: "JSONを読み込む",
+            backup: "🛟 自動バックアップ",
+            backupDescription:
+                "最新データの自動バックアップから復元します。",
+            restoreBackup: "バックアップから復元",
+            settingsDescription:
+                "Language Gymを自分好みに設定できます。",
+            themeColor: "🎨 テーマカラー",
+            customColor: "カスタムカラー",
+            voice: "🔊 音声",
+            autoVoice: "自動音声",
+            autoVoiceDescription: "カード表示時に自動再生",
+            randomStudy: "🎲 学習カードをランダムにする",
+            voiceRate: "音声速度",
+            voicePitch: "音声ピッチ",
+            languageSettings: "🌐 言語設定",
+            uiLanguage: "UI言語"
+        },
+
+        en: {
+            subtitle: "Multilingual Language Training",
+            home: "Home",
+            decks: "Decks",
+            study: "Study",
+            progress: "Progress",
+            import: "Import",
+            dataShare: "Data Sharing",
+            settings: "Settings",
+            homeDescription:
+                "Train your foreign language skills little by little every day.",
+            deckLabel: "Decks",
+            cardLabel: "Cards",
+            totalStudyTime: "Total Study Time",
+            accuracy: "Accuracy",
+            startLearning: "🚀 Start Learning",
+            chooseDeck:
+                "Choose a deck and start studying.",
+            viewDecks: "📚 View Decks",
+            importMaterial: "📥 Import Materials",
+            dailyMessage: "🌱 Today's Message",
+            dailyMessageText: "Another step forward today!",
+            deckDescription:
+                "Manage the materials you study.",
+            noDecks: "There are no decks yet.",
+            importMaterialButton: "Import Materials",
+            cardSearch: "🔎 Search Cards",
+            searchPlaceholder:
+                "Search card front and back",
+            studyDescription:
+                "Please select a deck.",
+            studyStart:
+                "Cards will appear here when you start studying.",
+            showAnswer: "👀 Show Answer",
+            dontKnow: "❌ Don't Know",
+            correct: "⭕ Correct",
+            finishStudy: "Finish Study",
+            progressDescription:
+                "Check your study time, answers, and accuracy.",
+            totalAnswers: "Total Answers",
+            correctAnswers: "Correct Answers",
+            studyHistory: "Study History",
+            noHistory:
+                "There is no study history yet.",
+            importDescription:
+                "Import study materials such as TXT, CSV, and PDF.",
+            addToDeck: "📚 Add to Deck",
+            newDeck: "Create a New Deck",
+            addToExistingDeck:
+                "Choose an existing deck to add cards to it.",
+            learningLanguage: "🌐 Learning Language",
+            chooseMaterial: "Choose Materials",
+            multipleFiles:
+                "You can select multiple files at once.",
+            chooseFile: "📂 Choose Files",
+            dataShareDescription:
+                "Share Language Gym data between PC and smartphone.",
+            exportData: "📤 Export Data",
+            exportDescription:
+                "Save study records, decks, settings, and more as a JSON file.",
+            exportButton: "Export Data",
+            importData: "📥 Import Data",
+            importDataDescription:
+                "Import a JSON file exported from another device.",
+            importJSON: "Import JSON",
+            backup: "🛟 Automatic Backup",
+            backupDescription:
+                "Restore from the latest automatic backup.",
+            restoreBackup: "Restore from Backup",
+            settingsDescription:
+                "Customize Language Gym to your preferences.",
+            themeColor: "🎨 Theme Color",
+            customColor: "Custom Color",
+            voice: "🔊 Voice",
+            autoVoice: "Auto Voice",
+            autoVoiceDescription:
+                "Play automatically when a card is displayed",
+            randomStudy: "🎲 Randomize Study Cards",
+            voiceRate: "Voice Rate",
+            voicePitch: "Voice Pitch",
+            languageSettings: "🌐 Language Settings",
+            uiLanguage: "UI Language"
+        },
+
+        de: {
+            subtitle: "Mehrsprachiges Sprachtraining",
+            home: "Startseite",
+            decks: "Decks",
+            study: "Lernen",
+            progress: "Lernfortschritt",
+            import: "Importieren",
+            dataShare: "Datenaustausch",
+            settings: "Einstellungen",
+            homeDescription:
+                "Trainiere deine Fremdsprachen jeden Tag Schritt für Schritt.",
+            deckLabel: "Decks",
+            cardLabel: "Karten",
+            totalStudyTime: "Gesamte Lernzeit",
+            accuracy: "Trefferquote",
+            startLearning: "🚀 Lernen beginnen",
+            chooseDeck:
+                "Wähle ein Deck und beginne mit dem Lernen.",
+            viewDecks: "📚 Decks anzeigen",
+            importMaterial: "📥 Lernmaterial importieren",
+            dailyMessage: "🌱 Nachricht des Tages",
+            dailyMessageText: "Heute wieder einen Schritt weiter!",
+            deckDescription:
+                "Verwalte deine Lernmaterialien.",
+            noDecks: "Noch keine Decks vorhanden.",
+            importMaterialButton: "Lernmaterial importieren",
+            cardSearch: "🔎 Karten durchsuchen",
+            searchPlaceholder:
+                "Vorder- und Rückseite der Karte durchsuchen",
+            studyDescription:
+                "Bitte wähle ein Deck aus.",
+            studyStart:
+                "Hier werden Karten angezeigt, sobald du mit dem Lernen beginnst.",
+            showAnswer: "👀 Antwort anzeigen",
+            dontKnow: "❌ Weiß ich nicht",
+            correct: "⭕ Richtig",
+            finishStudy: "Lernen beenden",
+            progressDescription:
+                "Lernzeit, Antworten und Trefferquote anzeigen.",
+            totalAnswers: "Antworten insgesamt",
+            correctAnswers: "Richtige Antworten",
+            studyHistory: "Lernverlauf",
+            noHistory:
+                "Noch keine Lernaufzeichnungen vorhanden.",
+            importDescription:
+                "Importiere Lernmaterialien wie TXT, CSV und PDF.",
+            addToDeck: "📚 Zu Deck hinzufügen",
+            newDeck: "Neues Deck erstellen",
+            addToExistingDeck:
+                "Wähle ein vorhandenes Deck, um Karten hinzuzufügen.",
+            learningLanguage: "🌐 Lernsprache",
+            chooseMaterial: "Lernmaterial auswählen",
+            multipleFiles:
+                "Du kannst mehrere Dateien gleichzeitig auswählen.",
+            chooseFile: "📂 Dateien auswählen",
+            dataShareDescription:
+                "Teile Language-Gym-Daten zwischen PC und Smartphone.",
+            exportData: "📤 Daten exportieren",
+            exportDescription:
+                "Speichere Lernaufzeichnungen, Decks und Einstellungen als JSON-Datei.",
+            exportButton: "Daten exportieren",
+            importData: "📥 Daten importieren",
+            importDataDescription:
+                "Importiere eine auf einem anderen Gerät exportierte JSON-Datei.",
+            importJSON: "JSON importieren",
+            backup: "🛟 Automatisches Backup",
+            backupDescription:
+                "Aus dem letzten automatischen Backup wiederherstellen.",
+            restoreBackup: "Aus Backup wiederherstellen",
+            settingsDescription:
+                "Passe Language Gym an deine Wünsche an.",
+            themeColor: "🎨 Themenfarbe",
+            customColor: "Benutzerdefinierte Farbe",
+            voice: "🔊 Sprache",
+            autoVoice: "Automatische Sprachausgabe",
+            autoVoiceDescription:
+                "Beim Anzeigen einer Karte automatisch abspielen",
+            randomStudy: "🎲 Lernkarten zufällig auswählen",
+            voiceRate: "Sprechgeschwindigkeit",
+            voicePitch: "Tonhöhe",
+            languageSettings: "🌐 Spracheinstellungen",
+            uiLanguage: "Oberflächensprache"
+        },
+
+        es: {
+            subtitle: "Entrenamiento multilingüe",
+            home: "Inicio",
+            decks: "Mazos",
+            study: "Estudiar",
+            progress: "Progreso",
+            import: "Importar",
+            dataShare: "Compartir datos",
+            settings: "Configuración",
+            homeDescription:
+                "Entrena tus idiomas extranjeros poco a poco cada día.",
+            deckLabel: "Mazos",
+            cardLabel: "Tarjetas",
+            totalStudyTime: "Tiempo total de estudio",
+            accuracy: "Precisión",
+            startLearning: "🚀 Empezar a estudiar",
+            chooseDeck:
+                "Elige un mazo y empieza a estudiar.",
+            viewDecks: "📚 Ver mazos",
+            importMaterial: "📥 Importar materiales",
+            dailyMessage: "🌱 Mensaje de hoy",
+            dailyMessageText: "¡Hoy también has dado un paso adelante!",
+            deckDescription:
+                "Gestiona los materiales que estudias.",
+            noDecks: "Todavía no hay mazos.",
+            importMaterialButton: "Importar materiales",
+            cardSearch: "🔎 Buscar tarjetas",
+            searchPlaceholder:
+                "Buscar en el anverso y reverso",
+            studyDescription:
+                "Selecciona un mazo.",
+            studyStart:
+                "Las tarjetas aparecerán aquí cuando empieces a estudiar.",
+            showAnswer: "👀 Ver respuesta",
+            dontKnow: "❌ No lo sé",
+            correct: "⭕ Correcto",
+            finishStudy: "Terminar estudio",
+            progressDescription:
+                "Consulta el tiempo de estudio, las respuestas y la precisión.",
+            totalAnswers: "Respuestas totales",
+            correctAnswers: "Respuestas correctas",
+            studyHistory: "Historial de estudio",
+            noHistory:
+                "Todavía no hay registros de estudio.",
+            importDescription:
+                "Importa materiales como TXT, CSV y PDF.",
+            addToDeck: "📚 Añadir al mazo",
+            newDeck: "Crear un nuevo mazo",
+            addToExistingDeck:
+                "Elige un mazo existente para añadir tarjetas.",
+            learningLanguage: "🌐 Idioma de aprendizaje",
+            chooseMaterial: "Seleccionar materiales",
+            multipleFiles:
+                "Puedes seleccionar varios archivos a la vez.",
+            chooseFile: "📂 Seleccionar archivos",
+            dataShareDescription:
+                "Comparte los datos de Language Gym entre PC y smartphone.",
+            exportData: "📤 Exportar datos",
+            exportDescription:
+                "Guarda registros, mazos y configuraciones como archivo JSON.",
+            exportButton: "Exportar datos",
+            importData: "📥 Importar datos",
+            importDataDescription:
+                "Importa un archivo JSON exportado desde otro dispositivo.",
+            importJSON: "Importar JSON",
+            backup: "🛟 Copia de seguridad automática",
+            backupDescription:
+                "Restaura desde la última copia de seguridad automática.",
+            restoreBackup: "Restaurar copia de seguridad",
+            settingsDescription:
+                "Personaliza Language Gym a tu gusto.",
+            themeColor: "🎨 Color del tema",
+            customColor: "Color personalizado",
+            voice: "🔊 Voz",
+            autoVoice: "Voz automática",
+            autoVoiceDescription:
+                "Reproducir automáticamente al mostrar una tarjeta",
+            randomStudy: "🎲 Aleatorizar tarjetas de estudio",
+            voiceRate: "Velocidad de voz",
+            voicePitch: "Tono de voz",
+            languageSettings: "🌐 Configuración de idioma",
+            uiLanguage: "Idioma de la interfaz"
+        },
+
+        it: {
+            subtitle: "Allenamento linguistico multilingue",
+            home: "Home",
+            decks: "Mazzi",
+            study: "Studio",
+            progress: "Progressi",
+            import: "Importa",
+            dataShare: "Condivisione dati",
+            settings: "Impostazioni",
+            homeDescription:
+                "Allena le tue lingue straniere un po' alla volta ogni giorno.",
+            deckLabel: "Mazzi",
+            cardLabel: "Carte",
+            totalStudyTime: "Tempo totale di studio",
+            accuracy: "Precisione",
+            startLearning: "🚀 Inizia a studiare",
+            chooseDeck:
+                "Scegli un mazzo e inizia a studiare.",
+            viewDecks: "📚 Visualizza mazzi",
+            importMaterial: "📥 Importa materiali",
+            dailyMessage: "🌱 Messaggio di oggi",
+            dailyMessageText: "Anche oggi hai fatto un passo avanti!",
+            deckDescription:
+                "Gestisci i materiali che studi.",
+            noDecks: "Non ci sono ancora mazzi.",
+            importMaterialButton: "Importa materiali",
+            cardSearch: "🔎 Cerca carte",
+            searchPlaceholder:
+                "Cerca fronte e retro della carta",
+            studyDescription:
+                "Seleziona un mazzo.",
+            studyStart:
+                "Le carte appariranno qui quando inizierai a studiare.",
+            showAnswer: "👀 Mostra risposta",
+            dontKnow: "❌ Non lo so",
+            correct: "⭕ Corretto",
+            finishStudy: "Termina studio",
+            progressDescription:
+                "Controlla tempo di studio, risposte e precisione.",
+            totalAnswers: "Risposte totali",
+            correctAnswers: "Risposte corrette",
+            studyHistory: "Cronologia dello studio",
+            noHistory:
+                "Non ci sono ancora registrazioni di studio.",
+            importDescription:
+                "Importa materiali come TXT, CSV e PDF.",
+            addToDeck: "📚 Aggiungi al mazzo",
+            newDeck: "Crea un nuovo mazzo",
+            addToExistingDeck:
+                "Scegli un mazzo esistente per aggiungere le carte.",
+            learningLanguage: "🌐 Lingua di apprendimento",
+            chooseMaterial: "Seleziona materiali",
+            multipleFiles:
+                "Puoi selezionare più file contemporaneamente.",
+            chooseFile: "📂 Seleziona file",
+            dataShareDescription:
+                "Condividi i dati di Language Gym tra PC e smartphone.",
+            exportData: "📤 Esporta dati",
+            exportDescription:
+                "Salva registri di studio, mazzi e impostazioni come file JSON.",
+            exportButton: "Esporta dati",
+            importData: "📥 Importa dati",
+            importDataDescription:
+                "Importa un file JSON esportato da un altro dispositivo.",
+            importJSON: "Importa JSON",
+            backup: "🛟 Backup automatico",
+            backupDescription:
+                "Ripristina dall'ultimo backup automatico.",
+            restoreBackup: "Ripristina dal backup",
+            settingsDescription:
+                "Personalizza Language Gym secondo le tue preferenze.",
+            themeColor: "🎨 Colore del tema",
+            customColor: "Colore personalizzato",
+            voice: "🔊 Voce",
+            autoVoice: "Voce automatica",
+            autoVoiceDescription:
+                "Riproduci automaticamente quando viene mostrata una carta",
+            randomStudy: "🎲 Randomizza le carte di studio",
+            voiceRate: "Velocità della voce",
+            voicePitch: "Tono della voce",
+            languageSettings: "🌐 Impostazioni della lingua",
+            uiLanguage: "Lingua dell'interfaccia"
+        }
+
+    };
+
+    const dict =
+        translations[lang] ||
+        translations.ja;
+
+    document.querySelectorAll(
+        "[data-i18n]"
+    ).forEach(
+        function (element) {
+
+            const key =
+                element.dataset.i18n;
+
+            if (dict[key]) {
+                element.textContent =
+                    dict[key];
+            }
+
+        }
     );
 
 }
@@ -9942,17 +10686,18 @@ function bindAppEvents() {
 
 
     if (uiLanguage) {
+    uiLanguage.addEventListener(
+        "change",
+        () => {
+            saveSetting(
+                "uiLanguage",
+                uiLanguage.value
+            );
 
-        uiLanguage.addEventListener(
-            "change",
-            () =>
-                saveSetting(
-                    "uiLanguage",
-                    uiLanguage.value
-                )
-        );
-
-    }
+            refreshAllUI();
+        }
+    );
+}
 
 
     /*
@@ -9965,18 +10710,20 @@ function bindAppEvents() {
         );
 
 
-    if (learningLanguage) {
+if (learningLanguage) {
+    learningLanguage.addEventListener(
+        "change",
+        () => {
+            saveSetting(
+                "learningLanguage",
+                learningLanguage.value
+            );
 
-        learningLanguage.addEventListener(
-            "change",
-            () =>
-                saveSetting(
-                    "learningLanguage",
-                    learningLanguage.value
-                )
-        );
-
-    }
+            updateHeader();
+            refreshAllUI();
+        }
+    );
+}
 
 
     /*
@@ -12004,6 +12751,9 @@ function refreshSettingsUI() {
         );
 
 }
+
+
+
 
 
 /* =========================================================
