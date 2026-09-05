@@ -8002,111 +8002,141 @@ function parseCSVLine(
    IMPORT PDF
    ========================================= */
 
-async function importPDFFile(
-    file
-) {
 
-    if (!file) {
-
-        return;
-
-    }
-
-    if (
-        typeof pdfjsLib ===
-        "undefined"
-    ) {
-
-        alert(
-            "PDF読み込み機能が利用できません。\n" +
-            "PDF.jsが読み込まれているか確認してください。"
-        );
-
-        return;
-
-    }
-
+   async function importPDFFile(file) {
     try {
-
-        const arrayBuffer =
-            await file.arrayBuffer();
-
-        const pdf =
-            await pdfjsLib
-                .getDocument({
-                    data:
-                        arrayBuffer
-                })
-                .promise;
-
-        let fullText =
-            "";
-
-        for (
-            let pageNumber = 1;
-            pageNumber <= pdf.numPages;
-            pageNumber++
-        ) {
-
-            const page =
-                await pdf.getPage(
-                    pageNumber
-                );
-
-            const content =
-                await page.getTextContent();
-
-            const pageText =
-                content.items
-                    .map(
-                        function (item) {
-
-                            return (
-                                item.str ||
-                                ""
-                            );
-
-                        }
-                    )
-                    .join(" ");
-
-            fullText +=
-                pageText +
-                "\n";
-
+        if (typeof pdfjsLib === "undefined") {
+            alert(
+                "PDF読み込み機能が利用できません。\n" +
+                "PDF.jsが読み込まれているか確認してください。"
+            );
+            return;
         }
 
-        if (
-            !fullText.trim()
-        ) {
+        updateImportStatus("PDFを読み込んでいます...");
 
-            alert(
-                "PDFから文字を取得できませんでした。\n\n" +
-                "画像だけのPDFの場合はOCRが必要です。"
+        const arrayBuffer = await file.arrayBuffer();
+
+        const pdf = await pdfjsLib.getDocument({
+            data: new Uint8Array(arrayBuffer)
+        }).promise;
+
+        let fullText = "";
+
+        for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++) {
+            updateImportStatus(
+                `PDFを解析中... ${pageNumber} / ${pdf.numPages} ページ`
             );
 
-            return;
+            const page = await pdf.getPage(pageNumber);
+            const textContent = await page.getTextContent();
 
+            // PDF上の文字位置を利用して、できるだけ自然な文章に戻す
+            const items = textContent.items || [];
+
+            let pageText = "";
+            let previousItem = null;
+
+            for (const item of items) {
+                const text = item.str || "";
+
+                if (!text) continue;
+
+                if (previousItem) {
+                    const previousX = previousItem.transform
+                        ? previousItem.transform[4]
+                        : 0;
+
+                    const currentX = item.transform
+                        ? item.transform[4]
+                        : 0;
+
+                    const previousY = previousItem.transform
+                        ? previousItem.transform[5]
+                        : 0;
+
+                    const currentY = item.transform
+                        ? item.transform[5]
+                        : 0;
+
+                    // 行が変わった場合
+                    if (Math.abs(currentY - previousY) > 3) {
+                        pageText += "\n";
+                    } else {
+                        // 同じ行なら空白を入れる
+                        // ただし日本語のように文字が連続している場合は
+                        // 不自然な空白を避ける
+                        const lastChar = pageText.slice(-1);
+
+                        if (
+                            lastChar &&
+                            !/[\s\u3000]/.test(lastChar) &&
+                            currentX - previousX > 3
+                        ) {
+                            pageText += " ";
+                        }
+                    }
+                }
+
+                pageText += text;
+                previousItem = item;
+            }
+
+            fullText += pageText + "\n\n";
         }
 
-        importTextData(
-            fullText,
-            "txt"
+        fullText = fullText
+            .replace(/\r\n/g, "\n")
+            .replace(/\r/g, "\n")
+            .replace(/\n{3,}/g, "\n\n")
+            .trim();
+
+        if (!fullText) {
+            alert(
+                "PDFから文字を読み取れませんでした。\n\n" +
+                "このPDFが画像として保存されたPDFの場合、" +
+                "OCR機能が必要です。"
+            );
+            return;
+        }
+
+        console.log("PDF extracted text:");
+        console.log(fullText);
+
+        updateImportStatus("PDFの内容をカードに変換しています...");
+
+        const cards = parseTextToCards(fullText, "txt");
+
+        if (!cards || cards.length === 0) {
+            alert(
+                "PDFからカードを作成できませんでした。\n\n" +
+                "PDFから文字自体は読み取れていますが、" +
+                "カード形式として認識できませんでした。"
+            );
+            return;
+        }
+
+        await addImportedCards(cards);
+
+        updateImportStatus(
+            `PDF読み込み完了：${cards.length}件のカードを追加しました。`
+        );
+
+        alert(
+            `PDF読み込み完了！\n\n` +
+            `${cards.length}件のカードを追加しました。`
         );
 
     } catch (error) {
+        console.error("PDF import error:", error);
 
-        console.error(
-            "PDF import error:",
-            error
-        );
+        updateImportStatus("PDFの読み込みに失敗しました。");
 
         alert(
-            "PDFの読み込みに失敗しました。"
+            "PDFの読み込み中にエラーが発生しました。\n\n" +
+            error.message
         );
-
     }
-
 }
 
 
@@ -14273,161 +14303,7 @@ function addImportedCards(
    PDF IMPORT
    ========================================================= */
 
-async function importPDF(
-    file
-) {
 
-    if (!file) {
-
-        return;
-
-    }
-
-
-    if (
-        typeof pdfjsLib ===
-        "undefined"
-    ) {
-
-        showStatus(
-            "PDF.jsが読み込まれていません。",
-            "error"
-        );
-
-        return;
-
-    }
-
-
-    try {
-
-        showImportStatus(
-            "PDFを読み込んでいます……",
-            "loading"
-        );
-
-
-        const arrayBuffer =
-            await file.arrayBuffer();
-
-
-        const loadingTask =
-            pdfjsLib.getDocument({
-                data:
-                    arrayBuffer
-            });
-
-
-        const pdf =
-            await loadingTask.promise;
-
-
-        let fullText =
-            "";
-
-
-        for (
-            let pageNumber = 1;
-            pageNumber <=
-            pdf.numPages;
-            pageNumber++
-        ) {
-
-            const page =
-                await pdf.getPage(
-                    pageNumber
-                );
-
-
-            const content =
-                await page.getTextContent();
-
-
-            const pageText =
-                content.items
-                    .map(
-                        function (item) {
-
-                            return (
-                                item.str ||
-                                ""
-                            );
-
-                        }
-                    )
-                    .join(" ");
-
-
-            fullText +=
-                pageText +
-                "\n";
-
-        }
-
-
-        if (
-            !fullText.trim()
-        ) {
-
-            showImportStatus(
-                "PDFから文字を取得できませんでした。画像PDFの場合はOCRが必要です。",
-                "error"
-            );
-
-            return;
-
-        }
-
-
-        const cards =
-            parseTextToCards(
-                fullText,
-                "txt"
-            );
-
-
-        if (
-            cards.length === 0
-        ) {
-
-            showImportStatus(
-                "PDFからカードを作成できませんでした。",
-                "error"
-            );
-
-            return;
-
-        }
-
-
-        addImportedCards(
-            cards,
-            file.name
-        );
-
-
-        showImportStatus(
-            `${cards.length}枚のカードを作成しました。`,
-            "success"
-        );
-
-
-    } catch (error) {
-
-        console.error(
-            "PDF import error:",
-            error
-        );
-
-
-        showImportStatus(
-            "PDFの読み込みに失敗しました。",
-            "error"
-        );
-
-    }
-
-}
 
 
 /* =========================================================
