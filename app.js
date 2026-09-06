@@ -8013,7 +8013,7 @@ function parseCSVLine(
             return;
         }
 
-        updateImportStatus("PDFを読み込んでいます...");
+        showImportStatus
 
         const arrayBuffer = await file.arrayBuffer();
 
