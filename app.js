@@ -13816,81 +13816,53 @@ function createId(
 /* =========================================================
    INITIALIZATION
    ========================================================= */
-
 function initializeApp() {
-
     try {
+        // 保存済みデータを1回だけ読み込む
+        appData = loadData();
 
-        appData =
-    loadData();
-
-if (
-    !appData ||
-    !Array.isArray(appData.decks)
-) {
-    console.error(
-        "データ読み込みに失敗しました。"
-    );
-
-    appData =
-        createDefaultData();
-}
-
-appData =
-    normalizeData(
-        appData
-    );
-
-console.log(
-    "起動時データ確認:",
-    appData.decks.length,
-    "デッキ"
-);
-
-studyState =
-    createDefaultStudyState();
-        appData =
-            loadData();
-
-
-        appData =
-            normalizeData(
-                appData
+        // 正常なデータが読み込めなかった場合だけ初期化
+        if (
+            !appData ||
+            !Array.isArray(appData.decks)
+        ) {
+            console.warn(
+                "保存データが見つからないため、初期データを作成します。"
             );
 
+            appData = createDefaultData();
+            saveData();
+        }
 
-        studyState =
-            createDefaultStudyState();
+        // データ形式を整える
+        appData = normalizeData(appData);
 
+        console.log(
+            "起動時データ確認:",
+            appData.decks.length,
+            "デッキ"
+        );
+
+        studyState = createDefaultStudyState();
 
         applyTheme(
             appData.settings.customColor
         );
 
-
         refreshAllUI();
 
-
         bindAppEvents();
-
         bindDeckActionEvents();
-
         bindCardActionEvents();
-
         setupDataShareEvents();
 
-
-        showPage(
-            "home"
-        );
-
+        showPage("home");
 
         console.log(
             "Language Gym initialized."
         );
 
     } catch (error) {
-
         console.error(
             "Initialization error:",
             error
@@ -13899,12 +13871,8 @@ studyState =
         alert(
             "Language Gymの初期化に失敗しました。"
         );
-
     }
-
 }
-
-
 /* =========================================================
    DOM READY
    ========================================================= */
