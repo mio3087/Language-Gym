@@ -438,114 +438,6 @@ function normalizeData(data) {
    LOAD / SAVE DATA
    ========================================================= */
 
-function loadData() {
-
-    try {
-
-        const raw =
-            localStorage.getItem(
-                STORAGE_KEY
-            );
-
-        if (!raw) {
-
-            appData =
-                createDefaultData();
-
-            return appData;
-
-        }
-
-        const parsed =
-            JSON.parse(raw);
-
-        appData =
-            normalizeData(
-                parsed
-            );
-
-        return appData;
-
-    } catch (error) {
-
-        console.error(
-            "データ読み込みエラー:",
-            error
-        );
-
-        appData =
-            createDefaultData();
-
-        return appData;
-
-    }
-
-}
-
-
-function saveData() {
-
-    try {
-
-        if (!appData) {
-
-            appData =
-                createDefaultData();
-
-        }
-
-        appData =
-            normalizeData(
-                appData
-            );
-
-        const dataToSave =
-            JSON.parse(
-                JSON.stringify(
-                    appData
-                )
-            );
-
-        localStorage.setItem(
-            STORAGE_KEY,
-            JSON.stringify(
-                dataToSave
-            )
-        );
-
-        try {
-
-            localStorage.setItem(
-                BACKUP_KEY,
-                JSON.stringify(
-                    dataToSave
-                )
-            );
-
-        } catch (backupError) {
-
-            console.warn(
-                "自動バックアップ保存エラー:",
-                backupError
-            );
-
-        }
-
-        return true;
-
-    } catch (error) {
-
-        console.error(
-            "データ保存エラー:",
-            error
-        );
-
-        return false;
-
-    }
-
-}
-
 
 /* =========================================================
    BACKUP
@@ -1502,114 +1394,6 @@ function normalizeData(data) {
 /* =========================================================
    LOAD / SAVE DATA
    ========================================================= */
-
-function loadData() {
-
-    try {
-
-        const raw =
-            localStorage.getItem(
-                STORAGE_KEY
-            );
-
-        if (!raw) {
-
-            appData =
-                createDefaultData();
-
-            return appData;
-
-        }
-
-        const parsed =
-            JSON.parse(raw);
-
-        appData =
-            normalizeData(
-                parsed
-            );
-
-        return appData;
-
-    } catch (error) {
-
-        console.error(
-            "データ読み込みエラー:",
-            error
-        );
-
-        appData =
-            createDefaultData();
-
-        return appData;
-
-    }
-
-}
-
-
-function saveData() {
-
-    try {
-
-        if (!appData) {
-
-            appData =
-                createDefaultData();
-
-        }
-
-        appData =
-            normalizeData(
-                appData
-            );
-
-        const dataToSave =
-            JSON.parse(
-                JSON.stringify(
-                    appData
-                )
-            );
-
-        localStorage.setItem(
-            STORAGE_KEY,
-            JSON.stringify(
-                dataToSave
-            )
-        );
-
-        try {
-
-            localStorage.setItem(
-                BACKUP_KEY,
-                JSON.stringify(
-                    dataToSave
-                )
-            );
-
-        } catch (backupError) {
-
-            console.warn(
-                "自動バックアップ保存エラー:",
-                backupError
-            );
-
-        }
-
-        return true;
-
-    } catch (error) {
-
-        console.error(
-            "データ保存エラー:",
-            error
-        );
-
-        return false;
-
-    }
-
-}
 
 
 /* =========================================================
@@ -8899,63 +8683,88 @@ function normalizeData(
    ========================================= */
 
 function loadData() {
-
-    let stored = null;
-
     try {
-
-        stored =
+        const stored =
             localStorage.getItem(
                 STORAGE_KEY
             );
 
-    } catch (error) {
+        if (stored) {
+            const parsed =
+                JSON.parse(stored);
 
-        console.error(
-            "localStorage read error:",
-            error
-        );
+            appData =
+                normalizeData(parsed);
 
-    }
+            return appData;
+        }
 
+        // メインデータがない場合はバックアップを確認
+        const backup =
+            localStorage.getItem(
+                BACKUP_KEY
+            );
 
-    if (!stored) {
+        if (backup) {
+            const parsedBackup =
+                JSON.parse(backup);
 
+            appData =
+                normalizeData(parsedBackup);
+
+            // 復元したデータをメインにも戻す
+            localStorage.setItem(
+                STORAGE_KEY,
+                JSON.stringify(appData)
+            );
+
+            return appData;
+        }
+
+        // 本当に何もない場合だけ新規データ
         appData =
             createDefaultData();
 
         return appData;
 
-    }
-
-
-    try {
-
-        const parsed =
-            JSON.parse(
-                stored
-            );
-
-        appData =
-            normalizeData(
-                parsed
-            );
-
     } catch (error) {
-
         console.error(
-            "Data parse error:",
+            "データ読み込みエラー:",
             error
         );
+
+        // 読み込み失敗時もバックアップから復元を試みる
+        try {
+            const backup =
+                localStorage.getItem(
+                    BACKUP_KEY
+                );
+
+            if (backup) {
+                appData =
+                    normalizeData(
+                        JSON.parse(backup)
+                    );
+
+                localStorage.setItem(
+                    STORAGE_KEY,
+                    JSON.stringify(appData)
+                );
+
+                return appData;
+            }
+        } catch (backupError) {
+            console.error(
+                "バックアップ復元エラー:",
+                backupError
+            );
+        }
 
         appData =
             createDefaultData();
 
+        return appData;
     }
-
-
-    return appData;
-
 }
 
 
@@ -10146,17 +9955,15 @@ function showStatus(
 
 /* =========================================
    FINAL SAFETY INITIALIZATION
-   ========================================= */
+   ========================================= *
 
-if (
+   if (
     typeof appData ===
     "undefined" ||
     !appData
 ) {
-
     appData =
-        createDefaultData();
-
+        loadData();
 }
 
 
@@ -14014,6 +13821,34 @@ function initializeApp() {
 
     try {
 
+        appData =
+    loadData();
+
+if (
+    !appData ||
+    !Array.isArray(appData.decks)
+) {
+    console.error(
+        "データ読み込みに失敗しました。"
+    );
+
+    appData =
+        createDefaultData();
+}
+
+appData =
+    normalizeData(
+        appData
+    );
+
+console.log(
+    "起動時データ確認:",
+    appData.decks.length,
+    "デッキ"
+);
+
+studyState =
+    createDefaultStudyState();
         appData =
             loadData();
 
