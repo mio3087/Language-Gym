@@ -4221,109 +4221,7 @@ function renderDataShare() {
    EXPORT DATA
    ========================================================= */
 
-function exportData() {
 
-    if (!appData) {
-
-        loadData();
-
-    }
-
-    try {
-
-        const exportObject = {
-
-            app:
-                "Language Gym",
-
-            version:
-                appData.version,
-
-            exportedAt:
-                nowISO(),
-
-            data:
-                normalizeData(
-                    appData
-                )
-
-        };
-
-        const json =
-            JSON.stringify(
-                exportObject,
-                null,
-                2
-            );
-
-        const blob =
-            new Blob(
-                [json],
-                {
-                    type:
-                        "application/json"
-                }
-            );
-
-        const url =
-            URL.createObjectURL(
-                blob
-            );
-
-        const link =
-            document.createElement(
-                "a"
-            );
-
-        const date =
-            new Date()
-                .toISOString()
-                .slice(
-                    0,
-                    10
-                );
-
-        link.href =
-            url;
-
-        link.download =
-            "language-gym-" +
-            date +
-            ".json";
-
-        document.body.appendChild(
-            link
-        );
-
-        link.click();
-
-        link.remove();
-
-        setTimeout(
-            function () {
-
-                URL.revokeObjectURL(
-                    url
-                );
-
-            },
-            1000
-        );
-
-    } catch (error) {
-
-        console.error(
-            "データ書き出しエラー:",
-            error
-        );
-
-        alert(
-            "データを書き出せませんでした。"
-        );
-
-    }
-
-}
 
 
 /* =========================================================
@@ -4351,92 +4249,7 @@ function triggerDataImport() {
 }
 
 
-async function importDataFile(
-    file
-) {
 
-    if (!file) {
-
-        return;
-
-    }
-
-    try {
-
-        const text =
-            await readFileAsText(
-                file
-            );
-
-        const parsed =
-            JSON.parse(
-                text
-            );
-
-        let importedData =
-            parsed;
-
-        /*
-         * exportData() で作った形式
-         */
-
-        if (
-            parsed &&
-            typeof parsed === "object" &&
-            parsed.data
-        ) {
-
-            importedData =
-                parsed.data;
-
-        }
-
-        const normalized =
-            normalizeData(
-                importedData
-            );
-
-        const confirmed =
-            window.confirm(
-                "JSONデータを読み込みます。\n\n" +
-                "現在のデータは上書きされます。"
-            );
-
-        if (!confirmed) {
-
-            return;
-
-        }
-
-        appData =
-            normalized;
-
-        saveData();
-
-        refreshAllUI();
-
-        alert(
-            "データを読み込みました。"
-        );
-
-    } catch (error) {
-
-        console.error(
-            "データ読み込みエラー:",
-            error
-        );
-
-        alert(
-            "JSONデータを読み込めませんでした。\n" +
-            (
-                error.message ||
-                ""
-            )
-        );
-
-    }
-
-}
 
 
 /* =========================================================
@@ -6481,46 +6294,6 @@ function setupDataShareEvents() {
    BACKUP
    ========================================= */
 
-function createBackup() {
-
-    try {
-
-        localStorage.setItem(
-            BACKUP_KEY,
-            JSON.stringify(
-                appData
-            )
-        );
-
-
-        localStorage.setItem(
-            BACKUP_DATE_KEY,
-            nowISO()
-        );
-
-
-        showStatus(
-            "バックアップを作成しました。",
-            "success"
-        );
-
-
-    } catch (error) {
-
-        console.error(
-            "Backup error:",
-            error
-        );
-
-
-        showStatus(
-            "バックアップの作成に失敗しました。",
-            "error"
-        );
-
-    }
-
-}
 
 
 /* =========================================
@@ -8739,35 +8512,21 @@ function normalizeData(
 
 function loadData() {
     try {
-        const stored =
-            localStorage.getItem(
-                STORAGE_KEY
-            );
+        const stored = localStorage.getItem(STORAGE_KEY);
 
         if (stored) {
-            const parsed =
-                JSON.parse(stored);
-
-            appData =
-                normalizeData(parsed);
-
+            const parsed = JSON.parse(stored);
+            appData = normalizeData(parsed);
             return appData;
         }
 
-        // メインデータがない場合はバックアップを確認
-        const backup =
-            localStorage.getItem(
-                BACKUP_KEY
-            );
+        const backup = localStorage.getItem(BACKUP_KEY);
 
         if (backup) {
-            const parsedBackup =
-                JSON.parse(backup);
+            const parsedBackup = JSON.parse(backup);
 
-            appData =
-                normalizeData(parsedBackup);
+            appData = normalizeData(parsedBackup);
 
-            // 復元したデータをメインにも戻す
             localStorage.setItem(
                 STORAGE_KEY,
                 JSON.stringify(appData)
@@ -8776,30 +8535,19 @@ function loadData() {
             return appData;
         }
 
-        // 本当に何もない場合だけ新規データ
-        appData =
-            createDefaultData();
-
+        appData = createDefaultData();
         return appData;
 
     } catch (error) {
-        console.error(
-            "データ読み込みエラー:",
-            error
-        );
+        console.error("データ読み込みエラー:", error);
 
-        // 読み込み失敗時もバックアップから復元を試みる
         try {
-            const backup =
-                localStorage.getItem(
-                    BACKUP_KEY
-                );
+            const backup = localStorage.getItem(BACKUP_KEY);
 
             if (backup) {
-                appData =
-                    normalizeData(
-                        JSON.parse(backup)
-                    );
+                const parsedBackup = JSON.parse(backup);
+
+                appData = normalizeData(parsedBackup);
 
                 localStorage.setItem(
                     STORAGE_KEY,
@@ -8815,13 +8563,10 @@ function loadData() {
             );
         }
 
-        appData =
-            createDefaultData();
-
+        appData = createDefaultData();
         return appData;
     }
 }
-
 
 /* =========================================
    SAVE DATA
