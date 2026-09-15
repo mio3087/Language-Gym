@@ -8593,12 +8593,25 @@ function saveData() {
             );
 
 
-        localStorage.setItem(
-            STORAGE_KEY,
-            JSON.stringify(
-                dataToSave
-            )
-        );
+        try {
+    localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify(dataToSave)
+    );
+
+    const check = localStorage.getItem(STORAGE_KEY);
+
+    if (!check) {
+        console.error("保存直後にデータが取得できません");
+        return false;
+    }
+} catch (storageError) {
+    console.error(
+        "localStorage保存エラー:",
+        storageError
+    );
+    return false;
+}
 
 
         appData =
