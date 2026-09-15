@@ -8512,7 +8512,7 @@ function normalizeData(
 
 function loadData() {
     try {
-        const stored = localStorage.getItem(STORAGE_KEY);
+        const stored = localStorage.getItem("languageGymData");
 
         if (stored) {
             const parsed = JSON.parse(stored);
@@ -14067,6 +14067,12 @@ function initializeApp() {
     try {
         // 保存済みデータを1回だけ読み込む
         appData = loadData();
+
+        alert(
+    "保存データ確認\n" +
+    "デッキ数: " +
+    (appData?.decks?.length ?? "取得失敗")
+);
 
         try {
     if (
