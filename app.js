@@ -11669,6 +11669,16 @@ function startStudy(
     studyState.cards =
         cards;
 
+if (
+    studyState.isTodayAdventure
+) {
+    studyState.cards =
+        studyState.cards.slice(
+            0,
+            5
+        );
+}
+
 
     studyState.currentIndex =
         0;
@@ -12792,8 +12802,134 @@ function renderHome() {
 
     renderGreeting();
 
+
+    const adventure = document.getElementById("today-adventure");
+
+if (adventure) {
+    adventure.innerHTML = `
+        <div class="card">
+            <h2>🌍 今日の冒険</h2>
+            <p>今日のミッションに挑戦しよう！</p>
+
+            <div style="font-size:3rem; text-align:center; margin:20px 0;">
+                🏰
+            </div>
+
+            <h3 style="text-align:center;">
+                🔥 今日のミッション
+            </h3>
+
+            <p style="text-align:center;">
+                カードを5枚クリアしよう！
+            </p>
+
+            <button
+                type="button"
+                class="btn btn-primary"
+                id="start-today-adventure"
+                style="width:100%;"
+            >
+                ⚔️ 冒険を始める
+            </button>
+        </div>
+    `;
+}
 }
 
+/* =========================================================
+   TODAY'S ADVENTURE
+   ========================================================= */
+
+function startTodayAdventure() {
+
+    if (
+        !appData ||
+        !Array.isArray(appData.decks)
+    ) {
+        return;
+    }
+
+    const availableDecks =
+        appData.decks.filter(
+            function (deck) {
+                return (
+                    Array.isArray(
+                        deck.cards
+                    ) &&
+                    deck.cards.length > 0
+                );
+            }
+        );
+
+    if (
+        availableDecks.length === 0
+    ) {
+        alert(
+            "冒険できるカードがありません。まずカードを追加してください。"
+        );
+        return;
+    }
+
+    let cards = [];
+
+    availableDecks.forEach(
+        function (deck) {
+
+            deck.cards.forEach(
+                function (card) {
+
+                    cards.push({
+                        ...card,
+                        adventureDeckId:
+                            deck.id
+                    });
+
+                }
+            );
+
+        }
+    );
+
+    cards =
+        shuffleArray(cards);
+
+    cards =
+        cards.slice(0, 5);
+
+    studyState =
+        createDefaultStudyState();
+
+    studyState.deckId =
+        cards[0].adventureDeckId;
+
+    studyState.cards =
+        cards;
+
+    studyState.currentIndex =
+        0;
+
+    studyState.answered =
+        false;
+
+    studyState.sessionCorrect =
+        0;
+
+    studyState.sessionAnswers =
+        0;
+
+    studyState.isTodayAdventure =
+        true;
+
+    showPage(
+        "study"
+    );
+
+    startStudyTimer();
+
+    renderStudyPage();
+
+    speakCurrentCard();
+}
 
 /* =========================================================
    GREETING
