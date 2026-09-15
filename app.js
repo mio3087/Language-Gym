@@ -4500,13 +4500,8 @@ function resetAllData() {
 
     try {
 
-        localStorage.removeItem(
-            STORAGE_KEY
-        );
+        
 
-        localStorage.removeItem(
-            BACKUP_KEY
-        );
 
     } catch (error) {
 
@@ -5718,13 +5713,6 @@ function resetAllData() {
 
     try {
 
-        localStorage.removeItem(
-            STORAGE_KEY
-        );
-
-        localStorage.removeItem(
-            BACKUP_KEY
-        );
 
     } catch (error) {
 
@@ -11310,9 +11298,6 @@ function resetAllData() {
 
     try {
 
-        localStorage.removeItem(
-            STORAGE_KEY
-        );
 
 
         appData =
