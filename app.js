@@ -14068,6 +14068,25 @@ function initializeApp() {
         // 保存済みデータを1回だけ読み込む
         appData = loadData();
 
+        try {
+    if (
+        navigator.storage &&
+        navigator.storage.persist
+    ) {
+        navigator.storage.persist().then((persistent) => {
+            console.log(
+                "ストレージ永続化:",
+                persistent
+            );
+        });
+    }
+} catch (error) {
+    console.warn(
+        "ストレージ永続化設定エラー:",
+        error
+    );
+}
+
         // 正常なデータが読み込めなかった場合だけ初期化
         if (
             !appData ||
