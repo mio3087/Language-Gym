@@ -14417,8 +14417,7 @@ if (
 
                         language:
                             appData
-                                .settings
-                                .learningLanguage
+                            
                     })
             
 
@@ -14457,11 +14456,10 @@ function addImportedCards(
 
     const selectedDeckId =
         select
-            ? select.value
-            : "";
+        
 
 
-    let deck =
+    let deck
         selectedDeckId
             ? getDeckById(
                 selectedDeckId
