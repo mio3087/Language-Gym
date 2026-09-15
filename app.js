@@ -4038,12 +4038,22 @@ function renderProgress() {
 
         </div>
 
+
+                <div class="progress-section">
+            <h3>
+                💪 苦手カード
+            </h3>
+
+            <div id="weak-cards-container"></div>
+        </div>
+
     `;
 
+
+        renderWeakCards();
     renderHistory();
 
 }
-
 
 /* =========================================================
    DATA SHARE
@@ -9051,7 +9061,230 @@ function addStudyHistory(
    RENDER HISTORY
    ========================================= */
 
+/* =========================================
+   WEAK CARDS
+   ========================================= */
+
+function renderWeakCards() {
+
+    const container =
+        document.getElementById(
+            "weak-cards-container"
+        );
+
+    if (!container) {
+        return;
+    }
+
+    const weakCards = [];
+
+    if (
+        !appData ||
+        !Array.isArray(appData.decks)
+    ) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <p>まだ苦手カードがありません。</p>
+            </div>
+        `;
+
+        return;
+    }
+
+
+    appData.decks.forEach(
+        function (deck) {
+
+            if (
+                !Array.isArray(deck.cards)
+            ) {
+                return;
+            }
+
+            deck.cards.forEach(
+                function (card) {
+
+                    const correct =
+                        Number(
+                            card.correct
+                        ) || 0;
+
+                    const incorrect =
+                        Number(
+                            card.incorrect
+                        ) || 0;
+
+                    const total =
+                        correct +
+                        incorrect;
+
+                    /*
+                     * 1回以上間違えたカードだけ
+                     * 苦手カードとして扱う
+                     */
+                    if (
+                        incorrect > 0
+                    ) {
+
+                        const accuracy =
+                            total > 0
+                                ? Math.round(
+                                    (
+                                        correct /
+                                        total
+                                    ) * 100
+                                )
+                                : 0;
+
+                        weakCards.push({
+                            deck: deck,
+                            card: card,
+                            correct: correct,
+                            incorrect: incorrect,
+                            total: total,
+                            accuracy: accuracy
+                        });
+
+                    }
+
+                }
+            );
+
+        }
+    );
+
+
+    /*
+     * 苦手度の高い順
+     *
+     * ① 不正解回数が多い
+     * ② 正答率が低い
+     */
+    weakCards.sort(
+        function (a, b) {
+
+            if (
+                b.incorrect !==
+                a.incorrect
+            ) {
+                return (
+                    b.incorrect -
+                    a.incorrect
+                );
+            }
+
+            return (
+                a.accuracy -
+                b.accuracy
+            );
+
+        }
+    );
+
+
+    /*
+     * 最大20枚表示
+     */
+    const displayCards =
+        weakCards.slice(
+            0,
+            20
+        );
+
+
+    if (
+        displayCards.length === 0
+    ) {
+
+        container.innerHTML = `
+            <div class="empty-state">
+
+                <div class="empty-state-icon">
+                    🎉
+                </div>
+
+                <p>
+                    まだ苦手カードはありません！
+                </p>
+
+                <small>
+                    間違えたカードがここに表示されます。
+                </small>
+
+            </div>
+        `;
+
+        return;
+    }
+
+
+    container.innerHTML =
+        displayCards
+            .map(
+                function (item) {
+
+                    return `
+                        <div class="weak-card-item">
+
+                            <div class="weak-card-header">
+
+                                <strong>
+                                    ${escapeHTML(
+                                        item.card.front
+                                    )}
+                                </strong>
+
+                                <span>
+                                    ${item.accuracy}%
+                                </span>
+
+                            </div>
+
+
+                            <div class="weak-card-answer">
+
+                                ${escapeHTML(
+                                    item.card.back
+                                )}
+
+                            </div>
+
+
+                            <div class="weak-card-stats">
+
+                                <span>
+                                    正解 ${item.correct}回
+                                </span>
+
+                                <span>
+                                    ❌ 不正解 ${item.incorrect}回
+                                </span>
+
+                                <span>
+                                    ${escapeHTML(
+                                        item.deck.name
+                                    )}
+                                </span>
+
+                            </div>
+
+                        </div>
+                    `;
+
+                }
+            )
+            .join("");
+
+}
+
+   
+
 function renderHistory() {
+
+
+
+
+    
 
     const container =
         document.getElementById(
