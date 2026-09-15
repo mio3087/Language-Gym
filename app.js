@@ -6988,6 +6988,10 @@ function searchAllCards(
    RENDER CARD SEARCH RESULTS
    ========================================= */
 
+/* =========================================
+   RENDER CARD SEARCH RESULTS
+   ========================================= */
+
 function renderCardSearchResults(
     keyword
 ) {
@@ -6998,15 +7002,15 @@ function renderCardSearchResults(
         );
 
     if (!container) {
-
         return;
-
     }
+
 
     const query =
         String(
             keyword || ""
         ).trim();
+
 
     if (!query) {
 
@@ -7014,13 +7018,14 @@ function renderCardSearchResults(
             "";
 
         return;
-
     }
+
 
     const results =
         searchAllCards(
             query
         );
+
 
     if (
         results.length === 0
@@ -7045,8 +7050,8 @@ function renderCardSearchResults(
         `;
 
         return;
-
     }
+
 
     container.innerHTML =
         results
@@ -7055,20 +7060,32 @@ function renderCardSearchResults(
 
                     return `
 
-                        <div class="search-result-card">
+                        <div
+                            class="search-result-card"
+                            data-card-id="${escapeHTML(
+                                result.card.id
+                            )}"
+                        >
 
-                            <div class="search-result-header">
+                            <div
+                                class="search-result-header"
+                            >
 
                                 <span>
+
                                     📚
                                     ${escapeHTML(
                                         result.deck.name
                                     )}
+
                                 </span>
 
                             </div>
 
-                            <div class="search-result-front">
+
+                            <div
+                                class="search-result-front"
+                            >
 
                                 ${escapeHTML(
                                     result.card.front
@@ -7076,11 +7093,51 @@ function renderCardSearchResults(
 
                             </div>
 
-                            <div class="search-result-back">
+
+                            <div
+                                class="search-result-back"
+                            >
 
                                 ${escapeHTML(
                                     result.card.back
                                 )}
+
+                            </div>
+
+
+                            <div
+                                class="button-row"
+                                style="margin-top:12px;"
+                            >
+
+                                <button
+                                    type="button"
+                                    class="btn btn-secondary"
+                                    data-action="edit-card"
+                                    data-deck-id="${escapeHTML(
+                                        result.deck.id
+                                    )}"
+                                    data-card-id="${escapeHTML(
+                                        result.card.id
+                                    )}"
+                                >
+                                    ✏️ 編集
+                                </button>
+
+
+                                <button
+                                    type="button"
+                                    class="btn btn-danger"
+                                    data-action="delete-card"
+                                    data-deck-id="${escapeHTML(
+                                        result.deck.id
+                                    )}"
+                                    data-card-id="${escapeHTML(
+                                        result.card.id
+                                    )}"
+                                >
+                                    🗑️ 削除
+                                </button>
 
                             </div>
 
@@ -13865,82 +13922,160 @@ function bindDeckActionEvents() {
 
 function bindCardActionEvents() {
 
-    const container =
+    const containers = [
         document.getElementById(
             "deck-cards-container"
-        );
+        ),
+
+        document.getElementById(
+            "card-search-results"
+        )
+    ];
 
 
-    if (!container) {
+    containers.forEach(
+        function (container) {
 
-        return;
-
-    }
-
-
-    container.addEventListener(
-        "click",
-        function (event) {
-
-            const button =
-                event.target.closest(
-                    "[data-action]"
-                );
-
-
-            if (!button) {
-
+            if (!container) {
                 return;
-
             }
 
 
-            const action =
-                button.dataset.action;
-
-
-            const deckId =
-                button.dataset.deckId;
-
-
-            const cardId =
-                button.dataset.cardId;
-
+            /*
+             * すでにイベントを登録している場合は
+             * 二重登録しない
+             */
 
             if (
-                action ===
-                "edit-card"
+                container.dataset.cardActionsBound ===
+                "true"
             ) {
-
-                editCard(
-                    deckId,
-                    cardId
-                );
-
                 return;
-
             }
 
 
-            if (
-                action ===
-                "delete-card"
-            ) {
+            container.dataset.cardActionsBound =
+                "true";
 
-                deleteCard(
-                    deckId,
-                    cardId
-                );
 
-                return;
+            container.addEventListener(
+                "click",
+                function (event) {
 
-            }
+                    const button =
+                        event.target.closest(
+                            "[data-action]"
+                        );
+
+
+                    if (!button) {
+                        return;
+                    }
+
+
+                    const action =
+                        button.dataset.action;
+
+
+                    const deckId =
+                        button.dataset.deckId;
+
+
+                    const cardId =
+                        button.dataset.cardId;
+
+
+                    if (
+                        !deckId ||
+                        !cardId
+                    ) {
+                        return;
+                    }
+
+
+                    /*
+                     * 編集
+                     */
+
+                    if (
+                        action ===
+                        "edit-card"
+                    ) {
+
+                        editCard(
+                            deckId,
+                            cardId
+                        );
+
+                        /*
+                         * 検索結果も更新
+                         */
+
+                        const searchInput =
+                            document.getElementById(
+                                "card-search-input"
+                            );
+
+
+                        if (
+                            searchInput
+                        ) {
+
+                            renderCardSearchResults(
+                                searchInput.value
+                            );
+
+                        }
+
+                        return;
+                    }
+
+
+                    /*
+                     * 削除
+                     */
+
+                    if (
+                        action ===
+                        "delete-card"
+                    ) {
+
+                        deleteCard(
+                            deckId,
+                            cardId
+                        );
+
+
+                        /*
+                         * 検索結果も更新
+                         */
+
+                        const searchInput =
+                            document.getElementById(
+                                "card-search-input"
+                            );
+
+
+                        if (
+                            searchInput
+                        ) {
+
+                            renderCardSearchResults(
+                                searchInput.value
+                            );
+
+                        }
+
+                        return;
+                    }
+
+                }
+            );
 
         }
     );
 
 }
-
 
 /* =========================================================
    UTILITY TEXT
