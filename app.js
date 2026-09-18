@@ -7491,150 +7491,32 @@ function getImportDeckName() {
 /* =========================================
    TXT PARSER
    ========================================= */
+function parseTXT(text) {
+    const lines = text.split(/\r?\n/);
+    return lines.map(line => {
+        const trimmed = line.trim();
+        if (!trimmed) return null;
+        
+        // タブ、カンマ、コロン、セミコロンの順で区切り文字を判定
+        let parts = trimmed.split('\t');
+        if (parts.length < 2) parts = trimmed.split(',');
+        if (parts.length < 2) parts = trimmed.split(':');
+        if (parts.length < 2) parts = trimmed.split(';');
 
-function parseTXT(
-    text
-) {
+        const front = parts[0] ? parts[0].trim() : '';
+        const back = parts[1] ? parts[1].trim() : '';
 
-    const lines =
-        String(
-            text || ""
-        )
-            .replace(
-                /\r\n/g,
-                "\n"
-            )
-            .replace(
-                /\r/g,
-                "\n"
-            )
-            .split(
-                "\n"
-            );
+        if (!front && !back) return null;
 
-    const rows = [];
-
-    lines.forEach(
-        function (line) {
-
-            const value =
-                line.trim();
-
-            if (!value) {
-
-                return;
-
-            }
-
-            let front = "";
-
-            let back = "";
-
-            /*
-             * タブ区切り
-             */
-
-            if (
-                value.includes("\t")
-            ) {
-
-                const parts =
-                    value.split(
-                        "\t"
-                    );
-
-                front =
-                    parts[0] ||
-                    "";
-
-                back =
-                    parts.slice(
-                        1
-                    ).join("\t");
-
-            }
-
-            /*
-             * | 区切り
-             */
-
-            else if (
-                value.includes("|")
-            ) {
-
-                const parts =
-                    value.split(
-                        "|"
-                    );
-
-                front =
-                    parts.shift() ||
-                    "";
-
-                back =
-                    parts.join("|");
-
-            }
-
-            /*
-             * カンマ区切り
-             */
-
-            else if (
-                value.includes(",")
-            ) {
-
-                const parts =
-                    parseCSVLine(
-                        value
-                    );
-
-                front =
-                    parts[0] ||
-                    "";
-
-                back =
-                    parts
-                        .slice(1)
-                        .join(",");
-
-            }
-
-            /*
-             * 区切りがない場合
-             */
-
-            else {
-
-                front =
-                    value;
-
-                back =
-                    "";
-
-            }
-
-            rows.push({
-
-                front:
-                    front.trim(),
-
-                back:
-                    back.trim(),
-
-                example:
-                    "",
-
-                note:
-                    ""
-
-            });
-
-        }
-    );
-
-    return rows;
-
+        return {
+            id: 'card_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+            front: front,
+            back: back,
+            correctCount: 0,
+            incorrectCount: 0,
+            lastStudied: null
+        };
+    }).filter(card => card !== null);
 }
 
 
@@ -12769,6 +12651,7 @@ if (adventure) {
 }
 }
 
+
 /* =========================================================
    TODAY'S ADVENTURE
    ========================================================= */
@@ -12862,74 +12745,6 @@ function startTodayAdventure() {
     renderStudyPage();
 
     speakCurrentCard();
-}
-
-/* =========================================================
-   GREETING
-   ========================================================= */
-
-function renderGreeting() {
-
-    const element =
-        document.getElementById(
-            "daily-greeting"
-        );
-
-
-    if (!element) {
-
-        return;
-
-    }
-
-
-    const hour =
-        new Date()
-            .getHours();
-
-
-    let greeting = "";
-
-
-    if (
-        hour < 5
-    ) {
-
-        greeting =
-            "夜遅くまでお疲れさまです。";
-
-    } else if (
-        hour < 11
-    ) {
-
-        greeting =
-            "おはようございます。今日も少しずつ進めましょう。";
-
-    } else if (
-        hour < 17
-    ) {
-
-        greeting =
-            "こんにちは。今日もLanguage Gymで頑張りましょう。";
-
-    } else if (
-        hour < 22
-    ) {
-
-        greeting =
-            "こんばんは。今日の学習を積み重ねましょう。";
-
-    } else {
-
-        greeting =
-            "今日も一日お疲れさまでした。";
-
-    }
-
-
-    element.textContent =
-        greeting;
-
 }
 
 

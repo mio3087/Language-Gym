@@ -1028,23 +1028,7 @@
             
 
 
-                
-
-
-                <div
-                    class="card"
-                    style="margin-top:20px;"
-                >
-
-                    <h2>
-                        🌱 今日のメッセージ
-                    </h2>
-
-                    <p id="daily-message">
-                        今日も一歩前進！
-                    </p>
-
-                </div>
+    
 
             </section>
 
@@ -2211,6 +2195,7 @@ if (mobileMenuOverlay) {
         function() {
 
             setMobileMenu(false);
+            
 
         }
     );
@@ -3282,7 +3267,228 @@ document.addEventListener(
 </script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-<script src="./app.js"></script>
+<script src="./app.js">
+
+
+<script>
+        
+        <p id=daily-message>
+        // --------------------------------------------------
+        // ★ ここに「メッセージリスト」と「処理関数」を追加
+        // --------------------------------------------------
+        const dailyMessages = [
+            "今日も一歩前進！",
+            "継続は力なり。今日の積み重ねが未来を作ります。",
+            "完璧を目指さず、まずは1回挑戦してみよう！",
+            "昨日の自分より、少しでも成長できれば大成功。",
+            "語学は日々の積み重ね。今日もナイスチャレンジ！",
+            "失敗は上達のサイン！怖がらずに進もう。",
+            "小さな習慣が、大きな成果を生み出します。",
+            "焦らず、自分のペースで進めていきましょう。",
+            "できたことに目を向けて、自分を褒めてあげよう！",
+            "今日も新しい知識との出会いを楽しもう。",
+            "毎日少しずつ鍛えることで、確実に力になります。",
+            "集中して一気に進めるのも、サクッと終わらせるのもGood！",
+            "言葉の世界が広がる楽しさを味わおう。",
+            "今日の頑張りは、未来の自分へのプレゼント！",
+            "疲れたときは無理せず、1分だけでもOK。",
+            "一歩ずつ着実に進んでいきましょう！",
+            "積み重ねた時間は裏切りません。",
+            "今日も語学ジムへようこそ！トレーニング開始！",
+            "自分を信じて、今日も楽しく学習しよう。",
+            "覚えた分だけ、世界が広がっていきます。",
+            "無理のない範囲で、今日も楽しく継続しよう。",
+            "今日の努力は、明日の自信につながります。",
+            "語学マスターへの道も、今日の一歩から。",
+            "気負わずに、まずはカードを1枚めくってみよう！",
+            "新しいフレーズを覚えて、表現の幅を広げよう。",
+            "スキマ時間を活用して、賢くスキルアップ！",
+            "間違えたカードこそ、伸びしろの宝庫です。",
+            "少しの継続が、数ヶ月後に大きな差になります。",
+            "楽しむことが一番の上達法です！",
+            "今日のあなたも素晴らしい挑戦をしています。",
+            "コツコツ続けるあなたが一番強い！",
+            "目標に向かって、今日も一歩踏み出そう。",
+            "覚えたフレーズを心の中で唱えてみよう！",
+            "学習の成果は、ある日突然実感できるもの。",
+            "今日のトレーニングで、脳を刺激しよう！",
+            "昨日の復習から始めて、記憶を定着させよう。",
+            "言葉が変われば、世界の見え方も変わります。",
+            "一日の始まり（終わりに）、最高のインプットを！",
+            "途切れさせないことが、一番の才能です。",
+            "自分のペースを大切にして、一歩ずつ進もう。",
+            "今日の「できた！」を大切にしよう。",
+            "あきらめずに続ける姿が本当に素晴らしい！",
+            "知的好奇心を満たす最高の時間を楽しもう。",
+            "少しずつでも、確実に前進しています！",
+            "今日も自分史上最高のアウトプットを目指そう！"
+
+"継続は力なり。今日の積み重ねが未来を作ります。",
+            "完璧を目指さず、まずは1回挑戦してみよう！",
+
+
+
+            "昨日の自分より、少しでも成長できれば大成功。",
+
+
+            "語学は日々の積み重ね。今日もナイスチャレンジ！",
+
+            "失敗は上達のサイン！怖がらずに進もう。",
+
+            "小さな習慣が、大きな成果を生み出します。",
+
+            "焦らず、自分のペースで進めていきましょう。",
+
+            "できたことに目を向けて、自分を褒めてあげよう！",
+
+            "今日も新しい知識との出会いを楽しもう。",
+
+            "毎日少しずつ鍛えることで、確実に力になります。",
+
+            "集中して一気に進めるのも、サクッと終わらせるのもGood！",
+
+            "言葉の世界が広がる楽しさを味わおう。",
+
+
+            "今日の頑張りは、未来の自分へのプレゼント！",
+
+
+            "疲れたときは無理せず、1分だけでもOK。",
+
+            "一歩ずつ着実に進んでいきましょう！",
+
+            "積み重ねた時間は裏切りません。",
+
+            "今日も語学ジムへようこそ！トレーニング開始！",
+
+
+            "自分を信じて、今日も楽しく学習しよう。",
+
+            "覚えた分だけ、世界が広がっていきます。",
+
+            "無理のない範囲で、今日も楽しく継続しよう。",
+            "今日の努力は、明日の自信につながります。",
+
+            "語学マスターへの道も、今日の一歩から。",
+
+            "気負わずに、まずはカードを1枚めくってみよう！",
+            "新しいフレーズを覚えて、表現の幅を広げよう。",
+
+            "スキマ時間を活用して、賢くスキルアップ！",
+
+            "間違えたカードこそ、伸びしろの宝庫です。",
+
+            "少しの継続が、数ヶ月後に大きな差になります。",
+
+            "楽しむことが一番の上達法です！",
+
+            "今日のあなたも素晴らしい挑戦をしています。",
+
+            "コツコツ続けるあなたが一番強い！",
+
+            "目標に向かって、今日も一歩踏み出そう。",
+
+            "覚えたフレーズを心の中で唱えてみよう！",
+
+            "学習の成果は、ある日突然実感できるもの。",
+
+            "今日のトレーニングで、脳を刺激しよう！",
+
+            "昨日の復習から始めて、記憶を定着させよう。",
+
+            "言葉が変われば、世界の見え方も変わります。",
+
+            "一日の始まり（終わりに）、最高のインプットを！",
+
+            "途切れさせないことが、一番の才能です。",
+
+            "自分のペースを大切にして、一歩ずつ進もう。",
+
+
+            "今日の「できた！」を大切にしよう。",
+
+            "あきらめずに続ける姿が本当に素晴らしい！",
+            "知的好奇心を満たす最高の時間を楽しもう。",
+
+            "少しずつでも、確実に前進しています！",
+            "今日も自分史上最高のアウトプットを目指そう！"
+
+        ];
+        </p>
+
+        function setDailyMessage() {
+            const messageElement = document.getElementById("daily-message");
+            if (messageElement) {
+                // 日替わりにしたい場合（アクセス毎にランダムなら Math.floor(Math.random() * dailyMessages.length) に変更）
+                const today = new Date();
+                const dateSeed = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
+                const index = dateSeed % dailyMessages.length;
+                
+                messageElement.textContent = dailyMessages[index];
+            }
+        }
+
+        // ページ読み込み時にメッセージを更新
+        document.addEventListener("DOMContentLoaded", setDailyMessage);
+
+
+        // --- 以下、元々あったコード ---
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('mobile-menu-overlay');
+
+        function toggleMenu() {
+            const isOpen = sidebar.classList.toggle('open');
+            overlay.classList.toggle('open', isOpen);
+            document.body.classList.toggle('mobile-menu-open', isOpen);
+            mobileMenuButton.setAttribute('aria-expanded', isOpen);
+        }
+
+        function closeMenu() {
+            sidebar.classList.remove('open');
+            overlay.classList.remove('open');
+            document.body.classList.remove('mobile-menu-open');
+            mobileMenuButton.setAttribute('aria-expanded', 'false');
+        }
+
+        if (mobileMenuButton) {
+            mobileMenuButton.addEventListener('click', toggleMenu);
+        }
+
+        if (overlay) {
+            overlay.addEventListener('click', closeMenu);
+        }
+
+        const navItems = document.querySelectorAll('.nav-item, [data-go-page]');
+        const pages = document.querySelectorAll('.page');
+
+        navItems.forEach(item => {
+            item.addEventListener('click', () => {
+                const targetPage = item.getAttribute('data-page') || item.getAttribute('data-go-page');
+                if (!targetPage) return;
+
+                pages.forEach(p => p.classList.remove('active-page'));
+                const pageEl = document.getElementById(`page-${targetPage}`);
+                if (pageEl) {
+                    pageEl.classList.add('active-page');
+                }
+
+                document.querySelectorAll('.nav-item').forEach(nav => {
+                    if (nav.getAttribute('data-page') === targetPage) {
+                        nav.classList.add('active');
+                    } else {
+                        nav.classList.remove('active');
+                    }
+                });
+
+                closeMenu();
+            });
+        });
+
+
+
+</script>
+
 
 </body>
 </html>
