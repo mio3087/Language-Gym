@@ -438,6 +438,46 @@ function normalizeData(data) {
    LOAD / SAVE DATA
    ========================================================= */
 
+/* =========================================================
+   LOAD / SAVE DATA
+   ========================================================= */
+
+function loadData() {
+    try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+            const parsed = JSON.parse(raw);
+            appData = normalizeData(parsed);
+        } else {
+            appData = createDefaultData();
+            saveData();
+        }
+    } catch (error) {
+        console.error("データ読み込みエラー:", error);
+        appData = createDefaultData();
+    }
+}
+
+function saveData() {
+    if (!appData) return;
+    try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
+    } catch (error) {
+        console.error("データ保存エラー:", error);
+    }
+}
+
+function refreshAllUI() {
+    const activePage = document.querySelector(".page.active")?.id || "home-page";
+    showPage(activePage);
+}
+
+// アプリ起動時の初期化処理
+document.addEventListener("DOMContentLoaded", function () {
+    loadData();
+    refreshAllUI();
+});
+
 
 /* =========================================================
    BACKUP
