@@ -1361,73 +1361,223 @@ function normalizeHistoryItem(item) {
 
 
 function normalizeData(data) {
-
-    const source =
-        data &&
-        typeof data === "object"
-            ? data
-            : {};
-
-    const settingsSource =
-        source.settings &&
-        typeof source.settings === "object"
-            ? source.settings
-            : {};
-
-    const decks =
-        Array.isArray(source.decks)
-            ? source.decks.map(
-                normalizeDeck
-            )
-            : [];
-
-    const studyHistory =
-        Array.isArray(
-            source.studyHistory
-        )
-            ? source.studyHistory.map(
-                normalizeHistoryItem
-            )
-            : [];
+    const source = data && typeof data === "object" ? data : {};
+    const settingsSource = source.settings && typeof source.settings === "object" ? source.settings : {};
+    const decks = Array.isArray(source.decks) ? source.decks.map(normalizeDeck) : [];
+    const studyHistory = Array.isArray(source.studyHistory) ? source.studyHistory.map(normalizeHistoryItem) : [];
 
     return {
-
-        version:
-            Number(
-                source.version
-            ) || 1,
-
+        version: Number(source.version) || 1,
         settings: {
-
             ...DEFAULT_SETTINGS,
-
             ...settingsSource
         },
-
-        decks:
-
-            decks,
-
-        studyHistory:
-
-            studyHistory,
-
-        totalStudyTime:
-            Number(
-                source.totalStudyTime
-            ) || 0,
-
-        totalAnswers:
-            Number(
-                source.totalAnswers
-            ) || 0,
-
-        totalCorrect:
-            Number(
-                source.totalCorrect
-            ) || 0
+        decks: decks,
+        studyHistory: studyHistory,
+        totalStudyTime: Number(source.totalStudyTime) || 0,
+        totalAnswers: Number(source.totalAnswers) || 0,
+        totalCorrect: Number(source.totalCorrect) || 0
     };
+}
 
+/* =========================================================
+   STORAGE OPERATORS
+   ========================================================= */
+
+function loadData() {
+    try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+            const parsed = JSON.parse(raw);
+            appData = normalizeData(parsed);
+        } else {
+            appData = createDefaultData();
+            saveData();
+        }
+    } catch (error) {
+        console.error("データ読み込みエラー:", error);
+        appData = createDefaultData();
+    }
+}
+
+function saveData() {
+    if (!appData) return;
+    try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
+    } catch (error) {
+        console.error("データ保存エラー:", error);
+    }
+}
+
+function refreshAllUI() {
+    const activePage = document.querySelector(".page.active")?.id || "home-page";
+    showPage(activePage);
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+    loadData();
+    refreshAllUI();
+});
+
+/* =========================================================
+   FAST CSV PARSER (10,000行以上のインポートに対応)
+   ========================================================= */
+
+function parseCSVLine(line) {
+    const result = [];
+    let current = "";
+    let quoted = false;
+
+    for (let i = 0; i < line.length; i++) {
+        const char = line[i];
+        if (char === '"') {
+            if (quoted && line[i + 1] === '"') {
+                current += '"';
+                i++;
+            } else {
+                quoted = !quoted;
+            }
+            continue;
+        }
+        if (char === "," && !quoted) {
+            result.push(current);
+            current = "";
+            continue;
+        }
+        current += char;
+    }
+    result.push(current);
+    return result;
+}
+
+function parseCSV(text) {
+    const lines = String(text || "").replace(/\r\n/g, "\n").replace(/\r/g, "\n").split("\n");
+    const rows = [];
+    const len = lines.length;
+
+    for (let i = 0; i < len; i++) {
+        const line = lines[i];
+        if (!line.trim()) continue;
+
+        const columns = parseCSVLine(line);
+        if (columns.length < 2) continue;
+
+        rows.push({
+            front: String(columns[0] || "").trim(),
+            back: String(columns[1] || "").trim(),
+            example: String(columns[2] || "").trim(),
+            note: String(columns[3] || "").trim()
+        });
+    }
+    return rows;
+}
+
+function importTextData(text, extension) {
+    if (!text || !text.trim()) {
+        alert("ファイルにデータがありません。");
+        return;
+    }
+
+    const deckId = getImportDeckId();
+    let deck = deckId ? getDeckById(deckId) : null;
+
+    if (!deck) {
+        const deckName = getImportDeckName();
+        if (!deckName) return;
+        deck = createDeck(deckName, getSelectedImportLanguage());
+    }
+
+    if (!deck) return;
+
+    const rows = extension === "csv" ? parseCSV(text) : parseTXT(text);
+    if (rows.length === 0) {
+        alert("カードとして読み込めるデータがありません。");
+        return;
+    }
+
+    const newCards = [];
+    const now = nowISO();
+
+    for (let i = 0; i < rows.length; i++) {
+        const row = rows[i];
+        if (!row.front && !row.back) continue;
+
+        newCards.push({
+            id: generateId("card"),
+            front: row.front,
+            back: row.back,
+            example: row.example || "",
+            note: row.note || "",
+            correct: 0,
+            incorrect: 0,
+            createdAt: now,
+            updatedAt: now
+        });
+    }
+
+    deck.cards.push(...newCards);
+    deck.updatedAt = now;
+
+    saveData();
+    refreshAllUI();
+    alert(newCards.length + "枚のカードを読み込みました。");
+}
+
+/* =========================================================
+   EXPORT / IMPORT JSON
+   ========================================================= */
+
+function exportData() {
+    if (!appData) loadData();
+    try {
+        const exportObject = {
+            app: "Language Gym",
+            version: appData.version,
+            exportedAt: nowISO(),
+            data: normalizeData(appData)
+        };
+        const json = JSON.stringify(exportObject, null, 2);
+        const blob = new Blob([json], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        const date = new Date().toISOString().slice(0, 10);
+
+        link.href = url;
+        link.download = "language-gym-" + date + ".json";
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+    } catch (error) {
+        console.error("データ書き出しエラー:", error);
+        alert("データを書き出せませんでした。");
+    }
+}
+
+async function importDataFile(file) {
+    if (!file) return;
+    try {
+        const text = await file.text();
+        const parsed = JSON.parse(text);
+        let importedData = parsed;
+
+        if (parsed && typeof parsed === "object" && parsed.data) {
+            importedData = parsed.data;
+        }
+
+        const normalized = normalizeData(importedData);
+        const confirmed = window.confirm("JSONデータを読み込みます。\n\n現在のデータは上書きされます。");
+        if (!confirmed) return;
+
+        appData = normalized;
+        saveData();
+        refreshAllUI();
+        alert("データを正常に読み込みました。");
+    } catch (error) {
+        console.error("データ読み込みエラー:", error);
+        alert("JSONデータを読み込めませんでした。\n" + (error.message || ""));
+    }
 }
 
 
