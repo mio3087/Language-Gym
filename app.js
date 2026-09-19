@@ -458,14 +458,7 @@ function loadData() {
     }
 }
 
-function saveData() {
-    if (!appData) return;
-    try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
-    } catch (error) {
-        console.error("データ保存エラー:", error);
-    }
-}
+
 
 function refreshAllUI() {
     const activePage = document.querySelector(".page.active")?.id || "home-page";
@@ -617,57 +610,6 @@ function getDeckCardCount(deck) {
 }
 
 
-function createDeck(
-    name,
-    language = "zh",
-    description = ""
-) {
-
-    const deck = {
-
-        id:
-            generateId("deck"),
-
-        name:
-            String(
-                name ||
-                "新しいデッキ"
-            ),
-
-        language:
-            String(
-                language ||
-                "zh"
-            ),
-
-        description:
-            String(
-                description ||
-                ""
-            ),
-
-        cards:
-            [],
-
-        createdAt:
-            nowISO(),
-
-        updatedAt:
-            nowISO(),
-
-        studyCount:
-            0
-    };
-
-    appData.decks.push(
-        deck
-    );
-
-    saveData();
-
-    return deck;
-
-}
 
 
 function addCardToDeck(
@@ -1381,43 +1323,7 @@ function normalizeData(data) {
 }
 
 /* =========================================================
-   STORAGE OPERATORS
-   ========================================================= */
 
-function loadData() {
-    try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (raw) {
-            const parsed = JSON.parse(raw);
-            appData = normalizeData(parsed);
-        } else {
-            appData = createDefaultData();
-            saveData();
-        }
-    } catch (error) {
-        console.error("データ読み込みエラー:", error);
-        appData = createDefaultData();
-    }
-}
-
-function saveData() {
-    if (!appData) return;
-    try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
-    } catch (error) {
-        console.error("データ保存エラー:", error);
-    }
-}
-
-function refreshAllUI() {
-    const activePage = document.querySelector(".page.active")?.id || "home-page";
-    showPage(activePage);
-}
-
-document.addEventListener("DOMContentLoaded", function () {
-    loadData();
-    refreshAllUI();
-});
 
 /* =========================================================
    FAST CSV PARSER (10,000行以上のインポートに対応)
@@ -1724,57 +1630,6 @@ function getDeckCardCount(deck) {
 }
 
 
-function createDeck(
-    name,
-    language = "zh",
-    description = ""
-) {
-
-    const deck = {
-
-        id:
-            generateId("deck"),
-
-        name:
-            String(
-                name ||
-                "新しいデッキ"
-            ),
-
-        language:
-            String(
-                language ||
-                "zh"
-            ),
-
-        description:
-            String(
-                description ||
-                ""
-            ),
-
-        cards:
-            [],
-
-        createdAt:
-            nowISO(),
-
-        updatedAt:
-            nowISO(),
-
-        studyCount:
-            0
-    };
-
-    appData.decks.push(
-        deck
-    );
-
-    saveData();
-
-    return deck;
-
-}
 
 
 function addCardToDeck(
