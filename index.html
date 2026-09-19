@@ -978,6 +978,7 @@
                         class="btn btn-primary"
                         id="start-today-adventure"
                         style="width:100%;"
+                        data-action="start-today-adventure"
                     >
                         ⚔️ 冒険を始める
                     </button>
@@ -2809,10 +2810,9 @@ document.addEventListener(
 
 
             if (
-                typeof appData !==
-                    "undefined" &&
-                appData.settings
-            ) {
+    appData &&
+    appData.settings
+) {
 
                 appData.settings.customColor =
                     color;
@@ -2899,11 +2899,10 @@ document.addEventListener(
            SETTINGS
            ================================= */
 
-        if (
-            typeof appData !==
-                "undefined" &&
-            appData.settings
-        ) {
+    if (
+    appData &&
+    appData.settings
+) {
 
             const settings =
                 appData.settings;

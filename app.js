@@ -2903,6 +2903,8 @@ function promptCreateDeck() {
 
     }
 
+
+
     const deck =
         createDeck(
             trimmedName
@@ -7127,7 +7129,7 @@ function renderImportDeckSelect() {
         </option>
 
         ${
-            appData.decks
+            appData?.decks
                 .map(
                     function (deck) {
 
@@ -12611,7 +12613,7 @@ function renderHome() {
     );
 
 
-    renderGreeting();
+
 
 
     const adventure = document.getElementById("today-adventure");
