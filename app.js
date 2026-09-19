@@ -11487,11 +11487,7 @@ function startStudy(
 if (
     studyState.isTodayAdventure
 ) {
-    studyState.cards =
-        studyState.cards.slice(
-            0,
-            5
-        );
+studyState.cards = studyState.cards.slice(0, 5);
 }
 
 
@@ -12624,7 +12620,7 @@ if (adventure) {
     adventure.innerHTML = `
         <div class="card">
             <h2>🌍 今日の冒険</h2>
-            <p>今日のミッションに挑戦しよう！</p>
+            <p>詳細は開くまで秘密</p>
 
             <div style="font-size:3rem; text-align:center; margin:20px 0;">
                 🏰
@@ -12635,7 +12631,7 @@ if (adventure) {
             </h3>
 
             <p style="text-align:center;">
-                カードを5枚クリアしよう！
+                今日は何が待っているのでしょう？
             </p>
 
             <button
@@ -12658,94 +12654,234 @@ if (adventure) {
 
 function startTodayAdventure() {
 
-    if (
-        !appData ||
-        !Array.isArray(appData.decks)
-    ) {
+    if (!appData || !Array.isArray(appData.decks)) {
         return;
     }
 
     const availableDecks =
-        appData.decks.filter(
-            function (deck) {
-                return (
-                    Array.isArray(
-                        deck.cards
-                    ) &&
-                    deck.cards.length > 0
-                );
-            }
-        );
+        appData.decks.filter(function (deck) {
 
-    if (
-        availableDecks.length === 0
-    ) {
+            return (
+                Array.isArray(deck.cards) &&
+                deck.cards.length > 0
+            );
+
+        });
+
+
+    if (availableDecks.length === 0) {
+
         alert(
             "冒険できるカードがありません。まずカードを追加してください。"
         );
+
         return;
+
     }
+
 
     let cards = [];
 
-    availableDecks.forEach(
-        function (deck) {
 
-            deck.cards.forEach(
-                function (card) {
+    availableDecks.forEach(function (deck) {
 
-                    cards.push({
-                        ...card,
-                        adventureDeckId:
-                            deck.id
-                    });
+        deck.cards.forEach(function (card) {
 
-                }
-            );
+            cards.push({
+                ...card,
+                adventureDeckId: deck.id
+            });
 
+        });
+
+    });
+
+
+    cards = shuffleArray(cards);
+
+
+    if (cards.length > 5) {
+
+        cards = cards.slice(0, 5);
+
+    }
+
+
+    const worlds = [
+
+        {
+            icon: "🏰",
+            name: "霧の城",
+            text: "霧に包まれた古い城へたどり着きました。城門の向こうには、まだ誰も知らない言葉の謎が隠されています。"
+        },
+
+        {
+            icon: "🌲",
+            name: "言葉の森",
+            text: "深い森の中で、不思議な声が聞こえてきます。声の正体を探すには、言葉の力が必要です。"
+        },
+
+        {
+            icon: "🏜️",
+            name: "忘れられた砂漠",
+            text: "砂漠の果てに、古代の遺跡が見えてきました。遺跡を開く鍵は、あなたの言葉かもしれません。"
+        },
+
+        {
+            icon: "🏝️",
+            name: "幻の島",
+            text: "海の向こうに、一度しか現れない島が姿を現しました。島には未知の宝物が眠っているようです。"
+        },
+
+        {
+            icon: "🌌",
+            name: "星空の街",
+            text: "夜空の星が道を照らしています。この街では、言葉を知る者だけが次の場所へ進めます。"
         }
-    );
 
-    cards =
-        shuffleArray(cards);
+    ];
 
-    cards =
-        cards.slice(0, 5);
 
-    studyState =
-        createDefaultStudyState();
+    const world =
+        worlds[
+            Math.floor(
+                Math.random() * worlds.length
+            )
+        ];
+
+
+    studyState = createDefaultStudyState();
 
     studyState.deckId =
         cards[0].adventureDeckId;
 
-    studyState.cards =
-        cards;
+    studyState.cards = cards;
 
-    studyState.currentIndex =
-        0;
+    studyState.currentIndex = 0;
 
-    studyState.answered =
-        false;
+    studyState.answered = false;
 
-    studyState.sessionCorrect =
-        0;
 
-    studyState.sessionAnswers =
-        0;
+    studyState.sessionAnswers = 0;
 
-    studyState.isTodayAdventure =
-        true;
 
-    showPage(
-        "study"
+    const adventureScreen =
+        document.createElement("div");
+
+
+    adventureScreen.id =
+        "today-adventure-screen";
+
+
+    adventureScreen.style.cssText = `
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        background:
+            linear-gradient(
+                180deg,
+                #182848 0%,
+                #4b6cb7 100%
+            );
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+        box-sizing: border-box;
+        text-align: center;
+    `;
+
+
+    adventureScreen.innerHTML = `
+
+        <div style="
+            width:100%;
+            max-width:600px;
+        ">
+
+            <div style="
+                font-size:5rem;
+                margin-bottom:24px;
+            ">
+                ${world.icon}
+            </div>
+
+            <div style="
+                font-size:0.9rem;
+                letter-spacing:0.2em;
+                opacity:0.75;
+                margin-bottom:12px;
+            ">
+                TODAY'S ADVENTURE
+            </div>
+
+            <h1 style="
+                font-size:2rem;
+                margin:0 0 24px;
+            ">
+                ${world.name}
+            </h1>
+
+            <p style="
+                font-size:1.1rem;
+                line-height:1.8;
+                margin-bottom:40px;
+            ">
+                ${world.text}
+            </p>
+
+            <button
+                type="button"
+                id="begin-adventure-study"
+                style="
+                    width:100%;
+                    padding:16px;
+                    border:none;
+                    border-radius:12px;
+                    background:white;
+                    color:#182848;
+                    font-size:1.05rem;
+                    font-weight:bold;
+                    cursor:pointer;
+                "
+            >
+                ⚔️ 冒険を開始する
+            </button>
+
+        </div>
+
+    `;
+
+
+    document.body.appendChild(
+        adventureScreen
     );
 
-    startStudyTimer();
 
-    renderStudyPage();
+    document
+        .getElementById(
+            "begin-adventure-study"
+        )
+        .addEventListener(
+            "click",
+            function () {
 
-    speakCurrentCard();
+                adventureScreen.remove();
+
+                showPage("study");
+
+                startStudyTimer();
+
+                renderStudyPage();
+
+                speakCurrentCard();
+
+            }
+        );
+
 }
+
 
 
 /* =========================================================
@@ -14722,6 +14858,9 @@ function setupActionDelegation() {
 
                     break;
 
+
+case "start-today-adventure": startTodayAdventure(); break;　
+                    
 
                 case "open-deck":
 
