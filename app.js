@@ -1385,7 +1385,11 @@ function importTextData(text, extension) {
     }
 
     const deckId = getImportDeckId();
-    let deck = deckId ? getDeckById(deckId) : null;
+let deck = deckId ? getDeckById(deckId) : null;
+
+if (deck && !Array.isArray(deck.cards)) {
+    deck.cards = [];
+}
 
     if (!deck) {
         const deckName = getImportDeckName();
@@ -8441,7 +8445,7 @@ function normalizeData(
 
 function loadData() {
     try {
-        const stored = localStorage.getItem("languageGymData");
+        const stored = localStorage.getItem(STORAGE_KEY);
 
         if (stored) {
             const parsed = JSON.parse(stored);
